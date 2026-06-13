@@ -1,0 +1,39 @@
+import { reviewItems } from "@/features/reviews/data/review-items";
+
+import { ReviewCard } from "./review-card";
+
+export function ReviewsPage() {
+  const [featuredReview, ...moreReviews] = reviewItems;
+
+  return (
+    <main className="min-h-screen bg-slate-950 text-white">
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 bg-cover bg-center opacity-30"
+        style={{ backgroundImage: "url('/home-night-sky.jpg')" }}
+      />
+      <div className="fixed inset-0 bg-slate-950/65" />
+
+      <section className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:py-20">
+        <header className="mb-10 text-center">
+          <p className="mb-3 text-sm tracking-[0.35em] text-purple-200/70 uppercase">
+            Kita Archive
+          </p>
+          <h1 className="kita-display text-6xl leading-none text-white md:text-7xl">
+            REVIEWS
+          </h1>
+        </header>
+
+        {featuredReview ? (
+          <ReviewCard review={featuredReview} featured />
+        ) : null}
+
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {moreReviews.map((review) => (
+            <ReviewCard key={review.slug} review={review} />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}

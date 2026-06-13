@@ -1,0 +1,29 @@
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URI: ${DATABASE_URI:-postgres://postgres:postgres@postgres:5432/kita}
+      ENABLE_DEV_SEED: ${ENABLE_DEV_SEED:-false}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      NEXT_TELEMETRY_DISABLED: "1"
+      NODE_ENV: production
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?PAYLOAD_SECRET is required}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kita}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

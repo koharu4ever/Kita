@@ -1,0 +1,46 @@
+{
+  "name": "kita",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "payload:types": "payload generate:types --use-swc",
+    "typecheck": "tsc --noEmit",
+    "seed:tools": "curl -X POST http://localhost:3000/api/dev/seed-tools"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.85.1",
+    "@payloadcms/next": "^3.85.1",
+    "@t3-oss/env-nextjs": "^0.13.11",
+    "next": "^16.2.7",
+    "payload": "^3.85.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "sharp": "^0.35.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@swc-node/register": "^1.11.1",
+    "@swc/core": "^1.15.41",
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/node": "^22.19.20",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.7",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "postcss": "^8.5.15",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3"
+  }
+}
