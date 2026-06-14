@@ -12,6 +12,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "payload:migrate": "payload migrate --use-swc",
+    "payload:migrate:create": "payload migrate:create --use-swc",
+    "payload:migrate:status": "payload migrate:status --use-swc",
     "payload:types": "payload generate:types --use-swc",
     "typecheck": "tsc --noEmit",
     "seed:tools": "curl -X POST http://localhost:3000/api/dev/seed-tools"

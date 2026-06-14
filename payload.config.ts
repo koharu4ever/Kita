@@ -4,6 +4,7 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { z } from "zod";
 
+import { migrations } from "./src/migrations/index.ts";
 import * as toolsCollection from "./src/payload/collections/tools.ts";
 import * as usersCollection from "./src/payload/collections/users.ts";
 
@@ -42,6 +43,7 @@ export default buildConfig({
     pool: {
       connectionString: payloadEnv.DATABASE_URI,
     },
+    prodMigrations: migrations,
   }),
   secret: payloadEnv.PAYLOAD_SECRET,
   typescript: {
