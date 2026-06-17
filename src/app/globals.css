@@ -20,14 +20,13 @@ body {
 @layer utilities {
   .kita-display {
     font-family:
-      var(--font-bebas-neue), Impact, "Arial Narrow",
-      "Franklin Gothic Condensed", sans-serif;
+      Impact, "Arial Narrow", "Franklin Gothic Condensed", sans-serif;
     font-weight: 400;
     letter-spacing: 0;
   }
 
   .kita-retro {
-    font-family: var(--font-vt323), "Courier New", monospace;
+    font-family: "Courier New", monospace;
     letter-spacing: 0;
   }
 }
