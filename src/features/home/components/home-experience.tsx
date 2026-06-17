@@ -2,7 +2,7 @@
 
 import { FloatingVisualNav } from "@/features/home/components/floating-visual-nav";
 import { MainVisualNav } from "@/features/home/components/main-visual-nav";
-import { RainyWindow } from "@/features/home/components/rainy-window";
+import { RainWaterLayer } from "@/features/home/components/rain-water-layer";
 import { SceneBackground } from "@/features/home/components/scene-background";
 import { VersePanel } from "@/features/home/components/verse-panel";
 import { useRotatingIndex } from "@/features/home/hooks/use-rotating-index";
@@ -45,9 +45,9 @@ export function HomeExperience({
         <MainVisualNav isHidden={hasScrolled} items={navItems} />
       </section>
 
-      <section className="relative z-30 mt-[100svh] min-h-[200svh] overflow-hidden border-t border-white/10 bg-black/45 backdrop-blur-[1px]">
+      <section className="relative z-30 mt-[100svh] min-h-[200svh] overflow-hidden border-t border-white/10 bg-black/[0.08] backdrop-blur-[0.5px]">
         {activeWallpaper ? (
-          <RainyWindow backgroundImageUrl={activeWallpaper.image.url} />
+          <RainWaterLayer backgroundImageUrl={activeWallpaper.image.url} />
         ) : null}
 
         <div className="relative z-10 flex min-h-svh items-center justify-center px-6 py-24">

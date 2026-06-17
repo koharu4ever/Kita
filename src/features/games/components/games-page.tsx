@@ -1,32 +1,20 @@
-import { gameItems } from "@/features/games/data/game-items";
-
-import { GameCard } from "./game-card";
+import { GamesGallery } from "./games-gallery";
 
 export function GamesPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-[#05070c] text-white">
       <div
         aria-hidden="true"
-        className="fixed inset-0 bg-cover bg-center opacity-35"
-        style={{ backgroundImage: "url('/home-sea-girl.jpg')" }}
+        className="fixed inset-0 bg-cover bg-center opacity-30"
+        style={{ backgroundImage: "url('/home-night-sky.jpg')" }}
       />
-      <div className="fixed inset-0 bg-slate-950/70" />
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.18),transparent_34%),linear-gradient(180deg,rgba(2,6,23,0.72),rgba(2,6,23,0.96))]"
+      />
 
-      <section className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:py-20">
-        <header className="mb-10 text-center">
-          <p className="mb-3 text-sm tracking-[0.35em] text-sky-200/70 uppercase">
-            Visual Novel Shelf
-          </p>
-          <h1 className="kita-display text-6xl leading-none text-white md:text-7xl">
-            GAMES
-          </h1>
-        </header>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {gameItems.map((game) => (
-            <GameCard key={game.slug} game={game} />
-          ))}
-        </div>
+      <section className="relative z-10 mx-auto max-w-[1960px] p-4">
+        <GamesGallery />
       </section>
     </main>
   );

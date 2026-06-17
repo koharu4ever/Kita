@@ -35,6 +35,14 @@ export const homeNavItems: HomeNavItem[] = [
 
 export const homeWallpapers: HomeWallpaper[] = [
   {
+    id: "cover",
+    name: "Cover",
+    image: {
+      url: "/cover.png",
+      alt: "Kita cover artwork behind a rain glass layer",
+    },
+  },
+  {
     id: "rain-harbor",
     name: "Rain Harbor",
     image: {
