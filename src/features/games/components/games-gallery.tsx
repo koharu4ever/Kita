@@ -1,8 +1,10 @@
+import Link from "next/link";
+import { Suspense } from "react";
+
 import { gameItems } from "@/features/games/data/game-items";
 
 import { GameGalleryCard } from "./game-gallery-card";
 import { GameLightbox } from "./game-lightbox";
-import Link from "next/link";
 
 export function GamesGallery() {
   return (
@@ -60,7 +62,9 @@ export function GamesGallery() {
         ))}
       </div>
 
-      <GameLightbox games={gameItems} />
+      <Suspense fallback={null}>
+        <GameLightbox games={gameItems} />
+      </Suspense>
     </>
   );
 }
