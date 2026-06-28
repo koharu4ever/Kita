@@ -1,9 +1,14 @@
-import { reviewItems } from "@/features/reviews/data/review-items";
+import type { ReviewPreview } from "@/features/reviews/data/review-items";
 
 import { ReviewCard } from "./review-card";
+import { ReviewsTopNav } from "./reviews-top-nav";
 
-export function ReviewsPage() {
-  const [featuredReview, ...moreReviews] = reviewItems;
+type ReviewsPageProps = {
+  reviews: ReviewPreview[];
+};
+
+export function ReviewsPage({ reviews }: ReviewsPageProps) {
+  const [featuredReview, ...moreReviews] = reviews;
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
@@ -14,7 +19,9 @@ export function ReviewsPage() {
       />
       <div className="fixed inset-0 bg-slate-950/65" />
 
-      <section className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:py-20">
+      <ReviewsTopNav />
+
+      <section className="relative z-10 mx-auto max-w-6xl px-5 pt-24 pb-16 md:pt-28 md:pb-20">
         <header className="mb-10 text-center">
           <p className="mb-3 text-sm tracking-[0.35em] text-purple-200/70 uppercase">
             Kita Archive

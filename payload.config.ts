@@ -5,11 +5,13 @@ import { fileURLToPath } from "url";
 import { z } from "zod";
 
 import { migrations } from "./src/migrations/index.ts";
+import * as reviewsCollection from "./src/payload/collections/reviews.ts";
 import * as toolsCollection from "./src/payload/collections/tools.ts";
 import * as usersCollection from "./src/payload/collections/users.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+const { Reviews } = reviewsCollection;
 const { Tools } = toolsCollection;
 const { Users } = usersCollection;
 const skipEnvValidation = process.env.SKIP_ENV_VALIDATION === "true";
@@ -38,7 +40,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Tools],
+  collections: [Users, Tools, Reviews],
   db: postgresAdapter({
     pool: {
       connectionString: payloadEnv.DATABASE_URI,
