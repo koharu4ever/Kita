@@ -1,5 +1,7 @@
 # Reviews Payload Data Shape Plan
 
+> 状态更新（2026-06-28）：本文前半保留了从静态段落数组开始理解数据链路的过程。当前最终实现已经使用 Payload Lexical Rich Text，正文以 JSONB 保存，前端通过官方 `RichText` renderer 渲染；生产 migration 已生成并验证。
+
 ## 目标
 
 `/reviews` 和 `/reviews/[slug]` 现在先保持前端模板状态。当前阶段只确认一件事：
@@ -28,7 +30,7 @@ Payload-like raw review data
 
 也就是说，先用 `src/features/reviews/data/review-items.ts` 把事情讲清楚。
 
-## 前端模板需要的数据类型
+## 前端模板需要的数据类型（最初草案）
 
 当前 `/reviews` 页面和详情页真正需要的是这个类型：
 
@@ -51,7 +53,7 @@ export type ReviewPreview = {
 
 `ReviewCard`、`ReviewsPage`、`ReviewDetailPage` 应该只吃这个类型。它们不应该关心数据来自 mock、Payload、REST API，还是别的地方。
 
-## Payload Collection 可以怎么写
+## Payload Collection 可以怎么写（最初草案）
 
 如果以后要在 Payload 里建 `reviews` collection，字段可以尽量贴近 `ReviewPreview`，但不需要强行完全一样。
 
@@ -151,7 +153,7 @@ export const Reviews: CollectionConfig = {
 - `body` 先用 paragraph array。当前详情页很克制，不需要一开始就上 Rich Text。
 - `publishedAt` 在 Payload 里叫发布时间，前端展示时再映射成 `date`。
 
-## mapper 可以先写在 review-items.ts
+## mapper 可以先写在 review-items.ts（最初方案）
 
 可以。当前阶段把 mapper 写在 `src/features/reviews/data/review-items.ts` 里反而更容易理解。
 
@@ -333,9 +335,9 @@ export const reviewItems = payloadReviewItems.map(...)
 
 这样你可以先看懂整个转换过程，也能继续保持 `/reviews` 页面完全静态、可控、不会影响生产数据库。
 
-## 当前最小实现：Local API 链路
+## 当前实现：Local API + Rich Text 链路
 
-现在已经按更清晰的后端边界做了最小实现，但仍然没有生成 migration。
+现在已经按更清晰的后端边界完成实现，并生成、验证了生产 migration。
 
 实际文件分工是：
 
@@ -354,7 +356,7 @@ src/features/reviews/utils/map-review-document-to-review-preview.ts
 ```txt
 publishedAt
 tags: [{ label }]
-body: [{ paragraph }]
+body: Lexical editor state JSON
 ```
 
 前端模板只需要：
@@ -362,7 +364,7 @@ body: [{ paragraph }]
 ```txt
 date
 tags: string[]
-body: string[]
+body: DefaultTypedEditorState
 ```
 
 这个文件就负责把 Payload document 转成 `ReviewPreview`。
@@ -383,7 +385,7 @@ payload.find({
 
 然后把查到的 Payload documents 交给 mapper，最终返回 `ReviewPreview[]`。
 
-如果当前本地数据库里还没有 `reviews` 表，或者里面暂时没有数据，它会回退到 `reviewItems`。这样 `/reviews` 页面不会因为数据库结构还在试验阶段就直接坏掉。
+开发环境查询失败时会回退到 `reviewItems`；生产环境查询失败会直接抛出错误，避免静态数据掩盖数据库故障。
 
 ```txt
 src/app/(site)/reviews/page.tsx

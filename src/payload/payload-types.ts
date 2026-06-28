@@ -185,12 +185,21 @@ export interface Review {
         id?: string | null;
       }[]
     | null;
-  body?:
-    | {
-        paragraph: string;
-        id?: string | null;
-      }[]
-    | null;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ("ltr" | "rtl") | null;
+      format: "left" | "start" | "center" | "right" | "end" | "justify" | "";
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -327,12 +336,7 @@ export interface ReviewsSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
-  body?:
-    | T
-    | {
-        paragraph?: T;
-        id?: T;
-      };
+  body?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -31,9 +31,11 @@ export type ReviewPreview = {
   rating: number;
   readingTime: string;
   tags: string[];
-  body: string[];
+  body: RichTextContent;
 };
 ```
+
+当前 Kita 中的 `RichTextContent` 实际使用 Payload Lexical 的 `DefaultTypedEditorState`。它仍然是前端 contract 的一部分，但不再把正文压缩成只能显示普通段落的 `string[]`。
 
 `ReviewsPage`、`ReviewCard`、`ReviewDetailPage` 只吃这个类型。
 

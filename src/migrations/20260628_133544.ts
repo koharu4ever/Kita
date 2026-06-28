@@ -1,4 +1,4 @@
-import { MigrateUpArgs, MigrateDownArgs, sql } from "@payloadcms/db-postgres";
+import { MigrateDownArgs, MigrateUpArgs, sql } from "@payloadcms/db-postgres";
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
@@ -8,13 +8,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     "_parent_id" integer NOT NULL,
     "id" varchar PRIMARY KEY NOT NULL,
     "label" varchar NOT NULL
-  );
-
-  CREATE TABLE "reviews_body" (
-    "_order" integer NOT NULL,
-    "_parent_id" integer NOT NULL,
-    "id" varchar PRIMARY KEY NOT NULL,
-    "paragraph" varchar NOT NULL
   );
 
   CREATE TABLE "reviews" (
@@ -28,17 +21,15 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     "cover_image" varchar NOT NULL,
     "rating" numeric NOT NULL,
     "reading_time" varchar NOT NULL,
+    "body" jsonb NOT NULL,
     "updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
     "created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
 
   ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "reviews_id" integer;
   ALTER TABLE "reviews_tags" ADD CONSTRAINT "reviews_tags_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."reviews"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "reviews_body" ADD CONSTRAINT "reviews_body_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."reviews"("id") ON DELETE cascade ON UPDATE no action;
   CREATE INDEX "reviews_tags_order_idx" ON "reviews_tags" USING btree ("_order");
   CREATE INDEX "reviews_tags_parent_id_idx" ON "reviews_tags" USING btree ("_parent_id");
-  CREATE INDEX "reviews_body_order_idx" ON "reviews_body" USING btree ("_order");
-  CREATE INDEX "reviews_body_parent_id_idx" ON "reviews_body" USING btree ("_parent_id");
   CREATE UNIQUE INDEX "reviews_slug_idx" ON "reviews" USING btree ("slug");
   CREATE INDEX "reviews_status_idx" ON "reviews" USING btree ("status");
   CREATE INDEX "reviews_updated_at_idx" ON "reviews" USING btree ("updated_at");
@@ -53,10 +44,8 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP INDEX "payload_locked_documents_rels_reviews_id_idx";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "reviews_id";
   ALTER TABLE "reviews_tags" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "reviews_body" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "reviews" DISABLE ROW LEVEL SECURITY;
   DROP TABLE "reviews_tags" CASCADE;
-  DROP TABLE "reviews_body" CASCADE;
   DROP TABLE "reviews" CASCADE;
   DROP TYPE "public"."enum_reviews_status";`);
 }

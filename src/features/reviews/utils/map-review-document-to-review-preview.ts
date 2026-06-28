@@ -1,3 +1,5 @@
+import type { DefaultTypedEditorState } from "@payloadcms/richtext-lexical";
+
 import type { Review } from "@/payload/payload-types";
 import type { ReviewPreview } from "@/features/reviews/data/review-items";
 
@@ -32,6 +34,6 @@ export function mapReviewDocumentToReviewPreview(
     rating: review.rating,
     readingTime: review.readingTime,
     tags: compactStrings(review.tags?.map((tag) => tag.label) ?? []),
-    body: compactStrings(review.body?.map((block) => block.paragraph) ?? []),
+    body: review.body as DefaultTypedEditorState,
   };
 }

@@ -1,0 +1,83 @@
+.root {
+  margin-top: 2rem;
+  color: rgb(255 255 255 / 68%);
+  font-size: 1rem;
+  line-height: 2rem;
+}
+
+.root :global(p) {
+  margin: 0 0 1.5rem;
+}
+
+.root :global(h2),
+.root :global(h3),
+.root :global(h4) {
+  margin: 2.75rem 0 1rem;
+  color: rgb(255 255 255 / 92%);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.root :global(h2) {
+  font-size: 1.75rem;
+}
+
+.root :global(h3) {
+  font-size: 1.4rem;
+}
+
+.root :global(h4) {
+  font-size: 1.15rem;
+}
+
+.root :global(strong) {
+  color: rgb(255 255 255 / 92%);
+  font-weight: 650;
+}
+
+.root :global(em) {
+  color: rgb(233 213 255 / 82%);
+}
+
+.root :global(ul),
+.root :global(ol) {
+  margin: 0 0 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.root :global(ul) {
+  list-style: disc;
+}
+
+.root :global(ol) {
+  list-style: decimal;
+}
+
+.root :global(li) {
+  margin: 0.35rem 0;
+  padding-left: 0.25rem;
+}
+
+.root :global(blockquote) {
+  margin: 2rem 0;
+  border-left: 2px solid rgb(216 180 254 / 45%);
+  padding-left: 1.25rem;
+  color: rgb(233 213 255 / 72%);
+  font-style: italic;
+}
+
+.root :global(a) {
+  color: rgb(233 213 255 / 92%);
+  text-decoration: underline;
+  text-decoration-color: rgb(216 180 254 / 45%);
+  text-underline-offset: 0.2em;
+}
+
+.root :global(a:hover) {
+  color: white;
+  text-decoration-color: rgb(255 255 255 / 75%);
+}
+
+.root > :global(:last-child) {
+  margin-bottom: 0;
+}

@@ -1,8 +1,10 @@
+import { RichText } from "@payloadcms/richtext-lexical/react";
 import Link from "next/link";
 
 import type { ReviewPreview } from "@/features/reviews/data/review-items";
 
 import { ReviewsTopNav } from "./reviews-top-nav";
+import styles from "./review-rich-text.module.css";
 
 type ReviewDetailPageProps = {
   review: ReviewPreview;
@@ -49,11 +51,7 @@ export function ReviewDetailPage({ review }: ReviewDetailPageProps) {
             {review.excerpt}
           </p>
 
-          <div className="mt-8 space-y-6 text-base leading-8 text-white/68">
-            {review.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
+          <RichText className={styles.root} data={review.body} />
 
           <div className="mt-8 flex flex-wrap gap-2">
             {review.tags.map((tag) => (

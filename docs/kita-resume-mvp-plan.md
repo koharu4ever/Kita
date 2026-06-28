@@ -153,7 +153,6 @@ Kita 初版可以定位为：
 - 全站搜索。
 - 多语言系统。
 - 复杂评分统计。
-- Reviews 富文本编辑器迁移。
 - 为了抽象而新增大量 Service、Repository 接口。
 - 继续寻找新的整站模板。
 - 大规模 UI 库迁移。
@@ -167,7 +166,7 @@ Kita 初版可以定位为：
 1. 确定发布机制，推荐使用 Payload drafts 或最小 `status` 字段。
 2. server getter 只读取 published Reviews。
 3. 保留 `coverImage` 文本路径。
-4. 保留 `body` 段落数组。
+4. 使用基础 Payload Lexical Rich Text，不加入上传、自定义 Blocks 或复杂关系。
 5. 重新生成 Payload types。
 6. 本地验证列表页和详情页。
 7. 确认 schema 后生成 migration。

@@ -1,4 +1,17 @@
 import type { CollectionConfig } from "payload";
+import {
+  BlockquoteFeature,
+  BoldFeature,
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineToolbarFeature,
+  ItalicFeature,
+  LinkFeature,
+  OrderedListFeature,
+  ParagraphFeature,
+  UnorderedListFeature,
+  lexicalEditor,
+} from "@payloadcms/richtext-lexical";
 
 export const Reviews: CollectionConfig = {
   slug: "reviews",
@@ -91,14 +104,22 @@ export const Reviews: CollectionConfig = {
     },
     {
       name: "body",
-      type: "array",
-      fields: [
-        {
-          name: "paragraph",
-          type: "textarea",
-          required: true,
-        },
-      ],
+      type: "richText",
+      editor: lexicalEditor({
+        features: () => [
+          ParagraphFeature(),
+          HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
+          BoldFeature(),
+          ItalicFeature(),
+          UnorderedListFeature(),
+          OrderedListFeature(),
+          BlockquoteFeature(),
+          LinkFeature(),
+          FixedToolbarFeature(),
+          InlineToolbarFeature(),
+        ],
+      }),
+      required: true,
     },
   ],
 };
