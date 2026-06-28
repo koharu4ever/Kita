@@ -6,3 +6,4 @@ build
 coverage
 pnpm-lock.yaml
 _reference
+src/app/(payload)/admin/importMap.ts

@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "payload:importmap": "payload generate:importmap --use-swc",
     "payload:migrate": "payload migrate --use-swc",
     "payload:migrate:create": "payload migrate:create --use-swc",
     "payload:migrate:status": "payload migrate:status --use-swc",

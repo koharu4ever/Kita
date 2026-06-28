@@ -38,6 +38,14 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+      importMapFile: path.resolve(
+        dirname,
+        "src",
+        "app",
+        "(payload)",
+        "admin",
+        "importMap.ts",
+      ),
     },
   },
   collections: [Users, Tools, Reviews],
