@@ -1,6 +1,6 @@
 import type { ToolkitItem } from "@/features/tools/types/toolkit-item";
 
-import { ToolsSidebar } from "./tools-sidebar";
+import { ToolsMobileNav, ToolsSidebar } from "./tools-sidebar";
 
 type ToolsPageProps = {
   items: ToolkitItem[];
@@ -8,7 +8,9 @@ type ToolsPageProps = {
 
 export function ToolsPage({ items }: ToolsPageProps) {
   return (
-    <div className="kita-retro flex min-h-screen bg-[#101827] text-[#9aff00]">
+    <div className="kita-retro flex min-h-screen flex-col bg-[#101827] text-[#9aff00] lg:flex-row">
+      <ToolsMobileNav />
+
       <main className="relative min-h-screen flex-1 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(154,255,0,0.08),transparent_28%),linear-gradient(135deg,rgba(6,12,22,0.95),rgba(12,22,35,0.98))]" />
         <div className="relative z-10 p-8 md:p-16">
