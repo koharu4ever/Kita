@@ -26,6 +26,10 @@ const dropTextures = {
   dropShine: "/rain-effect/drop-shine.png",
 };
 
+const desktopRainMediaQuery =
+  "(min-width: 768px) and (hover: hover) and (pointer: fine)";
+const reducedMotionMediaQuery = "(prefers-reduced-motion: reduce)";
+
 const intensityOptions: Record<RainIntensity, Partial<RaindropsOptions>> = {
   drizzle: {
     minR: 7,
@@ -55,10 +59,6 @@ const intensityOptions: Record<RainIntensity, Partial<RaindropsOptions>> = {
     trailRate: 1.5,
   },
 };
-
-function getReducedMotionPreference() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 function getCanvasSize(container: HTMLDivElement) {
   const rect = container.getBoundingClientRect();
@@ -161,13 +161,31 @@ export function RainWaterLayer({
 }: RainWaterLayerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isRainEnabled, setIsRainEnabled] = useState(false);
   const [isFallbackVisible, setIsFallbackVisible] = useState(false);
+
+  useEffect(() => {
+    const desktopRainMedia = window.matchMedia(desktopRainMediaQuery);
+    const reducedMotionMedia = window.matchMedia(reducedMotionMediaQuery);
+    const updateRainCapability = () => {
+      setIsRainEnabled(desktopRainMedia.matches && !reducedMotionMedia.matches);
+    };
+
+    updateRainCapability();
+    desktopRainMedia.addEventListener("change", updateRainCapability);
+    reducedMotionMedia.addEventListener("change", updateRainCapability);
+
+    return () => {
+      desktopRainMedia.removeEventListener("change", updateRainCapability);
+      reducedMotionMedia.removeEventListener("change", updateRainCapability);
+    };
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
 
-    if (!container || !canvas || getReducedMotionPreference()) {
+    if (!container || !canvas || !isRainEnabled) {
       setIsFallbackVisible(true);
       return;
     }
@@ -214,7 +232,7 @@ export function RainWaterLayer({
       resizeObserver.disconnect();
       scene?.destroy();
     };
-  }, [backgroundImageUrl, intensity]);
+  }, [backgroundImageUrl, intensity, isRainEnabled]);
 
   return (
     <div
@@ -223,7 +241,9 @@ export function RainWaterLayer({
       ref={containerRef}
     >
       <canvas
-        className="absolute inset-0 h-full w-full opacity-90"
+        className={`absolute inset-0 h-full w-full transition-opacity duration-300 ${
+          isRainEnabled && !isFallbackVisible ? "opacity-90" : "opacity-0"
+        }`}
         ref={canvasRef}
       />
       {isFallbackVisible ? (
