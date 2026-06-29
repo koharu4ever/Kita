@@ -2,6 +2,11 @@ import { RichText } from "@payloadcms/richtext-lexical/react";
 import Link from "next/link";
 
 import type { ReviewPreview } from "@/features/reviews/data/review-items";
+import {
+  formatReviewDate,
+  formatReviewReadingTime,
+  formatReviewScore,
+} from "@/features/reviews/utils/format-review-metadata";
 
 import { ReviewsTopNav } from "./reviews-top-nav";
 import styles from "./review-rich-text.module.css";
@@ -41,10 +46,12 @@ export function ReviewDetailPage({ review }: ReviewDetailPageProps) {
             {review.title}
           </h1>
 
-          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/48">
-            <time dateTime={review.date}>{review.date}</time>
-            <span>{review.rating.toFixed(1)}</span>
-            <span>{review.readingTime}</span>
+          <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-white/48">
+            <time dateTime={review.date}>{formatReviewDate(review.date)}</time>
+            <span aria-hidden="true">·</span>
+            <span>{formatReviewScore(review.rating)}</span>
+            <span aria-hidden="true">·</span>
+            <span>{formatReviewReadingTime(review.readingTime)}</span>
           </div>
 
           <p className="mt-8 text-lg leading-8 text-white/72">

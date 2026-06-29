@@ -3,6 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { ReviewPreview } from "@/features/reviews/data/review-items";
+import {
+  formatReviewDate,
+  formatReviewScore,
+} from "@/features/reviews/utils/format-review-metadata";
 
 type ReviewCardProps = {
   review: ReviewPreview;
@@ -49,10 +53,10 @@ export function ReviewCard({ review, featured = false }: ReviewCardProps) {
       <div className="space-y-4 p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-2 text-xs tracking-wider text-purple-200/70 uppercase">
           <span>{review.gameTitle}</span>
-          <span>/</span>
-          <time dateTime={review.date}>{review.date}</time>
-          <span>/</span>
-          <span>{review.rating.toFixed(1)}</span>
+          <span aria-hidden="true">·</span>
+          <time dateTime={review.date}>{formatReviewDate(review.date)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{formatReviewScore(review.rating)}</span>
         </div>
 
         <Link href={href}>
