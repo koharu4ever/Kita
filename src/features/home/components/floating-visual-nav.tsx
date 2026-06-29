@@ -15,14 +15,14 @@ export function FloatingVisualNav({
     <nav
       aria-label="Floating primary"
       className={[
-        "fixed top-1/2 right-0 z-50 hidden -translate-y-1/2 flex-col gap-2 transition-opacity duration-500 md:flex",
+        "fixed top-1/2 right-0 z-50 flex -translate-y-1/2 flex-col gap-1 transition-opacity duration-500 md:gap-2",
         isVisible ? "opacity-100" : "pointer-events-none opacity-0",
       ].join(" ")}
     >
       {items.map((item) => (
         <Link
           className={[
-            "kita-display bg-black/60 px-4 py-1 text-center text-lg leading-none text-white transition-colors duration-200 md:text-xl lg:text-2xl",
+            "kita-display bg-black/60 px-2 py-1 text-center text-base leading-none text-white transition-colors duration-200 sm:px-3 sm:text-lg md:px-4 md:text-xl lg:text-2xl",
             "outline-none focus-visible:ring-2 focus-visible:ring-white/80",
             item.floatingAccentClassName,
           ].join(" ")}
