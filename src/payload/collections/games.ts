@@ -13,8 +13,6 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 
-import { gameCoverOptions } from "@/features/games/data/game-cover-assets";
-
 export const Games: CollectionConfig = {
   slug: "games",
   admin: {
@@ -112,7 +110,14 @@ export const Games: CollectionConfig = {
     {
       name: "coverKey",
       type: "select",
-      options: [...gameCoverOptions],
+      options: [
+        { label: "Sea Side Fragment", value: "sea-side-fragment" },
+        { label: "Night Archive", value: "night-archive" },
+        { label: "After Rain", value: "after-rain" },
+        { label: "Sunset Field", value: "sunset-field" },
+        { label: "Crimson Room", value: "crimson-room" },
+        { label: "Harbor Loop", value: "harbor-loop" },
+      ],
       required: true,
     },
     {
