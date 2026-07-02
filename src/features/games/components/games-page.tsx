@@ -1,6 +1,12 @@
+import type { GameDetail } from "@/features/games/types/game-detail";
+
 import { GamesGallery } from "./games-gallery";
 
-export function GamesPage() {
+type GamesPageProps = {
+  games: GameDetail[];
+};
+
+export function GamesPage({ games }: GamesPageProps) {
   return (
     <main className="min-h-screen bg-[#05070c] text-white">
       <div
@@ -14,7 +20,7 @@ export function GamesPage() {
       />
 
       <section className="relative z-10 mx-auto max-w-[1960px] p-4">
-        <GamesGallery />
+        <GamesGallery games={games} />
       </section>
     </main>
   );

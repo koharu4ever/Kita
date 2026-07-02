@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { gameItems } from "@/features/games/data/game-items";
+import type { GameDetail } from "@/features/games/types/game-detail";
 
 import { GameGalleryCard } from "./game-gallery-card";
 import { GameLightbox } from "./game-lightbox";
 
-export function GamesGallery() {
+type GamesGalleryProps = {
+  games: GameDetail[];
+};
+
+export function GamesGallery({ games }: GamesGalleryProps) {
   return (
     <>
       <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
@@ -57,13 +61,13 @@ export function GamesGallery() {
           </div>
         </Link>
 
-        {gameItems.map((game) => (
+        {games.map((game) => (
           <GameGalleryCard key={game.slug} game={game} />
         ))}
       </div>
 
       <Suspense fallback={null}>
-        <GameLightbox games={gameItems} />
+        <GameLightbox games={games} />
       </Suspense>
     </>
   );

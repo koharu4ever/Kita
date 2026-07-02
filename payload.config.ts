@@ -5,12 +5,14 @@ import { fileURLToPath } from "url";
 import { z } from "zod";
 
 import { migrations } from "./src/migrations/index.ts";
+import * as gamesCollection from "./src/payload/collections/games.ts";
 import * as reviewsCollection from "./src/payload/collections/reviews.ts";
 import * as toolsCollection from "./src/payload/collections/tools.ts";
 import * as usersCollection from "./src/payload/collections/users.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+const { Games } = gamesCollection;
 const { Reviews } = reviewsCollection;
 const { Tools } = toolsCollection;
 const { Users } = usersCollection;
@@ -48,7 +50,7 @@ export default buildConfig({
       ),
     },
   },
-  collections: [Users, Tools, Reviews],
+  collections: [Users, Tools, Reviews, Games],
   db: postgresAdapter({
     pool: {
       connectionString: payloadEnv.DATABASE_URI,

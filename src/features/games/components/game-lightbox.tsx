@@ -4,12 +4,12 @@ import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import type { GameItem } from "@/features/games/data/game-items";
+import type { GameDetail } from "@/features/games/types/game-detail";
 
 import { GameSharedModal } from "./game-shared-modal";
 
 type GameLightboxProps = {
-  games: GameItem[];
+  games: GameDetail[];
 };
 
 function getPhotoHref(slug: string) {

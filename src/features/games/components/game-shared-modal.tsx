@@ -3,12 +3,12 @@ import Link from "next/link";
 import type { Route } from "next";
 import { useState } from "react";
 
-import type { GameItem } from "@/features/games/data/game-items";
+import type { GameDetail } from "@/features/games/types/game-detail";
 
 type GameSharedModalProps = {
   index: number;
   direction: number;
-  games: GameItem[];
+  games: GameDetail[];
   changePhotoId: (newIndex: number) => void;
   closeModal: () => void;
 };

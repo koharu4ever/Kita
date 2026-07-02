@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     tools: Tool;
     reviews: Review;
+    games: Game;
     "payload-kv": PayloadKv;
     "payload-locked-documents": PayloadLockedDocument;
     "payload-preferences": PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     tools: ToolsSelect<false> | ToolsSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    games: GamesSelect<false> | GamesSelect<true>;
     "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>;
     "payload-locked-documents":
       | PayloadLockedDocumentsSelect<false>
@@ -205,6 +207,58 @@ export interface Review {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "games".
+ */
+export interface Game {
+  id: number;
+  title: string;
+  slug: string;
+  originalTitle?: string | null;
+  developer: string;
+  releaseDate: string;
+  playStatus: "finished" | "playing" | "planned";
+  publicationStatus: "draft" | "published";
+  summary: string;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ("ltr" | "rtl") | null;
+      format: "left" | "start" | "center" | "right" | "end" | "justify" | "";
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  coverKey:
+    | "sea-side-fragment"
+    | "night-archive"
+    | "after-rain"
+    | "sunset-field"
+    | "crimson-room"
+    | "harbor-loop";
+  tags?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  links?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -238,6 +292,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: "reviews";
         value: number | Review;
+      } | null)
+    | ({
+        relationTo: "games";
+        value: number | Game;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -337,6 +395,37 @@ export interface ReviewsSelect<T extends boolean = true> {
         id?: T;
       };
   body?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "games_select".
+ */
+export interface GamesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  originalTitle?: T;
+  developer?: T;
+  releaseDate?: T;
+  playStatus?: T;
+  publicationStatus?: T;
+  summary?: T;
+  body?: T;
+  coverKey?: T;
+  tags?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  links?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

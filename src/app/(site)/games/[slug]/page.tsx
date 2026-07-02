@@ -1,7 +1,8 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { GameDetailPage } from "@/features/games/components/game-detail-page";
-import { gameItems, getGameBySlug } from "@/features/games/data/game-items";
+import { getGameBySlug } from "@/server/games/get-games";
 
 type GamePageProps = {
   params: Promise<{
@@ -9,15 +10,13 @@ type GamePageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  return gameItems.map((game) => ({
-    slug: game.slug,
-  }));
-}
+export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: GamePageProps) {
+export async function generateMetadata({
+  params,
+}: GamePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const game = getGameBySlug(slug);
+  const game = await getGameBySlug(slug);
 
   if (!game) {
     return {
@@ -33,7 +32,7 @@ export async function generateMetadata({ params }: GamePageProps) {
 
 export default async function GamePage({ params }: GamePageProps) {
   const { slug } = await params;
-  const game = getGameBySlug(slug);
+  const game = await getGameBySlug(slug);
 
   if (!game) {
     notFound();

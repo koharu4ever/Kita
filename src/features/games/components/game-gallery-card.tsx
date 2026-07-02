@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Route } from "next";
 
-import type { GameItem } from "@/features/games/data/game-items";
+import type { GameDetail } from "@/features/games/types/game-detail";
 
 type GameGalleryCardProps = {
-  game: GameItem;
+  game: GameDetail;
 };
 
 export function GameGalleryCard({ game }: GameGalleryCardProps) {

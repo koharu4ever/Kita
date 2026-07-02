@@ -1,28 +1,26 @@
-export type GameStatus = "finished" | "playing" | "planned";
+import type {
+  DefaultNodeTypes,
+  DefaultTypedEditorState,
+} from "@payloadcms/richtext-lexical";
+import { buildEditorState } from "@payloadcms/richtext-lexical";
 
-export type GameItem = {
-  slug: string;
-  title: string;
-  originalTitle?: string;
-  developer: string;
-  releaseDate: string;
-  status: GameStatus;
-  summary: string;
-  note: string;
-  cover: {
-    src: string;
-    alt: string;
-    width: number;
-    height: number;
-  };
-  tags: string[];
-  links: Array<{
-    href: string;
-    label: string;
-  }>;
-};
+import { resolveGameCover } from "@/features/games/data/game-cover-assets";
+import type { GameDetail } from "@/features/games/types/game-detail";
 
-export const gameItems: GameItem[] = [
+export function createGameBody(paragraphs: string[]): DefaultTypedEditorState {
+  const [firstParagraph, ...remainingParagraphs] = paragraphs;
+  const remainingNodes = remainingParagraphs.flatMap(
+    (paragraph) =>
+      buildEditorState<DefaultNodeTypes>({ text: paragraph }).root.children,
+  );
+
+  return buildEditorState<DefaultNodeTypes>({
+    nodes: remainingNodes,
+    text: firstParagraph,
+  });
+}
+
+export const gameItems: GameDetail[] = [
   {
     slug: "sea-side-fragment",
     title: "Sea Side Fragment",
@@ -32,13 +30,10 @@ export const gameItems: GameItem[] = [
     status: "playing",
     summary:
       "A quiet summer story about letters, tide pools, and the fragments people leave behind when they move on.",
-    note: "Use this slot for a short personal reading note once real content is ready.",
-    cover: {
-      src: "/home-sea-girl.jpg",
-      alt: "A girl standing near the blue sea",
-      width: 720,
-      height: 960,
-    },
+    body: createGameBody([
+      "A short archive entry for checking the most compact version of the detail page.",
+    ]),
+    cover: resolveGameCover("sea-side-fragment"),
     tags: ["Summer", "Drama", "Memory"],
     links: [{ href: "https://vndb.org/", label: "VNDB placeholder" }],
   },
@@ -51,13 +46,11 @@ export const gameItems: GameItem[] = [
     status: "finished",
     summary:
       "An atmospheric mystery built around a city observatory, missing recordings, and an old promise under the sky.",
-    note: "Good candidate for a future review page because the mood is already close to Kita's homepage.",
-    cover: {
-      src: "/home-night-sky.jpg",
-      alt: "A deep night sky over a quiet landscape",
-      width: 720,
-      height: 540,
-    },
+    body: createGameBody([
+      "The observatory, missing recordings, and slow nighttime dialogue give this entry enough atmosphere without turning it into a full review.",
+      "A future database record can replace this text while the page continues to consume the same GameDetail contract.",
+    ]),
+    cover: resolveGameCover("night-archive"),
     tags: ["Mystery", "Atmosphere", "Night"],
     links: [{ href: "https://vndb.org/", label: "VNDB placeholder" }],
   },
@@ -70,13 +63,11 @@ export const gameItems: GameItem[] = [
     status: "planned",
     summary:
       "A small urban visual novel about waiting rooms, glass reflections, and a harbor that changes after rain.",
-    note: "The image ratio is intentionally taller to test the masonry layout against varied covers.",
-    cover: {
-      src: "/home-rain-harbor.jpg",
-      alt: "Rain and harbor lights seen through a window",
-      width: 720,
-      height: 1080,
-    },
+    body: createGameBody([
+      "The image ratio is intentionally taller to test the masonry layout against varied covers.",
+      "This second paragraph checks the spacing between a short summary, body copy, tags, and external links.",
+    ]),
+    cover: resolveGameCover("after-rain"),
     tags: ["Urban", "Rain", "Reflection"],
     links: [{ href: "https://vndb.org/", label: "VNDB placeholder" }],
   },
@@ -89,13 +80,10 @@ export const gameItems: GameItem[] = [
     status: "finished",
     summary:
       "A nostalgic slice-of-life story where the last train, the school field, and a late confession share one orange hour.",
-    note: "This entry keeps the calm visual tone that already exists in Kita's public image set.",
-    cover: {
-      src: "/home-sunset-field.jpg",
-      alt: "A sunset field under warm orange light",
-      width: 720,
-      height: 900,
-    },
+    body: createGameBody([
+      "This entry keeps the calm visual tone that already exists in Kita's public image set.",
+    ]),
+    cover: resolveGameCover("sunset-field"),
     tags: ["Slice of Life", "Ending", "Nostalgia"],
     links: [{ href: "https://vndb.org/", label: "VNDB placeholder" }],
   },
@@ -108,13 +96,10 @@ export const gameItems: GameItem[] = [
     status: "planned",
     summary:
       "A compact chamber mystery placeholder for testing detail-page metadata, tags, and external links.",
-    note: "Uses the about background because the red interior works well for future denser notes.",
-    cover: {
-      src: "/about-bg.jpg",
-      alt: "A crimson interior used as a visual novel placeholder",
-      width: 720,
-      height: 520,
-    },
+    body: createGameBody([
+      "The red interior works as a contrast test for denser archive notes and longer metadata.",
+    ]),
+    cover: resolveGameCover("crimson-room"),
     tags: ["Mystery", "Room", "Classic"],
     links: [{ href: "https://vndb.org/", label: "VNDB placeholder" }],
   },
@@ -127,13 +112,13 @@ export const gameItems: GameItem[] = [
     status: "playing",
     summary:
       "A route-loop structure placeholder for checking how longer summaries sit beside the large hero image.",
-    note: "This can later become a real game entry with route notes, patches, and reading status.",
-    cover: {
-      src: "/home-rain-harbor.jpg",
-      alt: "A rainy harbor used for a looping route placeholder",
-      width: 720,
-      height: 780,
-    },
+    body: createGameBody([
+      "This longer body tests how the page behaves when an archive entry needs more than one compact note.",
+      "The first section can describe the premise without repeating a full review. A second section can record why the game matters, which route was completed, or which edition was used.",
+      "Because the body is Rich Text, headings, emphasis, lists, quotations, and links can be introduced later without adding dedicated database columns for every possible section.",
+      "The page remains an archive rather than a review: metadata stays structured, while the personal part stays flexible.",
+    ]),
+    cover: resolveGameCover("harbor-loop"),
     tags: ["Loop", "Harbor", "Route"],
     links: [{ href: "https://vndb.org/", label: "VNDB placeholder" }],
   },
