@@ -1,5 +1,7 @@
 # Games Payload Local API Data Flow
 
+> 注意：本文记录最初的 `coverKey + image registry` 方案。图片部分已由 [Games 图片资源解耦方案](./games-image-asset-decoupling-plan.md) 取代；getter、mapper 和 DTO 分层原则仍然有效。
+
 ## 1. 文档目标
 
 本文评估 `/games` 和 `/games/[slug]` 如何从当前 mock 数据迁移到 Payload Local API，同时继续使用 `public` 目录中的图片。

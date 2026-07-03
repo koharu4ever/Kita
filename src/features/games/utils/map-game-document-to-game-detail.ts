@@ -1,13 +1,15 @@
 import type { DefaultTypedEditorState } from "@payloadcms/richtext-lexical";
 
-import { resolveGameCover } from "@/features/games/data/game-cover-assets";
 import type { GameDetail } from "@/features/games/types/game-detail";
 import type { Game } from "@/payload/payload-types";
 
 export type PayloadGameDocument = Pick<
   Game,
   | "body"
-  | "coverKey"
+  | "coverAlt"
+  | "coverHeight"
+  | "coverSrc"
+  | "coverWidth"
   | "developer"
   | "links"
   | "originalTitle"
@@ -31,7 +33,12 @@ export function mapGameDocumentToGameDetail(
     status: game.playStatus,
     summary: game.summary,
     body: game.body as DefaultTypedEditorState,
-    cover: resolveGameCover(game.coverKey),
+    cover: {
+      src: game.coverSrc,
+      alt: game.coverAlt,
+      width: game.coverWidth,
+      height: game.coverHeight,
+    },
     tags: game.tags?.map((tag) => tag.label) ?? [],
     links:
       game.links?.map((link) => ({

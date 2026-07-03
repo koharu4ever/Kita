@@ -108,16 +108,29 @@ export const Games: CollectionConfig = {
       required: true,
     },
     {
-      name: "coverKey",
-      type: "select",
-      options: [
-        { label: "Sea Side Fragment", value: "sea-side-fragment" },
-        { label: "Night Archive", value: "night-archive" },
-        { label: "After Rain", value: "after-rain" },
-        { label: "Sunset Field", value: "sunset-field" },
-        { label: "Crimson Room", value: "crimson-room" },
-        { label: "Harbor Loop", value: "harbor-loop" },
-      ],
+      name: "coverSrc",
+      type: "text",
+      admin: {
+        description:
+          "Public asset URL, for example /games/covers/title-v1.webp",
+      },
+      required: true,
+    },
+    {
+      name: "coverAlt",
+      type: "text",
+      required: true,
+    },
+    {
+      name: "coverWidth",
+      type: "number",
+      min: 1,
+      required: true,
+    },
+    {
+      name: "coverHeight",
+      type: "number",
+      min: 1,
       required: true,
     },
     {

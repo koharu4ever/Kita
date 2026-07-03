@@ -17,25 +17,50 @@ const statusLabels: Record<GameDetail["status"], string> = {
 };
 
 export function GameDetailPage({ game }: GameDetailPageProps) {
+  const isLandscapeCover = game.cover.width / game.cover.height >= 1.35;
+
   return (
     <main className="min-h-screen bg-[#050609] text-white">
-      <section className="relative flex min-h-[72svh] items-center justify-center bg-black px-4 py-16 md:min-h-[82svh] md:px-10">
+      <section
+        className={
+          isLandscapeCover
+            ? "relative h-[78svh] min-h-[520px] overflow-hidden bg-black md:h-[84svh]"
+            : "relative flex min-h-[72svh] items-center justify-center bg-black px-4 py-16 md:min-h-[82svh] md:px-10"
+        }
+      >
         <Link
           href={`/games?photo=${game.slug}`}
-          className="absolute top-6 left-5 z-10 text-xs tracking-[0.22em] text-white/55 uppercase transition hover:text-white md:top-8 md:left-8"
+          className="absolute top-6 left-5 z-20 text-xs tracking-[0.22em] text-white/70 uppercase transition hover:text-white md:top-8 md:left-8"
         >
           &larr; Gallery
         </Link>
 
-        <Image
-          src={game.cover.src}
-          alt={game.cover.alt}
-          width={game.cover.width}
-          height={game.cover.height}
-          priority
-          sizes="(max-width: 768px) 100vw, 92vw"
-          className="max-h-[68svh] w-auto max-w-full object-contain md:max-h-[78svh]"
-        />
+        {isLandscapeCover ? (
+          <>
+            <Image
+              src={game.cover.src}
+              alt={game.cover.alt}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#050609]/75"
+            />
+          </>
+        ) : (
+          <Image
+            src={game.cover.src}
+            alt={game.cover.alt}
+            width={game.cover.width}
+            height={game.cover.height}
+            priority
+            sizes="(max-width: 768px) 100vw, 92vw"
+            className="max-h-[68svh] w-auto max-w-full object-contain md:max-h-[84svh]"
+          />
+        )}
       </section>
 
       <article className="mx-auto max-w-3xl px-6 py-14 md:py-20">
