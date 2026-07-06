@@ -18,6 +18,6 @@
       }
     }
   },
-  "postCreateCommand": "sudo corepack enable && pnpm install",
+  "postCreateCommand": "sudo corepack enable && pnpm install --frozen-lockfile",
   "remoteUser": "node"
 }

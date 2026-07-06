@@ -9,11 +9,12 @@ export async function getTools() {
     const tools = await payload.find({
       collection: "tools",
       limit: 20,
+      overrideAccess: false,
       sort: "sortOrder",
     });
 
     if (tools.docs.length === 0) {
-      return toolkitItems;
+      return env.NODE_ENV === "production" ? [] : toolkitItems;
     }
 
     return tools.docs.map((tool) => mapToolDocumentToToolkitItem(tool));

@@ -7,3 +7,5 @@ coverage
 pnpm-lock.yaml
 _reference
 src/app/(payload)/admin/importMap.ts
+src/migrations/*.json
+src/payload/payload-types.ts

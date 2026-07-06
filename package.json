@@ -6,6 +6,8 @@
   "packageManager": "pnpm@10.28.2",
   "scripts": {
     "dev": "next dev",
+    "dev:services": "docker compose -f compose.yaml -f compose.dev.yaml up -d postgres",
+    "dev:services:stop": "docker compose -f compose.yaml -f compose.dev.yaml stop postgres",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -17,6 +19,7 @@
     "payload:migrate:create": "payload migrate:create --use-swc",
     "payload:migrate:status": "payload migrate:status --use-swc",
     "payload:types": "payload generate:types --use-swc",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck",
     "typecheck": "tsc --noEmit",
     "seed:games": "curl -X POST http://localhost:3000/api/dev/seed-games",
     "seed:tools": "curl -X POST http://localhost:3000/api/dev/seed-tools"

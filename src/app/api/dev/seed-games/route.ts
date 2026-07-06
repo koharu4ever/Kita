@@ -49,32 +49,36 @@ export async function POST() {
   }
 
   const payload = await getPayloadClient();
-  const existingGames = await payload.find({
-    collection: "games",
-    limit: 100,
-  });
-
-  for (const game of existingGames.docs) {
-    await payload.delete({
-      collection: "games",
-      id: game.id,
-    });
-  }
-
-  const createdGames = [];
+  const createdOrUpdated = [];
 
   for (const game of seedGames) {
-    createdGames.push(
-      await payload.create({
-        collection: "games",
-        data: game,
-      }),
-    );
+    const existing = await payload.find({
+      collection: "games",
+      limit: 1,
+      where: {
+        slug: {
+          equals: game.slug,
+        },
+      },
+    });
+
+    const savedGame = existing.docs[0]
+      ? await payload.update({
+          collection: "games",
+          id: existing.docs[0].id,
+          data: game,
+        })
+      : await payload.create({
+          collection: "games",
+          data: game,
+        });
+
+    createdOrUpdated.push(savedGame);
   }
 
   return NextResponse.json({
-    count: createdGames.length,
-    games: createdGames.map((game) => ({
+    count: createdOrUpdated.length,
+    games: createdOrUpdated.map((game) => ({
       id: game.id,
       slug: game.slug,
       title: game.title,
