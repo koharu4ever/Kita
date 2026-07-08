@@ -340,6 +340,7 @@ SKIP_ENV_VALIDATION
 Coolify Compose application
   |-- web
   |-- postgres
+  |-- backup（仓库已实现，生产需显式启用）
   `-- postgres-data
 ```
 
@@ -357,6 +358,8 @@ Coolify Compose application
 - `postgres-data` 持久化。
 - PostgreSQL 5432 不对公网开放。
 - migration 启动前数据库已经 ready。
+- backup 不开放端口、不挂载数据库 volume，默认 `POSTGRES_BACKUP_ENABLED=false`。
+- 生产启用 backup 前，必须在 Coolify 填写 R2 Endpoint、Bucket 和受限凭据。
 
 Coolify 的 `SERVICE_FQDN_WEB`、`SERVICE_URL_WEB` 是平台自动变量，不需要复制到本地 `.env`。
 
@@ -439,7 +442,9 @@ D:\lipan\Kita
 - [ ] 轮换截图中暴露的 `PAYLOAD_SECRET` 与数据库密码。
 - [ ] 用临时空库验证 4 个 migration。
 - [x] PostgreSQL 已增加 healthcheck，web 等待 `service_healthy`。
-- [ ] 确认生产数据库备份。
+- [x] 仓库已实现 PostgreSQL custom dump -> R2 备份 sidecar，并通过本地负向验证。
+- [ ] 在 Coolify 填写生产备份变量并确认真实 R2 对象。
+- [ ] 用临时 PostgreSQL 16 完成一次恢复演练。
 - [ ] 确认 web/database 重启后数据仍存在。
 
 ### 内容收口

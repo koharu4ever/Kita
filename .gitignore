@@ -31,3 +31,6 @@ Thumbs.db
 .turbo/
 coverage/
 _reference/
+
+# Local PostgreSQL backup artifacts must never be committed.
+*.dump
