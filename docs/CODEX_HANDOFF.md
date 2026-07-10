@@ -116,6 +116,25 @@ PostgreSQL Windows Service
 node ➜ /workspaces/Kita
 ```
 
+### Dev Container 用户边界
+
+Docker-in-Docker 入口需要容器默认用户保持 root，但 VS Code 和生命周期命令使用 `remoteUser: node`。因此：
+
+```text
+VS Code Dev Container 终端       node
+裸 docker exec（未指定 -u）      可能是 root
+```
+
+Codex 或其他自动化通过 Docker 进入容器时，必须显式使用：
+
+```bash
+docker exec -u node -w /workspaces/Kita <container> ...
+```
+
+项目 package scripts 与 `next.config.ts` 已加入 bind-mounted workspace 用户守卫。root 在 `/workspaces/...` 运行项目命令会被拒绝；dev/build 冲突也会被拒绝。不得用 sudo 绕过守卫。
+
+如果守卫报告 `.next` 所有权异常，先停止所有 Next 进程，再按 `docs/first-priority-next-build-gate-remediation-2026-07-10.md` 的路径核验和清理流程处理。禁止把清理范围扩大到数据库、Volume、`node_modules` 或其他项目目录。
+
 ## 4. Compose 分层
 
 ### `compose.yaml`
