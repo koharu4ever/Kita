@@ -51,7 +51,7 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Unit tests
+      - name: Tests
         run: pnpm test
 
       - name: Production build
