@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 
 import { env } from "@/config/env";
 import { createGameBody } from "@/features/games/data/game-items";
-import type { PayloadGameDocument } from "@/features/games/utils/map-game-document-to-game-detail";
-import type { Game } from "@/payload/payload-types";
 import { getPayloadClient } from "@/server/payload/get-payload";
+import { upsertGameSeeds, type SeedGame } from "@/server/games/seed-games";
 
-type SeedGame = PayloadGameDocument & Pick<Game, "publicationStatus">;
-
-const seedGames: SeedGame[] = [
+const gameSeeds: SeedGame[] = [
   {
     body: createGameBody([
       "The story begins with three separate sounds meeting at school: guitar, piano, and a voice from the rooftop. That brief harmony becomes the emotional center of a relationship shaped by late autumn, winter snow, and choices that arrive too late.",
@@ -49,32 +46,7 @@ export async function POST() {
   }
 
   const payload = await getPayloadClient();
-  const createdOrUpdated = [];
-
-  for (const game of seedGames) {
-    const existing = await payload.find({
-      collection: "games",
-      limit: 1,
-      where: {
-        slug: {
-          equals: game.slug,
-        },
-      },
-    });
-
-    const savedGame = existing.docs[0]
-      ? await payload.update({
-          collection: "games",
-          id: existing.docs[0].id,
-          data: game,
-        })
-      : await payload.create({
-          collection: "games",
-          data: game,
-        });
-
-    createdOrUpdated.push(savedGame);
-  }
+  const createdOrUpdated = await upsertGameSeeds(payload, gameSeeds);
 
   return NextResponse.json({
     count: createdOrUpdated.length,
