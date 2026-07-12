@@ -26,7 +26,7 @@
 
 PR #1 已增加 7 个 Vitest 文件、30 个高价值单元测试；PR #2 已增加只读、无 production secret 的 GitHub Actions `quality` workflow。PR #2 的远端 CI 已真实运行通过，main Ruleset 已要求通过 Pull Request 和 `quality`，并阻止删除与 force push。两个 PR 已依次合并到 main。
 
-因此 P1-3 的第一阶段已关闭。后续临时 PostgreSQL、Playwright、published 权限和 backup 失败分支测试仍按独立增强项推进，不影响本阶段关闭结论。
+因此 P1-3 的第一阶段已关闭。2026-07-12 的后续独立 PR 又增加了 4 个 backup shell 场景，验证 dump、archive 校验和上传失败不会误报成功。临时 PostgreSQL、Playwright 和 published 权限测试仍按独立增强项推进，不影响本阶段关闭结论。
 
 ## 1. 结论
 
@@ -194,13 +194,15 @@ skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
 - main Ruleset 已要求通过 Pull Request 和 GitHub Actions `quality`，required approvals 为 0，并限制删除 main、阻止 force push；
 - PR #1、PR #2 已依次合并；远端 main 的合并提交分别为 `9bf5caa`、`faf8cea`。
 
-因此 P1-3 的“第一阶段高价值测试 + 自动 CI + main 合并门禁”已经闭环。临时 PostgreSQL、published 权限集成测试、Playwright smoke 和 backup 失败分支仍属于后续增强，不能据此声称整个测试体系已经完备。具体实施记录见 `docs/testing-and-github-actions-guide-2026-07-10.md`。
+因此 P1-3 的“第一阶段高价值测试 + 自动 CI + main 合并门禁”已经闭环，backup shell 的 4 个失败/成功场景也已作为后续独立增强实现。临时 PostgreSQL、published 权限集成测试和 Playwright smoke 仍未完成，不能据此声称整个测试体系已经完备。具体实施记录见 `docs/testing-and-github-actions-guide-2026-07-10.md`。
 
 ### P1-4：备份容器 Running 不代表最近备份成功
 
 `backup.sh` 会永久循环并在失败后重试，因此凭据失效、R2 故障或 tmpfs 空间不足时，容器仍可能显示 Running。当前没有 healthcheck、last-success 文件、指标或告警。
 
-真实上传和恢复演练完成后，应至少记录最近成功时间，并让 healthcheck 或外部检查判断是否超过允许窗口。
+2026-07-12 已增加 4 个 fake-command shell 场景，自动证明 `pg_dump`、archive 校验或 R2 上传失败不会打印 `Backup completed`，并验证临时 dump 清理。它关闭了失败误报的回归缺口，但不能证明最近一次真实备份成功。
+
+后续仍应记录最近成功时间，并让 healthcheck 或外部检查判断是否超过允许窗口。
 
 当前 R2 Token 具备对象读写能力，dump 也没有应用层加密。对当前单人项目可作为已知取舍，但 Token 泄露意味着攻击者可能读取或删除备份；数据敏感度提高后应考虑对象锁、权限隔离或客户端加密。
 

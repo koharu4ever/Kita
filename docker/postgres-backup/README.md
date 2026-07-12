@@ -37,6 +37,18 @@ R2 对象路径和时间戳统一使用 UTC：
 kita/postgres/YYYY/MM/<database>-YYYYMMDDTHHMMSSZ.dump
 ```
 
+## 自动化失败分支测试
+
+使用下面的命令单独运行 backup shell 测试：
+
+```bash
+pnpm test:backup
+```
+
+`pnpm test` 会先运行 Vitest，再自动运行这组 shell 测试。测试直接执行真实 `backup.sh`，但通过临时 `PATH` 注入 fake `pg_isready`、`pg_dump`、`pg_restore`、`rclone` 和 `sleep`，覆盖 dump 失败、archive 校验失败、上传失败和成功四个场景。
+
+测试不连接 PostgreSQL 或 R2，不读取 production secret，不修改 Coolify，也不操作 Docker Volume。实现和断言说明见 `docs/testing-and-github-actions-guide-2026-07-10.md` 第十七节。
+
 ## 验证与恢复
 
 R2 中出现对象、日志显示成功，只能证明导出和上传链路成功，不能替代恢复演练。正式依赖这套备份前，应下载一个 dump，并恢复到临时 PostgreSQL 16 数据库。

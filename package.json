@@ -24,7 +24,9 @@
     "typecheck": "node scripts/assert-dev-workspace-user.mjs --check-next && tsc --noEmit",
     "seed:games": "node scripts/assert-dev-workspace-user.mjs && curl -X POST http://localhost:3000/api/dev/seed-games",
     "seed:tools": "node scripts/assert-dev-workspace-user.mjs && curl -X POST http://localhost:3000/api/dev/seed-tools",
-    "test": "node scripts/assert-dev-workspace-user.mjs && vitest run",
+    "test": "pnpm test:unit && pnpm test:backup",
+    "test:unit": "node scripts/assert-dev-workspace-user.mjs && vitest run",
+    "test:backup": "node scripts/assert-dev-workspace-user.mjs && sh docker/postgres-backup/tests/backup.test.sh",
     "test:watch": "node scripts/assert-dev-workspace-user.mjs && vitest"
   },
   "dependencies": {
