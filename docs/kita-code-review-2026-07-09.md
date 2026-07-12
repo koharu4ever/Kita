@@ -18,9 +18,15 @@
 | P0-2 生产 secret 与备份恢复未闭环 | **已关闭，剩余事项转后续增强** | 生产备份连续成功且 R2 存在对应对象；恢复演练和 secret 轮换未执行，由项目所有者明确接受为现阶段非阻断风险。                        |
 | P0-3 migration 未从空库验证       | **已解决**                     | 项目所有者确认生产首次部署使用全新 PostgreSQL Volume，entrypoint 成功执行四个 migration，之后 Admin、Tools、Reviews、Games 正常。 |
 
-因此，三个 P0 均已关闭。当前最高优先级转为 **P1-3：测试与 CI**。
+因此，三个 P0 均已关闭。2026-07-10 时当前最高优先级转为 **P1-3：测试与 CI**；该项第一阶段随后于 2026-07-12 关闭。
 
 本次状态更新只修改评估文档，没有连接生产数据库、修改 Coolify、输出 secret 或操作 Volume。P0-2 的关闭不代表恢复演练或 secret 轮换已经执行，而是“真实备份已验证，剩余风险已明确接受”。
+
+### 2026-07-12：P1-3 第一阶段测试与 CI 闭环
+
+PR #1 已增加 7 个 Vitest 文件、30 个高价值单元测试；PR #2 已增加只读、无 production secret 的 GitHub Actions `quality` workflow。PR #2 的远端 CI 已真实运行通过，main Ruleset 已要求通过 Pull Request 和 `quality`，并阻止删除与 force push。两个 PR 已依次合并到 main。
+
+因此 P1-3 的第一阶段已关闭。后续临时 PostgreSQL、Playwright、published 权限和 backup 失败分支测试仍按独立增强项推进，不影响本阶段关闭结论。
 
 ## 1. 结论
 
@@ -30,22 +36,22 @@ Kita 作为初版是合格且有明显亮点的，整体约 **7/10**；只评价
 
 2026-07-10 更新后，原报告的三个 P0 均已关闭：本地 build gate 已恢复并加入防复发守卫；生产 R2 备份已连续成功；完整 migration 链路已由首次生产空库部署验证。
 
-当前短板主要集中在测试与 CI、备份最近成功时间监控，以及内容、性能、可访问性、错误/空状态和 SEO。恢复演练与 secret 轮换保留为后续安全增强，不再作为 P0 阻断。
+P1-3 第一阶段关闭后，当前短板主要集中在备份最近成功时间监控、集成/E2E 测试，以及内容、性能、可访问性、错误/空状态和 SEO。恢复演练与 secret 轮换保留为后续安全增强，不再作为 P0 阻断。
 
-一句话评价：**这是一个主架构可靠、三个 P0 已收口的合格初版；下一阶段应把人工验证固化为自动化测试和 CI。**
+一句话评价：**这是一个主架构可靠、三个 P0 已收口，并已建立首批自动测试与 CI 合并门禁的合格初版；下一阶段应继续补集成测试、备份监控和产品层收口。**
 
 ## 2. 评分
 
-| 维度           | 评分 | 评价                                                                    |
-| -------------- | ---: | ----------------------------------------------------------------------- |
-| 架构选择       | 8/10 | Next.js + Payload + PostgreSQL 适合当前规模，没有无意义的中间层。       |
-| 代码组织       | 8/10 | route、feature、server、collection、migration 分层合理。                |
-| 功能完成度     | 7/10 | Home、About、Tools、Reviews、Games、Admin 和详情数据流已成形。          |
-| 安全与配置     | 7/10 | 生产备份已运行；secret 轮换作为已接受的后续增强，环境校验细节仍需修复。 |
-| 数据可靠性     | 8/10 | 生产空库 migration 与连续 R2 备份已有证据；恢复演练仍可作为后续增强。   |
-| 测试与发布门禁 | 4/10 | 本地 build gate 已恢复并加守卫，但仍是 0 个测试、0 个 CI workflow。     |
-| 前端体验与视觉 | 8/10 | 视觉鲜明，响应式基础不错；资源体积和可访问性仍需优化。                  |
-| 可维护性       | 7/10 | 文档充分，但部分规则仍靠文档约束，文档也开始有漂移风险。                |
+| 维度           | 评分 | 评价                                                                                    |
+| -------------- | ---: | --------------------------------------------------------------------------------------- |
+| 架构选择       | 8/10 | Next.js + Payload + PostgreSQL 适合当前规模，没有无意义的中间层。                       |
+| 代码组织       | 8/10 | route、feature、server、collection、migration 分层合理。                                |
+| 功能完成度     | 7/10 | Home、About、Tools、Reviews、Games、Admin 和详情数据流已成形。                          |
+| 安全与配置     | 7/10 | 生产备份已运行；secret 轮换作为已接受的后续增强，环境校验细节仍需修复。                 |
+| 数据可靠性     | 8/10 | 生产空库 migration 与连续 R2 备份已有证据；恢复演练仍可作为后续增强。                   |
+| 测试与发布门禁 | 7/10 | 30 个高价值单元测试、GitHub Actions `quality` 和 main Ruleset 已落地；集成/E2E 仍待补。 |
+| 前端体验与视觉 | 8/10 | 视觉鲜明，响应式基础不错；资源体积和可访问性仍需优化。                                  |
+| 可维护性       | 7/10 | 文档充分，但部分规则仍靠文档约束，文档也开始有漂移风险。                                |
 
 ## 3. 本次实际验证
 
@@ -175,18 +181,20 @@ skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
 
 建议让生产基础 Compose 对 `DATABASE_URI`、`POSTGRES_PASSWORD` 使用 required 语义，或增加自动校验，证明生产部署没有使用模板默认值。
 
-### P1-3：测试和 CI 完全缺失
+### P1-3：测试和 CI 完全缺失 — **第一阶段已关闭（2026-07-12）**
 
-当前 0 个 test/spec、0 个 GitHub Actions workflow。以下规则都只能人工验证：
+2026-07-09 原始审查时确实是 0 个 test/spec、0 个 GitHub Actions workflow；production fallback、Games seed、nullable mapper 等规则只能人工验证。这个历史发现保留用于追溯，但已不再代表当前仓库状态。
 
-- production 不使用 fallback；
-- 匿名用户只能读取 published；
-- Games seed 不删除其他记录；
-- mapper 能处理 nullable tags/links；
-- migration 与 collection 保持一致；
-- backup 失败不会误报成功。
+关闭依据：
 
-第一批只需增加高价值测试：三个 mapper；getter 的正常、空、异常和环境分支；seed upsert；少量页面 smoke test。CI 建议执行 install → format:check → lint → typecheck → test → build，不必追求覆盖率数字。具体方案见 `docs/testing-and-github-actions-guide-2026-07-10.md`。
+- PR #1 增加 Vitest 4、7 个测试文件和 30 个测试，覆盖三个 mapper、Tools/Reviews/Games getter 的正常、空、异常与 development/production 分支，以及 Games seed upsert 不调用 delete；
+- PR #2 增加 `.github/workflows/ci.yml`，在 Pull Request 和 main push 上依次执行 install → format:check → lint → typecheck → test → build；
+- workflow 只有 `contents: read` 权限，不含 production secret、数据库连接或部署步骤；
+- PR #2 的 `CI / quality (pull_request)` 已在 GitHub 托管 runner 上真实运行并通过；
+- main Ruleset 已要求通过 Pull Request 和 GitHub Actions `quality`，required approvals 为 0，并限制删除 main、阻止 force push；
+- PR #1、PR #2 已依次合并；远端 main 的合并提交分别为 `9bf5caa`、`faf8cea`。
+
+因此 P1-3 的“第一阶段高价值测试 + 自动 CI + main 合并门禁”已经闭环。临时 PostgreSQL、published 权限集成测试、Playwright smoke 和 backup 失败分支仍属于后续增强，不能据此声称整个测试体系已经完备。具体实施记录见 `docs/testing-and-github-actions-guide-2026-07-10.md`。
 
 ### P1-4：备份容器 Running 不代表最近备份成功
 
@@ -288,4 +296,4 @@ getter 固定上限为 Tools 20、Reviews 20、Games 100，但没有分页或“
 
 Kita 的三个 P0 已经关闭：本地 build gate 恢复且有防复发守卫；生产 R2 备份持续成功；完整 migration 链路由首次生产空库部署验证。恢复演练与 secret 轮换并未伪装成已执行，而是由项目所有者接受为后续增强。
 
-当前最值得优先处理的是 P1-3 测试与 CI，其次是 backup last-success 监控和产品层收口。主架构不需要推倒重来；把人工验证固化为自动化门禁后，项目会明显更适合长期维护。
+P1-3 第一阶段测试与 CI 已关闭。当前更值得优先处理的是 backup last-success 监控、临时数据库/Playwright 等集成测试，以及产品层收口。主架构不需要推倒重来；现有自动化门禁已经让项目更适合长期维护。

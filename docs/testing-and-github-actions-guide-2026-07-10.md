@@ -6,7 +6,7 @@
 >
 > PR 2 执行日期：2026-07-12
 >
-> 状态：PR 1、PR 2 代码已完成并通过本地门禁；PR 2 尚需 GitHub 首次绿色运行和 main 保护规则确认
+> 状态：**P1-3 第一阶段测试与 CI 闭环已完成**；PR 1、PR 2 已合并，`quality` 已在 GitHub 真实运行通过，main Ruleset 已启用
 >
 > 技术栈：Next.js 16、Payload 3、PostgreSQL 16、Node.js 22、pnpm 10、Vitest 4.0.18
 
@@ -17,7 +17,7 @@ Kita 目前不是“代码不能用”，而是许多关键规则只能靠人工
 建议按四个小 PR 推进：
 
 1. [x] Vitest 单元测试：三个 mapper、getter 分支、Games seed upsert。
-2. [x] 基础 GitHub Actions：自动执行 install、format、lint、typecheck、test、build（本地已验证，等待 GitHub 首次运行）。
+2. [x] 基础 GitHub Actions：自动执行 install、format、lint、typecheck、test、build；GitHub 首次运行已通过，main 已要求 `quality`。
 3. [ ] 临时 PostgreSQL 16 与 Playwright：migration、published 权限、页面 smoke。
 4. [ ] backup shell 失败分支：确认失败绝不误报成功。
 
@@ -43,7 +43,7 @@ GitHub Actions 是 GitHub 临时提供的一台干净 Linux 机器。push 或创
 
 第一批以单元测试为主；数据库和浏览器测试后续独立增加，失败时更容易定位。
 
-## 三、当前仓库状态
+## 三、实施前仓库状态
 
 截至 2026-07-10，只读检查确认：
 
@@ -54,7 +54,7 @@ GitHub Actions 是 GitHub 临时提供的一台干净 Linux 机器。push 或创
 - 三个 mapper、server getters、Games seed route 适合成为第一批测试目标；
 - production 由 Coolify 管理，CI 不应获得生产数据库或 R2 凭据。
 
-所以 P1-3 的判断成立：检查命令虽然存在，但还没有“自动执行并阻止回归”的闭环。
+所以在 2026-07-10 方案制定时，P1-3 的判断成立：检查命令虽然存在，但还没有“自动执行并阻止回归”的闭环。该历史缺口已在 2026-07-12 通过 PR 1、PR 2 和 main Ruleset 关闭。
 
 ## 四、第一批具体测什么
 
@@ -321,17 +321,19 @@ ENABLE_DEV_SEED: "false"
 
 用 fake `pg_dump`、`pg_restore`、`rclone` 验证失败不误报成功、进入 retry 并清理临时文件。
 
-## 十四、P1-3 完成标准
+## 十四、P1-3 第一阶段完成确认（2026-07-12）
 
-P1-3 应继续保留为未完成，直到至少完成 PR 1 和 PR 2。仅有测试但 CI 不运行，或仅有 CI 而没有业务规则测试，都不算闭环。
+P1-3 第一阶段现已完成。PR 1 提供业务规则测试，PR 2 提供自动 CI，main Ruleset 把绿色 `quality` 变成合并条件；三者缺一都不能形成闭环。
 
 ```text
-三个 mapper 有测试
-getter 的开发/生产关键分支有测试
-Games seed upsert 有“不删除其他记录”测试
-Pull Request 自动执行 format/lint/typecheck/test/build
-main 必须在 CI 绿色后合并
+[x] 三个 mapper 有测试
+[x] getter 的开发/生产关键分支有测试
+[x] Games seed upsert 有“不删除其他记录”测试
+[x] Pull Request 自动执行 format/lint/typecheck/test/build
+[x] main 必须在 CI 绿色后合并
 ```
+
+以上五项已经全部满足。
 
 migration、published 权限、Playwright 和 backup 失败测试可后续增强，但不能把“人工验证过一次”当作永久保障。
 
@@ -465,7 +467,7 @@ pnpm build
 - 没有增加覆盖率工具或覆盖率门槛。
 - 没有修改生产环境、Coolify、R2 或任何 secret。
 
-因此 PR 1 完成后，P1-3 仍需等待 PR 2 的自动 CI 才能最终闭环。
+这是 PR 1 完成时点的历史结论；PR 2 随后已合并并完成远端 CI 与 main Ruleset，因此 P1-3 第一阶段现已闭环。
 
 ## 十六、PR 2 实际执行记录
 
@@ -475,16 +477,15 @@ pnpm build
 >
 > 范围：只增加基础 CI workflow 和本节教学记录；不连接数据库，不读取 production secret，不部署，也不修改 Coolify。
 
-### 16.1 为什么 PR 2 暂时叠在 PR 1 上
+### 16.1 为什么 PR 2 曾暂时叠在 PR 1 上
 
-PR 1 的 GitHub Pull Request 已创建但尚未合并。为了让 PR 2 使用 PR 1 新增的 `pnpm test` 和 30 个测试，PR 2 分支从 PR 1 的提交继续创建。正确合并顺序是：
+PR 2 创建时，PR 1 尚未合并。为了让 PR 2 使用 PR 1 新增的 `pnpm test` 和 30 个测试，PR 2 分支从 PR 1 的提交继续创建。GitHub 最终按预期完成了下面的合并顺序：
 
 ```text
-先合并 PR 1
-  → PR 2 自动以新的 main 为共同基础
-  → PR 2 的 Files changed 只剩 ci.yml 和本教学记录
-  → 等 PR 2 的 quality 全绿
-  → 再合并 PR 2
+[x] PR #1 合并到 main（main merge commit: 9bf5caa）
+[x] PR #2 的 Files changed 收敛为 ci.yml 和本教学记录
+[x] PR #2 的 CI / quality 真实运行通过
+[x] PR #2 合并到 main（main merge commit: faf8cea）
 ```
 
 这叫 stacked PR（堆叠 PR）。它没有把同一份代码复制两次；GitHub 会根据共同提交自动缩小差异。
@@ -534,16 +535,16 @@ checkout
 
 这次 `pnpm build` 在 Windows bind mount 上耗时较长。检查时主进程和 worker 持续有 CPU/I/O 活动，最终正常生成 `BUILD_ID`；没有重复启动 build，没有删除 `.next`，也没有改变其用户边界。
 
-本地通过能证明 workflow 中的项目命令可执行，但不能替代 GitHub runner 的真实结果。因此在 GitHub Actions 第一次显示绿色前，不能声称远端 CI 已经通过。
+本地通过只能证明 workflow 中的项目命令可执行，不能替代 GitHub runner。随后 PR #2 的 `CI / quality (pull_request)` 在 GitHub 托管 runner 上约 1 分钟完成并显示绿色，因此远端 CI 已有真实通过证据。
 
-### 16.5 推送后在 GitHub 做什么
+### 16.5 GitHub 收尾操作（已完成）
 
-1. 先合并已经打开的 PR 1。
-2. 用 PR 2 分支创建一个目标为 `main` 的 Pull Request。
-3. 打开 PR 的 **Checks**，确认 `CI / quality` 六个质量步骤全部绿色。
-4. 进入仓库 **Settings → Rules → Rulesets**（旧界面可能是 **Branches**）。
-5. 为 `main` 创建启用状态的 branch ruleset：要求通过 Pull Request，要求 status checks，通过列表选择 `quality`。
-6. 保存后确认检查运行中或失败时，GitHub 不允许合并。
+1. [x] PR #1 已合并。
+2. [x] PR #2 已创建并以 `main` 为目标分支。
+3. [x] PR #2 的 **Checks** 显示 `CI / quality` 成功。
+4. [x] 已进入 **Settings → Rules → Rulesets** 创建 main branch ruleset。
+5. [x] Ruleset 要求通过 Pull Request 和 GitHub Actions 的 `quality`，required approvals 为 0。
+6. [x] 同一 Ruleset 还限制删除 main、阻止 force push，并处于启用状态。
 
 `quality` 通常要先实际运行一次才会出现在可选检查列表里，所以保护规则应在第一次 CI 运行后设置。仓库内的 YAML 不能代替这个 GitHub 网页设置。
 
@@ -561,17 +562,16 @@ ESLint 错误 → Lint 变红
 
 看到预期的红色 step 后，立即修复或撤销那一个临时提交并再次 push。最终 PR 必须恢复全绿。只有 `quality` 已设为必需检查时，“变红”才会同时真正阻止合并。
 
-### 16.7 PR 2 的完成边界
+### 16.7 PR 2 与 P1-3 第一阶段完成确认
 
-仓库侧已经完成：workflow、只读权限、无 secret 配置、本地完整门禁和文档记录。
+仓库侧和 GitHub 侧均已完成：
 
-仍需 GitHub 页面证据：
+- workflow 使用只读权限、无 production secret，并执行完整质量门禁；
+- PR #2 的 `CI / quality` 首次真实运行全绿；
+- main Ruleset 已要求 Pull Request 和 GitHub Actions `quality`，并阻止删除与 force push；
+- PR #2 已在满足门禁后合并，远端 `main` 为合并提交 `faf8cea`，且包含 PR 2 提交与 `.github/workflows/ci.yml`。
 
-- PR 2 的 `CI / quality` 首次运行全绿；
-- main ruleset 已要求 Pull Request 和 `quality`；
-- 红色或运行中的 `quality` 确实禁止合并。
-
-这三项确认后，PR 2 和 P1-3 才能正式标记为完全闭环。
+因此 PR 2 和 P1-3 第一阶段在 2026-07-12 正式闭环。没有为了演示而向远端推送故意失败的提交；失败或运行中的 `quality` 会被已启用的 GitHub required status check 规则阻止合并。
 
 ## 十七、官方资料
 
