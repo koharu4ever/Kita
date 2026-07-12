@@ -4,7 +4,9 @@
 >
 > PR 1 执行日期：2026-07-12
 >
-> 状态：PR 1 已完成实施和本地验证；GitHub Actions workflow 仍属于 PR 2
+> PR 2 执行日期：2026-07-12
+>
+> 状态：PR 1、PR 2 代码已完成并通过本地门禁；PR 2 尚需 GitHub 首次绿色运行和 main 保护规则确认
 >
 > 技术栈：Next.js 16、Payload 3、PostgreSQL 16、Node.js 22、pnpm 10、Vitest 4.0.18
 
@@ -15,7 +17,7 @@ Kita 目前不是“代码不能用”，而是许多关键规则只能靠人工
 建议按四个小 PR 推进：
 
 1. [x] Vitest 单元测试：三个 mapper、getter 分支、Games seed upsert。
-2. [ ] 基础 GitHub Actions：自动执行 install、format、lint、typecheck、test、build。
+2. [x] 基础 GitHub Actions：自动执行 install、format、lint、typecheck、test、build（本地已验证，等待 GitHub 首次运行）。
 3. [ ] 临时 PostgreSQL 16 与 Playwright：migration、published 权限、页面 smoke。
 4. [ ] backup shell 失败分支：确认失败绝不误报成功。
 
@@ -189,7 +191,7 @@ export default defineConfig({
 
 ## 七、第一版 GitHub Actions
 
-计划创建 `.github/workflows/ci.yml`。以下 action 主版本已于 2026-07-10 从官方仓库核对；真正实施时仍应再确认一次。
+已创建 `.github/workflows/ci.yml`。以下 action 主版本在 2026-07-12 实施时从官方仓库再次核对。
 
 ```yaml
 name: CI
@@ -217,9 +219,14 @@ jobs:
       ENABLE_DEV_SEED: "false"
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Install pnpm from packageManager
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
@@ -302,9 +309,9 @@ ENABLE_DEV_SEED: "false"
 
 三个 mapper、getter 分支和 Games seed upsert 已完成；测试不连接数据库。`pnpm test`、`pnpm check`、`pnpm build` 均已通过。详细文件和验证结果见第十五节。
 
-### PR 2：基础 GitHub Actions
+### PR 2：基础 GitHub Actions — 代码已完成（2026-07-12）
 
-增加 `ci.yml`，自动执行 install、format、lint、typecheck、test、build；只读权限；无 production secret；保护 main。验收：正常 PR 全绿；故意制造错误时相应 step 变红且不能合并。
+已增加 `ci.yml`，自动执行 install、format、lint、typecheck、test、build；只读权限；无 production secret。本地等价命令已全部通过，详细记录见第十六节。尚需在 GitHub 完成首次绿色运行，再把 `quality` 设置为 main 的必需检查。
 
 ### PR 3：临时数据库与 smoke
 
@@ -460,7 +467,113 @@ pnpm build
 
 因此 PR 1 完成后，P1-3 仍需等待 PR 2 的自动 CI 才能最终闭环。
 
-## 十六、官方资料
+## 十六、PR 2 实际执行记录
+
+> 执行日期：2026-07-12
+>
+> 分支：`codex/ci-pr2-github-actions`
+>
+> 范围：只增加基础 CI workflow 和本节教学记录；不连接数据库，不读取 production secret，不部署，也不修改 Coolify。
+
+### 16.1 为什么 PR 2 暂时叠在 PR 1 上
+
+PR 1 的 GitHub Pull Request 已创建但尚未合并。为了让 PR 2 使用 PR 1 新增的 `pnpm test` 和 30 个测试，PR 2 分支从 PR 1 的提交继续创建。正确合并顺序是：
+
+```text
+先合并 PR 1
+  → PR 2 自动以新的 main 为共同基础
+  → PR 2 的 Files changed 只剩 ci.yml 和本教学记录
+  → 等 PR 2 的 quality 全绿
+  → 再合并 PR 2
+```
+
+这叫 stacked PR（堆叠 PR）。它没有把同一份代码复制两次；GitHub 会根据共同提交自动缩小差异。
+
+### 16.2 新增的 workflow 做什么
+
+`.github/workflows/ci.yml` 在指向 `main` 的 Pull Request 和 push 到 `main` 时运行一个名为 `quality` 的 job：
+
+```text
+checkout
+  → 安装 package.json 中声明的 pnpm
+  → Node.js 22 + pnpm cache
+  → pnpm install --frozen-lockfile
+  → pnpm format:check
+  → pnpm lint
+  → pnpm typecheck
+  → pnpm test
+  → pnpm build
+```
+
+它还包含两项并发保护：同一分支有新提交时取消旧运行；单次 job 最长 20 分钟。这样不会让过时提交继续占用 runner。
+
+### 16.3 安全边界
+
+- workflow 顶层只有 `permissions: contents: read`；
+- checkout 使用 `persist-credentials: false`，job 不保留 GitHub 写凭据；
+- 没有 deploy、Coolify、SSH、Docker registry 或发布步骤；
+- 没有 `DATABASE_URI`、`PAYLOAD_SECRET`、R2 access key 等 production secret；
+- `NEXT_PUBLIC_SITE_URL` 是 CI 专用公开占位值；
+- `SKIP_ENV_VALIDATION=true` 只让无 secret 的 build 阶段完成编译，不启动生产服务；
+- `ENABLE_DEV_SEED=false` 明确禁止 CI 运行开发 seed。
+
+因此这台 GitHub 临时 runner 只检查代码，不能修改生产环境。
+
+### 16.4 本地等价门禁和结果
+
+先在 Dev Container 中使用 `node` 用户、与 workflow 相同的非 secret 环境变量执行完整顺序：
+
+| 门禁                             | 结果                                          |
+| -------------------------------- | --------------------------------------------- |
+| `pnpm install --frozen-lockfile` | exit 0                                        |
+| `pnpm format:check`              | exit 0                                        |
+| `pnpm lint`                      | exit 0                                        |
+| `pnpm typecheck`                 | exit 0                                        |
+| `pnpm test`                      | exit 0；7 个 test files、30 个 tests 全部通过 |
+| `pnpm build`                     | 完成；Next.js 生成有效 `BUILD_ID`             |
+
+这次 `pnpm build` 在 Windows bind mount 上耗时较长。检查时主进程和 worker 持续有 CPU/I/O 活动，最终正常生成 `BUILD_ID`；没有重复启动 build，没有删除 `.next`，也没有改变其用户边界。
+
+本地通过能证明 workflow 中的项目命令可执行，但不能替代 GitHub runner 的真实结果。因此在 GitHub Actions 第一次显示绿色前，不能声称远端 CI 已经通过。
+
+### 16.5 推送后在 GitHub 做什么
+
+1. 先合并已经打开的 PR 1。
+2. 用 PR 2 分支创建一个目标为 `main` 的 Pull Request。
+3. 打开 PR 的 **Checks**，确认 `CI / quality` 六个质量步骤全部绿色。
+4. 进入仓库 **Settings → Rules → Rulesets**（旧界面可能是 **Branches**）。
+5. 为 `main` 创建启用状态的 branch ruleset：要求通过 Pull Request，要求 status checks，通过列表选择 `quality`。
+6. 保存后确认检查运行中或失败时，GitHub 不允许合并。
+
+`quality` 通常要先实际运行一次才会出现在可选检查列表里，所以保护规则应在第一次 CI 运行后设置。仓库内的 YAML 不能代替这个 GitHub 网页设置。
+
+### 16.6 怎样安全验证“错误会变红”
+
+不需要污染 main，也不要删除测试。可以在一个临时验证分支故意制造一种小错误，例如把代码格式打乱或写一个错误类型，然后 push：
+
+```text
+格式错误 → Check formatting 变红
+ESLint 错误 → Lint 变红
+类型错误 → Typecheck 变红
+错误断言 → Unit tests 变红
+编译错误 → Production build 变红
+```
+
+看到预期的红色 step 后，立即修复或撤销那一个临时提交并再次 push。最终 PR 必须恢复全绿。只有 `quality` 已设为必需检查时，“变红”才会同时真正阻止合并。
+
+### 16.7 PR 2 的完成边界
+
+仓库侧已经完成：workflow、只读权限、无 secret 配置、本地完整门禁和文档记录。
+
+仍需 GitHub 页面证据：
+
+- PR 2 的 `CI / quality` 首次运行全绿；
+- main ruleset 已要求 Pull Request 和 `quality`；
+- 红色或运行中的 `quality` 确实禁止合并。
+
+这三项确认后，PR 2 和 P1-3 才能正式标记为完全闭环。
+
+## 十七、官方资料
 
 - [Bulletproof React：Project Structure](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md)
 - [Bulletproof React：Testing](https://github.com/alan2207/bulletproof-react/blob/master/docs/testing.md)
@@ -468,6 +581,7 @@ pnpm build
 - [GitHub：actions/checkout](https://github.com/actions/checkout)
 - [GitHub：actions/setup-node](https://github.com/actions/setup-node)
 - [pnpm：pnpm/action-setup](https://github.com/pnpm/action-setup)
+- [GitHub：管理分支 ruleset](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/managing-rulesets-for-a-repository)
 - [GitHub：PostgreSQL service container](https://docs.github.com/en/actions/tutorials/use-containerized-services/create-postgresql-service-containers)
 - [Vitest 入门](https://vitest.dev/guide/)
 - [Vitest Mocking](https://vitest.dev/guide/mocking.html)
