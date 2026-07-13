@@ -23,6 +23,6 @@ export const env = createEnv({
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
-  skipValidation: Boolean(process.env.SKIP_ENV_VALIDATION),
+  skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
   emptyStringAsUndefined: true,
 });
