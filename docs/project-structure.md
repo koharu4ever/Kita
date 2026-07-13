@@ -1,6 +1,6 @@
 # Kita Project Structure
 
-> 最后核对：2026-07-12
+> 最后核对：2026-07-13
 >
 > 定位：当前代码目录与依赖边界的 source of truth。较早 plan/notes 中的 “future” 或“尚未接入”描述只代表历史阶段。
 
@@ -244,7 +244,7 @@ docker/postgres-backup/tests/backup.test.sh
 当前 `pnpm test` 依次运行：
 
 ```text
-30 个 Vitest
+33 个 Vitest（8 个测试文件）
 -> 4 个 backup shell 场景
 ```
 
@@ -290,7 +290,6 @@ main Ruleset 要求 PR 和 `quality`，并阻止 force push 与删除 main。
 
 ## 仍需关注但不要求重构的地方
 
-- `src/config/env.ts` 的 `SKIP_ENV_VALIDATION` 仍应改为严格比较 `=== "true"`；
 - production Compose 的数据库默认凭据仍应评估 fail-fast；
 - 尚无临时 PostgreSQL/published 集成测试和 Playwright smoke；
 - 页面 error/empty/not-found、分页、metadata、可访问性仍可加强；

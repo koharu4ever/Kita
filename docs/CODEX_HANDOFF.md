@@ -1,6 +1,6 @@
 # Kita Codex 开发交接
 
-> 更新时间：2026-07-12
+> 更新时间：2026-07-13
 >
 > 项目根目录：`D:\lipan\Kita`
 >
@@ -25,10 +25,10 @@ Kita 的本地开发环境和 Coolify 生产运行链路已经搭建完成并通
 本地 PostgreSQL 16              healthy
 本地 Node                       v22.16.0
 本地 pnpm                       10.28.2
-pnpm test                       30 Vitest + 4 backup shell 场景通过
+pnpm test                       33 Vitest + 4 backup shell 场景通过
 pnpm check                      通过
 pnpm build                      通过
-GitHub main                     f853969（PR #5）
+GitHub main                     bf9c53e（PR #7）
 GitHub Actions quality          已启用并通过
 main Ruleset                    必须 PR + quality
 Coolify Compose Production      正在运行
@@ -43,7 +43,7 @@ https://kita.kral-koharu.com/   HTTP 200
 当前最新 main：
 
 ```text
-f853969 Merge pull request #5 from koharu4ever/codex/test-backup-shell
+bf9c53e Merge pull request #7 from koharu4ever/codex/fix-env-validation-flag
 ```
 
 ## 2. 项目架构
@@ -247,7 +247,7 @@ pnpm test
 pnpm check
 ```
 
-`pnpm test` 运行 30 个 Vitest 和 4 个 backup shell 场景；`pnpm check` 依次执行 format、lint、typecheck。
+`pnpm test` 运行 33 个 Vitest 和 4 个 backup shell 场景；`pnpm check` 依次执行 format、lint、typecheck。
 
 ### 生产构建检查
 
@@ -456,7 +456,6 @@ web runtime logs
 当前代码与工程底座已经稳定，不需要继续扩张技术栈。建议顺序：
 
 ```text
-P1 修复 SKIP_ENV_VALIDATION 严格布尔判断
 P1 评估 production Compose 数据库凭据 fail-fast
 P1 替换 About、Tools 等前台 placeholder，录入真实内容
 P1 补 error / empty / not-found 产品行为
