@@ -45,6 +45,85 @@ PR #1 已增加 7 个 Vitest 文件、30 个高价值单元测试；PR #2 已增
 
 没有发现必须通过大规模目录调整才能解决的循环依赖、重复后端或职责倒置。当前最容易造成“项目结构混乱”感受的来源是历史文档与现状不同步，而不是业务代码本身。今后应以 `CODEX_HANDOFF.md`、`current-project-status.md`、`project-structure.md` 和 `development-production-alignment.md` 为当前事实入口，其余带日期的评估与修复文件主要作为历史证据。
 
+### 2026-07-12：第二次当前代码复核与下一步决定
+
+#### 当前结论
+
+本次复核基线为 `main` / `c4e83c8`（PR #6 已合并），工作树干净。实际执行结果：
+
+```text
+pnpm test    通过：7 files / 30 Vitest + 4 backup shell scenarios
+pnpm check   通过：Prettier + ESLint + TypeScript
+```
+
+本次没有启动本地 PostgreSQL；Dev Container 可用，`.env` 中要求的四个键均存在，但只检查键名，没有读取或输出任何值。没有连接或修改生产环境、数据库、secret 或 Volume。
+
+**没有发现新的 P0，也没有发现需要推倒重写的架构问题。** 对当前个人内容站 V1，代码架构清晰度约为 **8/10**；把历史文档和仍显示 “draft/placeholder” 的页面文案计算进去，整体理解清晰度约为 **7/10**。
+
+#### 为什么代码结构是清楚的
+
+```text
+src/app route
+  -> src/server getter
+  -> Payload Local API
+  -> PostgreSQL
+  -> feature mapper / view model
+  -> feature component
+```
+
+- route 文件很薄，没有把查询、mapping 和大块 UI 混在一起；
+- `src/features` 按 Games、Reviews、Tools 等业务域组织，符合项目采用的 feature-oriented 方向；
+- `src/server` 统一承担 Payload 查询、production fail-fast 和 development fallback；
+- collection schema、generated types 和 migration 分别位于稳定位置；
+- Docker、backup、workspace guard 和 GitHub Actions 没有侵入业务目录；
+- 测试与 mapper/getter/seed 就近放置，跨测试 fixture 才进入 `src/testing`；
+- 当前没有证据表明存在循环依赖、重复后端、巨型 service 层或需要引入 Prisma/Redis 的问题。
+
+#### 当前真正需要解决的问题
+
+| 优先级  | 问题                                                                | 影响                                                                                                                                      | 当前判断                                                        |
+| ------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| P1      | `src/config/env.ts` 用 `Boolean(process.env.SKIP_ENV_VALIDATION)`   | 字符串 `"false"` 也会被当成 `true`，可能意外跳过环境校验；而 `payload.config.ts` 已使用严格比较，两处行为不一致                           | **下一项最适合解决的问题**                                      |
+| P1      | `compose.yaml` 为 `DATABASE_URI` 和 PostgreSQL 凭据保留开发默认值   | 生产变量漏填时可能使用弱默认值继续启动，降低 fail-fast 能力                                                                               | 应单独设计，不能直接破坏本地开发默认流程                        |
+| P1-理解 | 必读文档与当前事实仍有漂移                                          | handoff/status 固定写着 PR #5，但当前已是 PR #6；`development-production-alignment.md` 仍写 secret “必须轮换”，与当前已接受延期的决定冲突 | 不影响运行，但会直接造成接手者判断困难                          |
+| P1-产品 | About 与 Tools 仍公开显示 placeholder / static draft 文案           | 访问者会认为 CMS 尚未接入或站点仍是脚手架，与真实架构不符                                                                                 | 技术收口后应马上替换                                            |
+| P2      | collection 的写权限依赖 Payload 默认“需要已认证用户”                | 当前不是匿名可写漏洞，但意图不够显式，阅读代码时需要知道框架默认规则                                                                      | 后续提取 `authenticated` helper 并显式声明 create/update/delete |
+| P2      | development fallback 文件名看起来像第二套正式数据源                 | `game-items.ts`、`review-items.ts`、`toolkit-items.ts` 容易让新接手者误以为生产同时依赖静态数据                                           | 可改名为 `development-fallback-*`，或在文件头明确用途           |
+| P2      | detail metadata 与页面分别调用同一 getter                           | Games/Reviews 详情请求可能产生重复 Payload 查询                                                                                           | 内容量增大后用 React `cache()` 或共享 request memoization       |
+| P2      | Lightbox 缺少完整 focus trap/焦点恢复                               | 键盘和读屏体验不完整                                                                                                                      | 产品可访问性收口时处理                                          |
+| P2      | WebGL renderer 只删除 program/buffer，没有保存并删除创建的 textures | 多次 resize/重建场景可能累积 GPU 资源，长期停留首页时有性能风险                                                                           | 应在首页性能 PR 中修复并验证                                    |
+| P2      | 没有自定义 error/empty/not-found、health endpoint 和页面 smoke      | 数据为空或后端失败时体验依赖框架默认行为；单元测试无法证明真实 HTTP 链路                                                                  | 逐步补，不是当前 P0                                             |
+
+Payload 当前版本的默认 Access Control 会要求请求中存在已认证用户；因此三个内容 collection 没有显式 `create/update/delete` 时，**不能据此断言匿名用户可以写入**。但是显式写出权限仍更利于审计和理解。参考：[Payload Access Control](https://payloadcms.com/docs/access-control/overview)。
+
+#### 最容易造成理解问题的地方
+
+1. **历史文档数量多，而且部分文档同时被列为“必读”。** 带日期的实施记录应视为历史证据，不应和当前状态入口处于同一权威层级。
+2. **固定 commit 编号很快过期。** `CODEX_HANDOFF.md` 与 `current-project-status.md` 写死 `f853969`，PR #6 合并后立刻落后；以后更适合记录“最后核对日期 + 当时基线”，不要称为永久“当前最新 main”。
+3. **页面文案否认了已经存在的架构。** About 写着 CMS 尚未接入，Tools 仍显示 “STATIC FRONT-END DRAFT”，会让维护者和访问者误判 Payload 是否已经工作。
+4. **production CMS 与 development fallback 同时存在。** 这是合理设计，但命名不够直白；生产不会使用 fallback，这个边界主要依靠 getter 和文档解释。
+5. **权限安全依赖框架默认值。** 行为当前安全，但读者必须先知道 Payload 默认 access 才能确认，因此显式配置更容易维护。
+
+#### 建议的下一步，不要再继续扩张基础设施
+
+建议按三个小 PR 推进：
+
+1. **PR A：严格环境校验（现在就做）**
+   - 把 `src/config/env.ts` 改为 `process.env.SKIP_ENV_VALIDATION === "true"`；
+   - 增加 `true`、`false`、未设置三个分支测试；
+   - 确认 Docker build 和 GitHub Actions 仍通过；
+   - 顺手消除 `payload.config.ts` 与 `src/config/env.ts` 的行为差异。
+2. **PR B：生产 Compose fail-fast（单独做）**
+   - production 不允许默认数据库密码或 fallback `DATABASE_URI`；
+   - development 默认值放进 `compose.dev.yaml` 或本地 `.env.example`；
+   - 只验证 Compose config，不修改 Coolify 和现有 Volume。
+3. **PR C：从工程转回产品**
+   - 替换 About、Tools 的 placeholder/draft 文案；
+   - 增加 Tools/Reviews/Games 的空状态与一个通用错误边界；
+   - 再录入真实内容。此时用户可见收益高于继续增加测试框架。
+
+临时 PostgreSQL、Playwright、恢复演练和 backup last-success 都有价值，但以当前内容量不应排在上述三项之前。当前最合理的方向是：**用一个很小的配置 PR 消除真实代码 bug，然后停止工程底座扩张，开始完成内容和产品体验。**
+
 ## 1. 结论
 
 Kita 作为初版是合格且有明显亮点的，整体约 **7/10**；只评价个人内容站初版的产品与架构完成度，可以给 **7.5/10**。
