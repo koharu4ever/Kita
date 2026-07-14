@@ -6,8 +6,8 @@
   "packageManager": "pnpm@10.28.2",
   "scripts": {
     "workspace:check-user": "node scripts/assert-dev-workspace-user.mjs --check-next",
-    "dev": "node scripts/assert-dev-workspace-user.mjs --check-next --mode=dev && next dev",
-    "dev:services": "node scripts/assert-dev-workspace-user.mjs && docker compose -f compose.yaml -f compose.dev.yaml up -d postgres",
+    "dev": "node scripts/assert-dev-workspace-user.mjs --check-next --mode=dev && pnpm dev:services && next dev",
+    "dev:services": "node scripts/assert-dev-workspace-user.mjs && docker compose -f compose.yaml -f compose.dev.yaml up -d --wait postgres",
     "dev:services:stop": "node scripts/assert-dev-workspace-user.mjs && docker compose -f compose.yaml -f compose.dev.yaml stop postgres",
     "build": "node scripts/assert-dev-workspace-user.mjs --check-next --mode=build && next build",
     "start": "node scripts/assert-dev-workspace-user.mjs --check-next && next start",

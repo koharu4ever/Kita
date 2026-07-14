@@ -73,6 +73,10 @@ package.json
 
 不要为 `node_modules`、`.pnpm-store` 或 `.next` 擅自增加 named volume。当前 workspace guard 已负责阻止 root 生成物和 dev/build 并发写入。
 
+> 2026-07-14 性能例外：在用户明确授权并确认 Windows `9p` 是冷编译瓶颈后，Dev Container 仅为 `node_modules` 与 `.next` 增加 targeted named volumes。root 用户禁令、`.next` 所有权检查和 dev/build 并发守卫仍然有效；这不允许擅自增加数据库 Volume 或修改生产结构。
+>
+> 修改该配置后需执行一次 `Dev Containers: Rebuild Container`。
+
 ## `src` 当前布局
 
 ```text
