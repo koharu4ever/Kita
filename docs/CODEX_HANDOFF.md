@@ -224,9 +224,12 @@ DATABASE_URI 中的数据库用户、密码和数据库名
 在 Dev Container 终端执行：
 
 ```bash
-pnpm dev:services
 pnpm dev
 ```
+
+`pnpm dev` 会先幂等启动本地 PostgreSQL，并等待 healthcheck 通过，再启动 Next.js。只有需要单独启动数据库而暂时不启动 Web 时，才执行 `pnpm dev:services`。
+
+Dev Container 将 `node_modules` 和 `.next` 挂载到只用于本地开发的 Docker named volumes，避免 Windows bind mount 的高频小文件 I/O。修改 `.devcontainer/devcontainer.json` 后必须执行一次 `Dev Containers: Rebuild Container`；两个 Volume 仍必须由 `node` 用户写入，现有 root 与 dev/build 并发守卫继续生效。
 
 访问：
 
@@ -239,6 +242,8 @@ http://localhost:3000/admin
 ```
 
 Windows 机械盘 + bind mount 的首次 Next.js 编译可能需要一两分钟。Next.js 已报告 slow filesystem，这属于 I/O 性能，不等于代码或依赖错误。
+
+从 2026-07-14 起，`.next` 与 `node_modules` 改由 Linux named volumes 承载；源码仍在 Windows，但 Next 高频缓存和依赖读写不再经过 9p。第一次重建会重新安装依赖，后续冷编译与 HMR 才会受益。
 
 ### 日常检查
 
