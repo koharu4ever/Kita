@@ -4,6 +4,10 @@
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:3": {}
   },
+  "mounts": [
+    "source=${devcontainerId}-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+    "source=${devcontainerId}-next-cache,target=${containerWorkspaceFolder}/.next,type=volume"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -18,6 +22,6 @@
       }
     }
   },
-  "postCreateCommand": "sudo corepack enable && pnpm install --frozen-lockfile",
+  "postCreateCommand": "sudo corepack enable && sudo chown node:node node_modules .next && pnpm install --frozen-lockfile",
   "remoteUser": "node"
 }

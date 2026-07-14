@@ -8,6 +8,10 @@
 >
 > 安全边界：不读取或输出 secret，不修改生产环境，不操作 PostgreSQL，不停止或删除数据库 Volume，不修改业务源码。
 
+> 2026-07-14 后续：本文当时不建议 named volume，是因为首要矛盾是 root 污染而非性能。root 与并发守卫完成后，新的实测证据确认 Windows `9p` 使 `.next` 高频 I/O 严重变慢，因此现已在 Dev Container 中为 `.next` 和 `node_modules` 增加 targeted named volumes。该变化不替代本文的 node 用户边界，也不涉及 PostgreSQL Volume。
+>
+> named volume 生效后，如需重建缓存，应先停止 Next 进程并清空挂载目录内容，不应删除、替换或扩大处理范围到数据库 Volume。
+
 ## 1. 第一优先级是什么
 
 第一优先级是修复 Dev Container 工作区中被污染的 `.next` 生成目录，使下面两条命令重新得到可信、可重复的退出结果：

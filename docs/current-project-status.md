@@ -393,6 +393,10 @@ D:\lipan\Kita
 
 准确说法是：项目专属运行时与服务已隔离；项目源码和生成目录通过 bind mount 与宿主机共享。
 
+> 2026-07-14 更新：源码与 `.env` 仍由 `D:\lipan\Kita` bind mount 到 `/workspaces/Kita`；`node_modules` 与 `.next` 改为 Dev Container targeted named volumes，以避开 Windows `9p` 高频小文件瓶颈。PostgreSQL 继续使用独立的 Docker managed volume，生产结构不变。
+>
+> `pnpm dev` 会自动启动并等待本地 PostgreSQL healthy；无需再手工先运行 `pnpm dev:services`。
+
 ## 8. 当前数据库与 migration 状态
 
 仓库包含：
