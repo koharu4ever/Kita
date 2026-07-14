@@ -17,6 +17,10 @@ const gameSeeds: SeedGame[] = [
     coverWidth: 1920,
     developer: "Leaf / AQUAPLUS / STING",
     links: [
+      {
+        href: "https://archive.kral-koharu.com/White%20Album%202.zip",
+        label: "Game archive",
+      },
       { href: "https://vndb.org/v7771", label: "VNDB" },
       {
         href: "https://en.wikipedia.org/wiki/White_Album_2",
