@@ -4,6 +4,7 @@ import type { Route } from "next";
 import { useState } from "react";
 
 import type { GameDetail } from "@/features/games/types/game-detail";
+import { getGameArchiveLink } from "@/features/games/utils/get-game-archive-link";
 
 type GameSharedModalProps = {
   index: number;
@@ -142,6 +143,8 @@ export function GameSharedModal({
     return null;
   }
 
+  const archiveLink = getGameArchiveLink(currentGame.links);
+
   return (
     <div className="relative z-50 flex h-dvh w-full items-center">
       <div className="w-full overflow-hidden">
@@ -199,15 +202,18 @@ export function GameSharedModal({
               >
                 <ArrowTopRightOnSquareIcon className="h-5 w-5" />
               </Link>
-              <a
-                href={currentGame.cover.src}
-                download
-                className="rounded-full bg-black/50 p-2 text-white/75 backdrop-blur-lg transition hover:bg-black/75 hover:text-white"
-                title="Download fullsize version"
-                aria-label="Download image"
-              >
-                <ArrowDownTrayIcon className="h-5 w-5" />
-              </a>
+              {archiveLink ? (
+                <a
+                  href={archiveLink.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full bg-black/50 p-2 text-white/75 backdrop-blur-lg transition hover:bg-black/75 hover:text-white"
+                  title="Open download page"
+                  aria-label={`Open ${currentGame.title} download page`}
+                >
+                  <ArrowDownTrayIcon className="h-5 w-5" />
+                </a>
+              ) : null}
             </div>
 
             <div className="absolute top-0 left-0 flex items-center gap-2 p-3 text-white">

@@ -41,6 +41,10 @@ export const gameItems: GameDetail[] = [
     },
     tags: ["Romance", "Drama", "Winter", "Musical Themes"],
     links: [
+      {
+        href: "https://archive.kral-koharu.com/White%20Album%202.zip",
+        label: "Game archive",
+      },
       { href: "https://vndb.org/v7771", label: "VNDB" },
       {
         href: "https://en.wikipedia.org/wiki/White_Album_2",
