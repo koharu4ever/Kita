@@ -1,6 +1,6 @@
 # Kita Project Structure
 
-> 最后核对：2026-07-13
+> 最后核对：2026-07-15
 >
 > 定位：当前代码目录与依赖边界的 source of truth。较早 plan/notes 中的 “future” 或“尚未接入”描述只代表历史阶段。
 
@@ -71,10 +71,10 @@ package.json
   开发、检查、测试、migration 和 build 命令
 ```
 
-不要为 `node_modules`、`.pnpm-store` 或 `.next` 擅自增加 named volume。当前 workspace guard 已负责阻止 root 生成物和 dev/build 并发写入。
+Dev Container 仅为 `node_modules` 与 `.next` 使用两个 targeted named volumes。这是在用户明确授权并实测 Windows `9p` 是冷编译瓶颈后保留的性能例外；不是可随意复制的默认模式。
 
-> 2026-07-14 性能例外：在用户明确授权并确认 Windows `9p` 是冷编译瓶颈后，Dev Container 仅为 `node_modules` 与 `.next` 增加 targeted named volumes。root 用户禁令、`.next` 所有权检查和 dev/build 并发守卫仍然有效；这不允许擅自增加数据库 Volume 或修改生产结构。
->
+`.pnpm-store`、源码、`.env` 和 Git 不使用新增 named volume。root 用户禁令、`.next` 所有权检查和 dev/build 并发守卫仍然有效；不得擅自增加第三个开发 Volume、删除数据库 Volume 或修改生产结构。
+
 > 修改该配置后需执行一次 `Dev Containers: Rebuild Container`。
 
 ## `src` 当前布局
@@ -248,7 +248,7 @@ docker/postgres-backup/tests/backup.test.sh
 当前 `pnpm test` 依次运行：
 
 ```text
-33 个 Vitest（8 个测试文件）
+36 个 Vitest（9 个测试文件）
 -> 4 个 backup shell 场景
 ```
 
@@ -274,6 +274,8 @@ docker/postgres-backup/
 ```
 
 真实 secret 只存在于本地忽略的 `.env` 或 Coolify Runtime Variables，不进入 Git、文档、测试或 GitHub Actions。
+
+OpenList 是独立 Coolify Application，不进入 Kita 的 `compose.yaml`。Kita 只保存 Games `links[].href` 的公开 URL，不调用 OpenList API，也不共享 OpenList 的数据库、配置 Volume 或 secret；这是两者唯一的运行时契约。
 
 ## Git 与发布边界
 

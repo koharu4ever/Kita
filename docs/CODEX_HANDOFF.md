@@ -1,6 +1,6 @@
 # Kita Codex 开发交接
 
-> 更新时间：2026-07-13
+> 更新时间：2026-07-15
 >
 > 项目根目录：`D:\lipan\Kita`
 >
@@ -25,14 +25,15 @@ Kita 的本地开发环境和 Coolify 生产运行链路已经搭建完成并通
 本地 PostgreSQL 16              healthy
 本地 Node                       v22.16.0
 本地 pnpm                       10.28.2
-pnpm test                       33 Vitest + 4 backup shell 场景通过
+pnpm test                       36 Vitest + 4 backup shell 场景通过
 pnpm check                      通过
 pnpm build                      通过
-GitHub main                     bf9c53e（PR #7）
+GitHub main                     1d52475（PR #11）
 GitHub Actions quality          已启用并通过
 main Ruleset                    必须 PR + quality
 Coolify Compose Production      正在运行
 PostgreSQL -> R2 backup         已启用并有真实成功日志/对象
+OpenList                        独立 Coolify Application；Kita 只保存公开 URL
 https://kita.kral-koharu.com/   HTTP 200
 /tools                          HTTP 200
 /reviews                        HTTP 200
@@ -43,7 +44,7 @@ https://kita.kral-koharu.com/   HTTP 200
 当前最新 main：
 
 ```text
-bf9c53e Merge pull request #7 from koharu4ever/codex/fix-env-validation-flag
+1d52475 Merge pull request #11 from koharu4ever/codex/feat-games-openlist-archive-link
 ```
 
 ## 2. 项目架构
@@ -79,6 +80,8 @@ src/migrations
 ```
 
 项目没有独立 Express 后端，也没有 Prisma。Payload 已承担 CMS、CRUD、权限、Local API 和 PostgreSQL schema 管理职责，不应无理由增加新的后端层。
+
+OpenList 是单独部署在 Coolify 的 Application，不属于 Kita Compose，也不与 Kita 共享源码、数据库或 Volume。Kita 只在 Games 内容的 `links[].href` 中保存公开 archive URL；OpenList 不可用时，不应阻止 Kita 页面本身渲染。
 
 ## 3. 开发环境结构
 
@@ -162,15 +165,14 @@ web 等待 service_healthy
 
 本地使用两份 Compose 叠加；Coolify 只读取 `compose.yaml`。
 
-不要给以下目录擅自增加 Docker named volume：
+Dev Container 当前有且仅有两个经过实测验证的性能例外：
 
 ```text
 node_modules
-.pnpm-store
 .next
 ```
 
-当前决定是让这些目录作为项目内生成产物存在于 bind-mounted workspace。
+它们使用 targeted named volumes，目的是避开 Windows `9p` 高频小文件 I/O；源码、`.env`、Git 和 `.pnpm-store` 仍按项目现有配置管理。不得把这一例外扩张到其他目录、数据库 Volume 或生产结构。
 
 ## 5. 环境变量边界
 
@@ -227,7 +229,7 @@ DATABASE_URI 中的数据库用户、密码和数据库名
 pnpm dev
 ```
 
-`pnpm dev` 会先幂等启动本地 PostgreSQL，并等待 healthcheck 通过，再启动 Next.js。只有需要单独启动数据库而暂时不启动 Web 时，才执行 `pnpm dev:services`。
+`pnpm dev` 是唯一正常开发入口：它会先幂等启动本地 PostgreSQL，并等待 healthcheck 通过，再启动 Next.js。`pnpm dev:services` 只用于“仅启动数据库”的诊断或维护场景，不是日常启动的前置步骤。
 
 Dev Container 将 `node_modules` 和 `.next` 挂载到只用于本地开发的 Docker named volumes，避免 Windows bind mount 的高频小文件 I/O。修改 `.devcontainer/devcontainer.json` 后必须执行一次 `Dev Containers: Rebuild Container`；两个 Volume 仍必须由 `node` 用户写入，现有 root 与 dev/build 并发守卫继续生效。
 
@@ -252,7 +254,7 @@ pnpm test
 pnpm check
 ```
 
-`pnpm test` 运行 33 个 Vitest 和 4 个 backup shell 场景；`pnpm check` 依次执行 format、lint、typecheck。
+`pnpm test` 运行 9 个测试文件中的 36 个 Vitest，以及 4 个 backup shell 场景；`pnpm check` 依次执行 format、lint、typecheck。
 
 ### 生产构建检查
 
@@ -470,7 +472,7 @@ P2 最后再考虑 Playwright smoke
 P2 数据价值提高后再做恢复演练和 last-success 监控
 ```
 
-不要优先增加 Redis、Prisma、微服务、Kubernetes、大型监控平台或额外 named volume。
+不要优先增加 Redis、Prisma、微服务、Kubernetes、大型监控平台或两个已验证性能例外之外的额外 named volume。
 
 ## 14. 必读文档
 
@@ -495,7 +497,7 @@ P2 数据价值提高后再做恢复演练和 last-success 监控
 不提交 .env
 不删除 Volume
 不擅自操作生产环境
-不擅自增加 named volume 或新技术栈
+不擅自增加两个已验证性能例外之外的 named volume 或新技术栈
 修改后运行与风险相称的验证
 先本地验收，再 commit/push，再观察 Coolify
 ```
