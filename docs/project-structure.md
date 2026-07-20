@@ -1,8 +1,10 @@
 # Kita Project Structure
 
-> 最后核对：2026-07-15
+> 目录结构最后核对：2026-07-15；文档边界复核：2026-07-20
 >
 > 定位：当前代码目录与依赖边界的 source of truth。较早 plan/notes 中的 “future” 或“尚未接入”描述只代表历史阶段。
+>
+> 2026-07-20 可移植性验证：同一目录结构已从 GitHub 全新 clone 到 `C:\dev\Kita`，并通过 Dev Container、全新本地 PostgreSQL、页面 smoke、36 Vitest、4 个 shell 场景、check 与 build。此结果证明目录和开发入口可复建，不代表生产数据或 VPS 恢复已完成。
 
 Kita 采用 feature-oriented 结构，参考 `bulletproof-react` 的精神，但针对 Next.js App Router、Payload CMS、PostgreSQL、Docker/Coolify 和当前个人内容站规模做了简化。目标不是追求目录数量，而是让每种职责有稳定位置。
 
@@ -25,7 +27,8 @@ Kita 采用 feature-oriented 结构，参考 `bulletproof-react` 的精神，但
 2. `docs/current-project-status.md`
 3. `docs/project-structure.md`
 4. `docs/development-production-alignment.md`
-5. `docs/kita-code-review-2026-07-09.md` 顶部最新状态节
+5. `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md`
+6. `docs/kita-code-review-2026-07-09.md` 顶部最新状态节
 
 ## 顶层目录
 
@@ -275,7 +278,7 @@ docker/postgres-backup/
 
 真实 secret 只存在于本地忽略的 `.env` 或 Coolify Runtime Variables，不进入 Git、文档、测试或 GitHub Actions。
 
-OpenList 是独立 Coolify Application，不进入 Kita 的 `compose.yaml`。Kita 只保存 Games `links[].href` 的公开 URL，不调用 OpenList API，也不共享 OpenList 的数据库、配置 Volume 或 secret；这是两者唯一的运行时契约。
+OpenList 是独立 Coolify Application，不进入 Kita 的 `compose.yaml`。Kita 只保存 Games `links[].href` 的公开 URL，不调用 OpenList API，也不共享 OpenList 的数据库、配置 Volume 或 secret；这是两者唯一的运行时契约。OpenList 最终 storage provider 与 data backup 的延期属于运行资产决策，不改变 Kita 代码目录；其状态只在灾难恢复 Runbook 中维护。
 
 ## Git 与发布边界
 

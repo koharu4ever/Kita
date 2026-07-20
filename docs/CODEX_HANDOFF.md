@@ -1,8 +1,10 @@
 # Kita Codex 开发交接
 
-> 更新时间：2026-07-15
+> 更新时间：2026-07-20
 >
-> 项目根目录：`D:\lipan\Kita`
+> 推荐日常项目根目录：`C:\dev\Kita`
+>
+> 旧 D 盘目录：`D:\lipan\Kita`，仅保留到本轮文档 PR 合并并确认无遗漏；之后不再作为正常开发入口。
 >
 > 用途：在新建 Codex 工作区并将 Project Root 选择为 `D:\lipan\Kita` 后，先让 Codex 完整阅读本文，再开始任何修改。
 
@@ -28,12 +30,15 @@ Kita 的本地开发环境和 Coolify 生产运行链路已经搭建完成并通
 pnpm test                       36 Vitest + 4 backup shell 场景通过
 pnpm check                      通过
 pnpm build                      通过
-GitHub main                     1d52475（PR #11）
+本轮文档分支基线               78ad2d2（PR #13）
 GitHub Actions quality          已启用并通过
 main Ruleset                    必须 PR + quality
 Coolify Compose Production      正在运行
 PostgreSQL -> R2 backup         已启用并有真实成功日志/对象
 OpenList                        独立 Coolify Application；Kita 只保存公开 URL
+Recovery inventory              外部账户与关键 secret 已盘点到 Bitwarden
+Coolify SSH recovery archive    已加密，C 盘与私有 R2 各有一份并核对 checksum
+C SSD clean rebuild drill       已通过（clone -> Dev Container -> dev/test/check/build）
 https://kita.kral-koharu.com/   HTTP 200
 /tools                          HTTP 200
 /reviews                        HTTP 200
@@ -44,7 +49,7 @@ https://kita.kral-koharu.com/   HTTP 200
 当前最新 main：
 
 ```text
-1d52475 Merge pull request #11 from koharu4ever/codex/feat-games-openlist-archive-link
+78ad2d2 Merge pull request #13 from koharu4ever/docs/disaster-recovery-runbook
 ```
 
 ## 2. 项目架构
@@ -458,6 +463,33 @@ web runtime logs
 - 未来可用一次性 PostgreSQL 16 做 CI 防回归，但它不再是关闭 P0 的前置条件；
 - 不得为了 migration 测试删除现有本地或生产 Volume。
 
+## 12.1 2026-07-20 恢复材料状态
+
+当前恢复事实以 `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md` 为准。不要把“已有备份材料”写成“完整灾难恢复已经演练”。
+
+已经确认：
+
+- 本轮文档分支建立前，本地 `main` 与 GitHub `origin/main` 同为 `78ad2d2`，工作区干净，没有只存在于 D 盘的未提交项目文件；
+- Git 仓库包含 Dev Container、Compose、Dockerfile、migration、lockfile、CI、`.env.example` 和恢复手册；
+- 生产、本地开发、Cloudflare、VPS、Coolify、Tailscale 与 OpenList 的关键登录/配置材料已经按用途盘点到 Bitwarden，真实值不进入 Git 或本文档；
+- Coolify SSH keys 与 VPS `authorized_keys` 已制作 AES256 加密归档；解密读取成功，C 盘副本与服务器生成的 SHA-256 一致；
+- 同一加密归档与 checksum 文件已上传到私有 R2 `kita-recovery-private`，Public Access 为 Disabled；
+- OpenList 已作为固定版本的独立 Application 运行，Kita 只保存 URL；
+- 已在 `C:\dev\Kita` 从 GitHub 全新 clone，并从 `.env.example` 与 Bitwarden 中的本地开发记录重建 `.env`；Dev Container 以 `node` 用户运行，`pnpm dev` 自动启动全新本地 PostgreSQL，页面 smoke、36 Vitest、4 个 backup shell 场景、`pnpm check` 与 `pnpm build` 全部通过，最终 Git 状态干净并与 `origin/main` 对齐。
+
+因此，**仅 D 盘工作区丢失后的本地复建已经实际演练通过**。`C:\dev\Kita` 应作为后续日常开发工作区；旧 D 盘目录只保留到本轮文档 PR 合并并确认无遗漏为止。这个结论不包含生产数据恢复、Coolify 控制面恢复或 VPS 整体重建。
+
+仍未完成或明确暂缓：
+
+- 从私有 R2 重新下载 Coolify SSH 归档并再次核对的 round-trip；
+- 临时 PostgreSQL 16 的真实 dump restore；
+- Coolify 控制面完整 backup/restore 演练；
+- OpenList 最终 storage provider、逐挂载凭据记录与 data Volume backup；
+- VPS 整体丢失后的端到端恢复演练；
+- 独立离线介质和密码库加密导出。
+
+OpenList storage 尚未定型是有意延期，不是配置丢失。当前测试挂载可以视为可丢弃状态；在最终公开存储确定前，不应编造一条“已完成”的 storage inventory，也不应声称 OpenList data 恢复已经闭环。
+
 ## 13. 当前优先级
 
 当前代码与工程底座已经稳定，不需要继续扩张技术栈。建议顺序：
@@ -483,8 +515,9 @@ P2 数据价值提高后再做恢复演练和 last-success 监控
 3. `docs/project-structure.md`
 4. `docs/development-production-alignment.md`
 5. `docs/kita-code-review-2026-07-09.md`
+6. `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md`
 
-其他 docs 中有早期学习记录和历史计划，可能描述旧阶段。发生冲突时，以当前代码、Git 历史和上述 5 份文档为准。
+其他 docs 中有早期学习记录和历史计划，可能描述旧阶段。发生冲突时，以当前代码、Git 历史和上述 6 份文档为准。
 
 ## 15. 新 Codex 的工作原则
 

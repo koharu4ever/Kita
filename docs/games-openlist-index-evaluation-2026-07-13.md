@@ -5,6 +5,8 @@
 > 评估性质：产品与架构想法评估，不代表已经决定实施。
 >
 > 边界：本次没有修改业务代码、Payload schema、migration、Compose、Coolify、生产环境、数据库、secret 或 Volume。
+>
+> 2026-07-20 实施结果：方案 A 已落地。Games 仍是 Kita 的封面画廊与资料入口，archive 按钮通过现有公开 URL 打开独立 OpenList；Kita 不调用 OpenList API，也不保存其 storage 凭据。最终 storage provider 尚未确定，当前测试挂载可丢弃。实时部署与恢复事实以 OpenList 边界评估和灾难恢复 Runbook 为准，本文其余内容保留为产品/UX 决策记录。
 
 ## 1. 结论先行
 
