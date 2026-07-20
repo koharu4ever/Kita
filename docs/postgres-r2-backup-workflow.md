@@ -57,7 +57,7 @@ R2 是被动对象存储，不会主动连接 VPS，也不会主动读取 Postgr
 实现采用仓库根目录 `docker` 分类，并在 Compose 中增加一个 `backup` service：
 
 ```text
-D:\lipan\Kita
+C:\dev\Kita
 ├─ src                         Next.js / Payload 业务代码
 ├─ public                      网站静态资源
 ├─ docs                        项目文档

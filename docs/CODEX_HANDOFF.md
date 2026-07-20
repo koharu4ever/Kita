@@ -4,9 +4,9 @@
 >
 > 推荐日常项目根目录：`C:\dev\Kita`
 >
-> 旧 D 盘目录：`D:\lipan\Kita`，仅保留到本轮文档 PR 合并并确认无遗漏；之后不再作为正常开发入口。
+> 旧机械盘工作区已经退役，不再作为正常开发、提交或推送入口。
 >
-> 用途：在新建 Codex 工作区并将 Project Root 选择为 `D:\lipan\Kita` 后，先让 Codex 完整阅读本文，再开始任何修改。
+> 用途：在新建 Codex 工作区并将 Project Root 选择为 `C:\dev\Kita` 后，先让 Codex 完整阅读本文，再开始任何修改。
 
 ## 给新 Codex 的第一条消息
 
@@ -349,7 +349,7 @@ ENABLE_DEV_SEED=false
 项目真实 Git 根目录：
 
 ```text
-D:\lipan\Kita\.git
+C:\dev\Kita\.git
 ```
 
 远程仓库：
@@ -477,7 +477,7 @@ web runtime logs
 - OpenList 已作为固定版本的独立 Application 运行，Kita 只保存 URL；
 - 已在 `C:\dev\Kita` 从 GitHub 全新 clone，并从 `.env.example` 与 Bitwarden 中的本地开发记录重建 `.env`；Dev Container 以 `node` 用户运行，`pnpm dev` 自动启动全新本地 PostgreSQL，页面 smoke、36 Vitest、4 个 backup shell 场景、`pnpm check` 与 `pnpm build` 全部通过，最终 Git 状态干净并与 `origin/main` 对齐。
 
-因此，**仅 D 盘工作区丢失后的本地复建已经实际演练通过**。`C:\dev\Kita` 应作为后续日常开发工作区；旧 D 盘目录只保留到本轮文档 PR 合并并确认无遗漏为止。这个结论不包含生产数据恢复、Coolify 控制面恢复或 VPS 整体重建。
+因此，**仅 D 盘工作区丢失后的本地复建已经实际演练通过**。`C:\dev\Kita` 是后续唯一的日常开发工作区；旧机械盘工作区已经退役，不再用于开发、提交或推送。这个结论不包含生产数据恢复、Coolify 控制面恢复或 VPS 整体重建。
 
 仍未完成或明确暂缓：
 
