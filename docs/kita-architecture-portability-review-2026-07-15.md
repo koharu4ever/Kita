@@ -2,11 +2,13 @@
 
 > 复核日期：2026-07-15（America/Los_Angeles）
 >
-> GitHub 基线：`main` / `1d524754`（PR #11 已合并）
+> 原始复核基线：`main` / `1d524754`（PR #11 已合并）
 >
 > 范围：目录边界、Next.js / Payload 数据流、环境配置、Dev Container、Docker / Coolify、PostgreSQL、备份、测试与 CI、OpenList 松耦合集成、可移植性与复建难度。
 >
 > 安全边界：本次为只读代码复核；没有读取或输出 secret，没有修改生产环境、数据库或 Volume。
+
+> 2026-07-20 后续状态：本轮文档分支基线为 `78ad2d2`（PR #13）。外部账户与关键 secret 已盘点到 Bitwarden；Coolify SSH keys / `authorized_keys` 已制作 AES256 加密归档，并在 C 盘核对 checksum 后上传私有 R2。`C:\dev\Kita` 已完成全新 clone、Dev Container、本地 PostgreSQL、页面 smoke、36 Vitest、4 个 shell 场景、check 与 build 的真实复建演练。PostgreSQL restore、OpenList data backup、Coolify/VPS 端到端恢复仍未演练。最新恢复事实以灾难恢复 Runbook 为准；本文其余内容保留为 2026-07-15 的架构复核快照。
 
 ## 1. 结论先行
 
@@ -371,7 +373,7 @@ pnpm dev
 
 源码步骤不复杂，但 Docker Desktop / WSL / DIND 任一层故障都会让症状看起来像项目容器或数据库丢失。named volumes 保留数据，却也使“容器消失但数据还在”的状态需要一定 Docker 知识才能理解。
 
-建议建立 `docs/local-recovery-runbook.md`，只包含：
+这份本地恢复清单现已由 `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md` 的第 11、12 节覆盖，包括：
 
 1. 如何判断是外层 Docker、WSL、Dev Container 还是内层 PostgreSQL 故障；
 2. 如何确认 volumes 存在；
@@ -402,6 +404,8 @@ new PostgreSQL Volume
 - OpenList 挂载来源与访客权限。
 
 因此“应用能重新启动”和“原站内容完整恢复”是两件事。前者难度中等偏低，后者仍取决于备份恢复步骤是否被真正演练。
+
+2026-07-20 更新：上述仓库外身份、secret 与平台配置已经按用途盘点到 Bitwarden；Coolify SSH 恢复归档也已经形成独立加密副本。这降低了“只靠记忆复建”的风险，但不改变完整 restore drill 尚未完成的结论。
 
 ### 8.4 数据可移植性：中等
 

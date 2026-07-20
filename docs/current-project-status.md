@@ -1,6 +1,6 @@
 # Kita 当前项目状态与环境配置
 
-> 最后核对：2026-07-15
+> 最后核对：2026-07-20
 >
 > 文档定位：这是当前项目状态的入口文档。代码、开发环境和部署操作以本文为准；其他较早的学习笔记与实施计划可能记录的是历史阶段。
 
@@ -45,7 +45,7 @@ ESLint                通过
 TypeScript            通过
 Vitest                 9 files / 36 tests 通过
 Backup shell tests     4 scenarios 通过
-GitHub main            1d52475（PR #11 已合并）
+本轮文档分支基线      78ad2d2（PR #13 已合并）
 GitHub quality         通过并设为 main 必需检查
 ```
 
@@ -59,6 +59,23 @@ GitHub quality         通过并设为 main 必需检查
   -> main 由 Pull Request + quality Ruleset 保护
   -> 当前重点转向真实内容、产品体验和少量高价值集成测试
 ```
+
+### 1.1 当前恢复准备度
+
+2026-07-20 的核对和实际演练确认：本轮文档分支建立前，本地 `main` 与 GitHub `origin/main` 同为 `78ad2d2`，工作区干净，未发现只存在于 D 盘的未提交项目文件。随后已在 `C:\dev\Kita` 从 GitHub 全新 clone，并成功重建本地开发环境。仓库内的可重建配置与仓库外的 secret/账户材料已经分开管理。
+
+| 范围                              | 当前状态     | 说明                                                                      |
+| --------------------------------- | ------------ | ------------------------------------------------------------------------- |
+| D 盘工作区丢失后的本地复建        | 已验证通过   | C SSD 全新 clone、`.env` 重建、Dev Container、dev/test/check/build 均通过 |
+| 外部账户与关键 secret inventory   | 已建立       | 保存在 Bitwarden；真实值不进入 Git 或本文档                               |
+| Coolify SSH key 恢复材料          | 已建立并核验 | AES256 加密；C 盘与私有 R2 各有副本；本地 checksum 一致                   |
+| PostgreSQL 自动 backup            | 正在运行     | 生产 custom dump 已上传 R2；shell 失败路径有自动测试                      |
+| PostgreSQL 完整 restore drill     | 未完成，暂缓 | 必须使用隔离 PostgreSQL 16，不触碰生产库                                  |
+| OpenList Application inventory    | 已建立       | 独立 Application、固定镜像版本、域名、端口、Volume 与账号边界已记录       |
+| OpenList 最终 storage/data backup | 有意延期     | provider 尚未定型，当前测试挂载按可丢弃状态处理                           |
+| VPS/Coolify 端到端灾难恢复        | 尚未演练     | 不能描述为“完整恢复已闭环”                                                |
+
+详细资产、重建顺序和未完成边界以 `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md` 为唯一恢复事实入口。
 
 ## 2. 当前架构
 
@@ -450,7 +467,13 @@ D:\lipan\Kita
 - [x] PostgreSQL 已增加 healthcheck，web 等待 `service_healthy`。
 - [x] PostgreSQL custom dump -> R2 backup sidecar 已启用并连续生成真实对象。
 - [x] backup shell 的 dump/校验/上传失败分支已自动测试且不会误报成功。
+- [x] 外部账户、生产/开发配置键与关键 secret 的恢复 inventory 已存入 Bitwarden。
+- [x] Coolify SSH keys 与 VPS `authorized_keys` 已生成加密恢复归档，C 盘副本 checksum 已核对，并上传私有 R2。
 - [ ] 用临时 PostgreSQL 16 完成一次恢复演练（已接受为后续增强）。
+- [ ] 从私有 R2 重新下载 SSH 恢复归档并做一次 round-trip 核对（当前明确暂缓）。
+- [x] 在 C SSD 完成一次全新 clone + Dev Container 本地复建演练；页面 smoke、36 Vitest、4 个 shell 场景、check 与 build 全部通过。
+- [ ] 确定 OpenList 最终 storage 后，再补逐挂载 inventory 与 data Volume backup；当前测试挂载按可丢弃处理。
+- [ ] 完成 Coolify / VPS 端到端恢复演练。
 - [ ] 轮换生产 secret（项目所有者当前决定暂缓，不能写成已完成）。
 - [ ] 增加 backup last-success healthcheck/告警（内容量较少时可延后）。
 
@@ -526,6 +549,9 @@ development-environment-architecture-review.md
 development-workflow.md
   日常功能开发流程，后续需要按当前代码更新
 
+kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md
+  外部账户、备份材料、故障场景、复建顺序和恢复完成定义
+
 deployment-roadmap.md
   部署背景和历史路线，其中部分“尚未部署”描述已经过时
 
@@ -553,4 +579,4 @@ ENABLE_DEV_SEED
   固定 false
 ```
 
-Kita 当前代码结构清晰，生产链路、备份、测试、CI 和 main 保护均已建立。接下来优先补真实内容、产品体验和少量高价值集成测试；恢复演练、secret 轮换与 backup last-success 监控作为已知后续增强，不需要继续扩张技术栈。
+Kita 当前代码结构清晰，生产链路、备份、测试、CI 和 main 保护均已建立。D 盘单点丢失后的本地复建已在 C SSD 实际验证通过，但完整生产灾难恢复仍需 PostgreSQL restore、Coolify restore、OpenList 最终 storage/data backup 和端到端演练来证明。接下来优先补真实内容与产品体验；恢复演练、secret 轮换与 backup last-success 监控作为已知后续增强，不需要继续扩张技术栈。

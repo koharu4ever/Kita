@@ -2,9 +2,11 @@
 
 > 评估日期：2026-07-13（America/Los_Angeles）
 >
-> 状态：架构决策建议；尚未部署 OpenList，也没有修改 Kita 业务代码或生产环境。
+> 原始状态：架构决策建议；评估当时尚未部署 OpenList，也没有修改 Kita 业务代码或生产环境。
 >
 > 关联评估：[Games 与 OpenList 文件索引方案评估](./games-openlist-index-evaluation-2026-07-13.md)
+>
+> 2026-07-20 实施结果：该边界方案已经落地。OpenList 以 `openlistteam/openlist:v4.2.2` 作为独立 Coolify Application 运行在 `https://archive.kral-koharu.com`；Kita 只在 Games 数据中保存公开 URL，不共享数据库、Volume、secret 或构建流程。最终 storage provider 与 OpenList data backup 有意延期。当前部署与恢复状态以灾难恢复 Runbook 为准，本文其余内容保留为决策依据。
 
 ## 1. 结论先行
 

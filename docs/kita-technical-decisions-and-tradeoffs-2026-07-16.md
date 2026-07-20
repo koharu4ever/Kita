@@ -1,9 +1,11 @@
 # Kita 技术决策、架构取舍与演进思路总览
 
 > 日期：2026-07-16
-> 当前基线：`main` / `3cc7977`
+> 原始写作基线：`main` / `3cc7977`
 > 文档性质：技术决策地图、架构解释和长期维护指南
 > 适用范围：Kita 主应用、本地开发环境、生产部署、备份、CI，以及与 OpenList 的边界
+>
+> 2026-07-20 状态更新：本轮文档分支基线为 `78ad2d2`（PR #13）。OpenList 已按本文决策作为独立 Coolify Application 运行，Kita 只保存公开 URL；`C:\dev\Kita` 已完成 GitHub 全新 clone、Dev Container、全新本地 PostgreSQL、页面 smoke、36 Vitest、4 个 backup shell 场景、`pnpm check` 与 `pnpm build` 的复建演练。最终 OpenList storage、PostgreSQL restore 与 Coolify/VPS 端到端恢复仍未完成。易变恢复事实只以灾难恢复 Runbook 为准。
 
 ## 1. 这份文档为什么存在
 
