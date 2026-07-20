@@ -5,6 +5,8 @@
 > 审计目标：确认换电脑后是否已经具备稳定开发条件，解释当前架构与隔离边界，列出仍缺少的内容，并给出按优先级执行的收口路线。
 >
 > 审计原则：以仓库当前代码为准，不擅自增加依赖、Volume、服务或框架；环境验证只在现有 Dev Container 内执行。
+>
+> 2026-07-20 状态更新：宿主机项目根目录已从旧机械盘迁移到 `C:\dev\Kita`，容器内路径与 Docker-in-Docker 架构不变；本地复建演练已经通过。
 
 ## 1. 先说结论
 
@@ -242,7 +244,7 @@ postCreateCommand=sudo corepack enable && pnpm install
 
 ```text
 Windows 宿主机
-  D:\lipan\Kita
+  C:\dev\Kita
   Docker Desktop
     Dev Container
       /workspaces/Kita
@@ -283,11 +285,11 @@ Windows 宿主机
 “使用容器”不等于宿主机磁盘上完全没有文件。当前真实挂载是：
 
 ```text
-D:\lipan\Kita
+C:\dev\Kita
   -> /workspaces/Kita
 ```
 
-这是 bind mount。容器在 `/workspaces/Kita` 写文件，Windows 的 `D:\lipan\Kita` 会立刻看到同一文件。
+这是 bind mount。容器在 `/workspaces/Kita` 写文件，Windows 的 `C:\dev\Kita` 会立刻看到同一文件。
 
 因此以下目录当前真实存在于宿主机项目目录：
 
