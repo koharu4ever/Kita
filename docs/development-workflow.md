@@ -1,5 +1,7 @@
 # Kita 开发工作流
 
+> **文档定位：工作流参考，不单独维护项目完成度。** 本文保留开发流程形成过程中的解释；凡涉及“当前状态”“下一步”或部署完成度的内容，以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 和 [current-project-status.md](./current-project-status.md) 为准。
+
 这份文档记录当前项目从“能跑起来”进入“可以稳定写功能”之后的工作方式。
 
 当前项目的核心架构是：
@@ -41,35 +43,9 @@ Docker-in-Docker Dev Container
 
 ## 当前还缺什么
 
-第一版能写码，但还有一些后续会逐步补齐的部分：
+本文件不再复制容易漂移的完成清单。Reviews、Games、Payload generated types、自动化测试和生产部署等现状统一维护在 [current-project-status.md](./current-project-status.md)。
 
-```text
-Media collection
-  后面需要图片上传、背景图、封面图时再接。
-
-Reviews / Games collections
-  当前 reviews 和 games 还是前端模板数据。
-  后续可以按 Tools 的模式接到 Payload。
-
-Payload generated types
-  payload.config.ts 已经配置输出位置。
-  但当前 Payload CLI 和 Next 16 / TS collection 的组合还有兼容细节。
-  暂时用前端展示类型 + mapper 维持类型边界。
-
-正式 seed 脚本
-  当前 seed:tools 是开发路由触发。
-  后续可以改成专门脚本或 Payload 官方推荐的 seed 流程。
-
-测试
-  当前主要靠 lint/typecheck/build。
-  后续功能复杂后再加组件测试或端到端测试。
-
-部署配置
-  VPS / Coolify 还没正式接入。
-  本地闭环跑稳后再处理。
-```
-
-这些不是阻塞项。它们是后续工程化增强项。
+开发时只需要遵守这里的稳定边界：小步闭环、通过 Payload server getter 访问内容、保持前后端 DTO/mapping 分层、不要让本地 fallback 掩盖生产数据库故障。具体待办以权威状态文档为准。
 
 ## 日常启动流程
 
@@ -605,21 +581,15 @@ pnpm typecheck
 pnpm build
 ```
 
-如果 `.next` 生成类型出奇怪错误，可以清理：
+如果 `.next` 生成类型或所有权异常，先停止所有 `next dev` / `next build` 进程，再运行守卫确认问题：
 
 ```bash
-sudo rm -rf .next
-pnpm typecheck
+pnpm workspace:check-user
 ```
 
-如果 `node_modules` 权限异常，可以清理：
+不要在工作区中执行 `sudo rm -rf .next`，也不要直接删除 `node_modules` 或其 named Volume。`.next` 与 `node_modules` 由 Dev Container 的 targeted named volumes 承载，错误清理可能重新制造 root 所有权或误伤本地环境。
 
-```bash
-sudo rm -rf node_modules .pnpm-store
-pnpm install
-```
-
-这两个目录都是生成产物，不是源码。
+需要恢复时，按照 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 的 `.next` 安全边界和 [本地开发性能修复记录](./local-development-performance-remediation-2026-07-14.md) 操作；涉及 Dev Container mount 变化时使用 `Dev Containers: Rebuild Container`，不得扩大到 PostgreSQL Volume、生产数据或其他目录。
 
 ## 数据库相关命令
 

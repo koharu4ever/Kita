@@ -1,5 +1,7 @@
 # Kita Deployment Roadmap
 
+> **历史记录（非当前事实源）**：本文保留从本地闭环走向 VPS、Coolify 与 Cloudflare 的部署路线及当时判断，不能作为当前生产操作清单。文中的状态描述可能早于实际部署。当前状态和恢复边界以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md)、[current-project-status.md](./current-project-status.md) 与 [灾备 Runbook](./kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md) 为准。
+
 这份文档记录 Kita 从本地开发环境走向 VPS + Coolify + Cloudflare 部署环境的路线图。
 
 它不是一份马上照着执行的命令清单，而是一份上线前的地图：告诉自己每一步在解决什么问题、什么时候该做、哪些东西现在已经跑通、哪些东西还没有跑通。

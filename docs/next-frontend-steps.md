@@ -1,5 +1,7 @@
 # 下一阶段前端开发步骤
 
+> **历史记录（非当前事实源）**：本文记录前端骨架开始实现前的阶段计划。文中的“当前状态”“下一阶段”和“先不接 Payload”均指当时决策，不代表现状。当前进度与操作边界以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 和 [current-project-status.md](./current-project-status.md) 为准。
+
 这份笔记用来把“总结阶段”连接到“开始写码阶段”。
 
 当前状态：

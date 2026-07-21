@@ -1,5 +1,7 @@
 # 数据库与部署前路线图
 
+> **历史记录（非当前事实源）**：本文记录 Payload/PostgreSQL 与生产部署尚未落地时的路线设计。文中的“当前”“下一阶段”和未完成项均属于当时快照。当前进度与操作边界以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 和 [current-project-status.md](./current-project-status.md) 为准。
+
 这份笔记整理下一阶段思路：前端骨架完成后，项目准备进入 Payload CMS + PostgreSQL 阶段。我们继续参考 CJ 的 Next.js starter 和 self-host 相关视频，但不会照抄他的 Drizzle / Auth.js / Guestbook 技术栈。
 
 当前项目目标仍然是：

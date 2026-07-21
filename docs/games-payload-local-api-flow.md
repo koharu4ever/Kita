@@ -1,5 +1,7 @@
 # Games Payload Local API Data Flow
 
+> **历史记录（非当前事实源）**：本文主要保留 Games 从 mock 数据迁移到 Payload Local API 的设计过程。文中的“当前 mock”“这一阶段”等表述只代表当时状态；当前实现与操作边界以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 和 [current-project-status.md](./current-project-status.md) 为准。
+
 > 注意：本文记录最初的 `coverKey + image registry` 方案。图片部分已由 [Games 图片资源解耦方案](./games-image-asset-decoupling-plan.md) 取代；getter、mapper 和 DTO 分层原则仍然有效。
 
 ## 1. 文档目标
