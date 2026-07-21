@@ -1,5 +1,7 @@
 # Payload + PostgreSQL 最小闭环计划
 
+> **历史记录（非当前事实源）**：本文保留 Payload + PostgreSQL 最小闭环从计划到实现的过程。前半部分的“下一阶段”“尚未连接”等表述只描述当时状态；当前进度与操作边界以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 和 [current-project-status.md](./current-project-status.md) 为准。
+
 这份笔记说明下一阶段要做什么：用最少的数据跑通完整链路。
 
 目标不是一次性做完整 CMS，也不是马上把所有页面都接后端。目标是：

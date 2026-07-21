@@ -1,5 +1,7 @@
 # Reviews Payload Data Shape Plan
 
+> **历史记录（非当前事实源）**：本文主要保留 Reviews 从静态数据迁移到 Payload Local API 的设计与实施过程。正文中“不要生成 migration”“尚未固化”等内容只代表中间阶段；当前实现与操作边界以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 和 [current-project-status.md](./current-project-status.md) 为准。
+
 > 状态更新（2026-06-28）：本文前半保留了从静态段落数组开始理解数据链路的过程。当前最终实现已经使用 Payload Lexical Rich Text，正文以 JSONB 保存，前端通过官方 `RichText` renderer 渲染；生产 migration 已生成并验证。
 
 ## 目标
@@ -446,4 +448,4 @@ pnpm payload:migrate:create
 
 也没有新增 migration 文件。
 
-当前状态可以理解为：代码已经知道 `reviews` collection 应该长什么样，前端也已经能通过服务端 getter 接收 `ReviewPreview`，但数据库结构还没有被正式固化成生产 migration。等你确认这个 schema 稳定后，再生成 migration，把它同步到生产数据库。
+以上是本轮中间阶段的验收记录：当时数据库结构还没有被正式固化成生产 migration。后续已经生成并验证 production migration；最终状态以本文顶部状态更新和权威状态文档为准。

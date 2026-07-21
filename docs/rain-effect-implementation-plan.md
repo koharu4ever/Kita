@@ -1,16 +1,18 @@
 # Rain Effect Implementation Plan
 
+> **历史记录（非当前事实源）**：本文保留 WebGL 雨滴效果实施前的分析以及文末的落地记录。前半部分对 `RainyWindow` 的引用描述的是替换前状态；当前实现与操作边界以 [CODEX_HANDOFF.md](./CODEX_HANDOFF.md) 和 [current-project-status.md](./current-project-status.md) 为准。
+
 ## 结论
 
 可以做，但只建议做成一个独立的首页玻璃层替换，不建议把 Codrops / Rainyscope 的整套页面逻辑搬进 Kita。
 
-当前首页的雨滴已经集中在 `src/features/home/components/rainy-window.tsx`，`HomeExperience` 只通过下面这一行使用它：
+方案编写时，首页旧雨滴集中在 `src/features/home/components/rainy-window.tsx`，`HomeExperience` 只通过下面这一行使用它：
 
 ```tsx
 <RainyWindow backgroundImageUrl={activeWallpaper.image.url} />
 ```
 
-这说明雨滴层和首页文字、导航、背景轮播没有深度耦合。新的 WebGL 雨滴层可以保持同样的输入接口，只替换这一层：
+这说明当时的雨滴层和首页文字、导航、背景轮播没有深度耦合。新的 WebGL 雨滴层可以保持同样的输入接口，只替换这一层：
 
 ```tsx
 <RainWaterLayer backgroundImageUrl={activeWallpaper.image.url} />
