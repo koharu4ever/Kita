@@ -42,4 +42,47 @@ describe("mapGameDocumentToGameDetail", () => {
     expect(result.originalTitle).toBeUndefined();
     expect(result.tags).toEqual([]);
   });
+
+  it("prefers the display-sized Payload Media cover", () => {
+    const result = mapGameDocumentToGameDetail(
+      createPayloadGameDocument({
+        cover: {
+          alt: "Payload-managed cover",
+          createdAt: "2026-07-21T00:00:00.000Z",
+          id: 42,
+          sizes: {
+            display: {
+              height: 900,
+              url: "https://media.example.com/media/game-display.webp",
+              width: 1600,
+            },
+          },
+          updatedAt: "2026-07-21T00:00:00.000Z",
+          url: "https://media.example.com/media/game-original.png",
+          width: 2400,
+          height: 1350,
+        },
+      }),
+    );
+
+    expect(result.cover).toEqual({
+      alt: "Payload-managed cover",
+      height: 900,
+      src: "https://media.example.com/media/game-display.webp",
+      width: 1600,
+    });
+  });
+
+  it("falls back to legacy cover fields when the Media relation is not populated", () => {
+    const result = mapGameDocumentToGameDetail(
+      createPayloadGameDocument({ cover: 42 }),
+    );
+
+    expect(result.cover).toEqual({
+      alt: "Test game cover",
+      height: 1200,
+      src: "/games/covers/test-game.jpg",
+      width: 1920,
+    });
+  });
 });

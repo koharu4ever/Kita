@@ -2,6 +2,7 @@ import * as migration_20260614_112311_init from "./20260614_112311_init";
 import * as migration_20260628_133544 from "./20260628_133544";
 import * as migration_20260702_161526 from "./20260702_161526";
 import * as migration_20260703_132233 from "./20260703_132233";
+import * as migration_20260721_131302_add_media_and_game_cover from "./20260721_131302_add_media_and_game_cover";
 
 export const migrations = [
   {
@@ -23,5 +24,10 @@ export const migrations = [
     up: migration_20260703_132233.up,
     down: migration_20260703_132233.down,
     name: "20260703_132233",
+  },
+  {
+    up: migration_20260721_131302_add_media_and_game_cover.up,
+    down: migration_20260721_131302_add_media_and_game_cover.down,
+    name: "20260721_131302_add_media_and_game_cover",
   },
 ];

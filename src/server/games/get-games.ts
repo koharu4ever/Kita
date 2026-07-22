@@ -12,6 +12,7 @@ export async function getGames(): Promise<GameDetail[]> {
     const payload = await getPayloadClient();
     const games = await payload.find({
       collection: "games",
+      depth: 1,
       limit: 100,
       overrideAccess: false,
       sort: "title",
@@ -48,6 +49,7 @@ export async function getGameBySlug(
     const payload = await getPayloadClient();
     const games = await payload.find({
       collection: "games",
+      depth: 1,
       limit: 1,
       overrideAccess: false,
       where: {

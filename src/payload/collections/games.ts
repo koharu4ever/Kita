@@ -108,6 +108,15 @@ export const Games: CollectionConfig = {
       required: true,
     },
     {
+      name: "cover",
+      type: "upload",
+      admin: {
+        description:
+          "Preferred Payload Media cover. Legacy public asset fields remain available as a rollback fallback during migration.",
+      },
+      relationTo: "media",
+    },
+    {
       name: "coverSrc",
       type: "text",
       admin: {
