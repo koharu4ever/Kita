@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import { NextResponse } from "next/server";
 
 import { env } from "@/config/env";
@@ -5,16 +7,12 @@ import { createGameBody } from "@/features/games/data/game-items";
 import { getPayloadClient } from "@/server/payload/get-payload";
 import { upsertGameSeeds, type SeedGame } from "@/server/games/seed-games";
 
-const gameSeeds: SeedGame[] = [
+const gameSeedTemplates: Array<Omit<SeedGame, "cover">> = [
   {
     body: createGameBody([
       "The story begins with three separate sounds meeting at school: guitar, piano, and a voice from the rooftop. That brief harmony becomes the emotional center of a relationship shaped by late autumn, winter snow, and choices that arrive too late.",
       "This local entry is intentionally compact. It tests the real cover ratio and the new asset-path data flow without turning the game archive into a second review section.",
     ]),
-    coverAlt: "WHITE ALBUM2 cover featuring two heroines in a snowy street",
-    coverHeight: 1200,
-    coverSrc: "/games/covers/white-album-2-v2.jpg",
-    coverWidth: 1920,
     developer: "Leaf / AQUAPLUS / STING",
     links: [
       {
@@ -50,6 +48,31 @@ export async function POST() {
   }
 
   const payload = await getPayloadClient();
+  const existingCover = await payload.find({
+    collection: "media",
+    limit: 1,
+    where: {
+      filename: {
+        equals: "white-album-2-v2.jpg",
+      },
+    },
+  });
+  const cover =
+    existingCover.docs[0] ??
+    (await payload.create({
+      collection: "media",
+      data: {
+        alt: "WHITE ALBUM2 cover featuring two heroines in a snowy street",
+      },
+      filePath: path.resolve(
+        process.cwd(),
+        "public/games/covers/white-album-2-v2.jpg",
+      ),
+    }));
+  const gameSeeds: SeedGame[] = gameSeedTemplates.map((game) => ({
+    ...game,
+    cover: cover.id,
+  }));
   const createdOrUpdated = await upsertGameSeeds(payload, gameSeeds);
 
   return NextResponse.json({

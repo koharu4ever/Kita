@@ -19,7 +19,7 @@ describe("mapGameDocumentToGameDetail", () => {
       cover: {
         alt: "Test game cover",
         height: 1200,
-        src: "/games/covers/test-game.jpg",
+        src: "https://media.example.com/media/test-game.jpg",
         width: 1920,
       },
       links: [{ href: "https://vndb.org/v1", label: "VNDB" }],
@@ -73,16 +73,24 @@ describe("mapGameDocumentToGameDetail", () => {
     });
   });
 
-  it("falls back to legacy cover fields when the Media relation is not populated", () => {
-    const result = mapGameDocumentToGameDetail(
-      createPayloadGameDocument({ cover: 42 }),
-    );
+  it("fails explicitly when the Media relation is not populated", () => {
+    expect(() =>
+      mapGameDocumentToGameDetail(createPayloadGameDocument({ cover: 42 })),
+    ).toThrow('Game "test-game" has no resolvable Media cover');
+  });
 
-    expect(result.cover).toEqual({
-      alt: "Test game cover",
-      height: 1200,
-      src: "/games/covers/test-game.jpg",
-      width: 1920,
-    });
+  it("fails explicitly when Media has no usable image metadata", () => {
+    expect(() =>
+      mapGameDocumentToGameDetail(
+        createPayloadGameDocument({
+          cover: {
+            alt: "Incomplete cover",
+            createdAt: "2026-07-21T00:00:00.000Z",
+            id: 42,
+            updatedAt: "2026-07-21T00:00:00.000Z",
+          },
+        }),
+      ),
+    ).toThrow('Game "test-game" has no resolvable Media cover');
   });
 });

@@ -6,11 +6,24 @@
 >
 > 文档性质：架构评估与实施记录
 >
-> 实施状态：代码与本地验证已完成；Cloudflare/Coolify 配置、生产上传 smoke 和真实内容迁移尚未完成
+> 实施状态：P1 已上线并通过真实 R2、页面与 Redeploy smoke；生产 6 条 Games 已迁移；P6 legacy cover 清理在本 PR 完成
 >
 > 推荐结论：按本文限定范围实施，不扩张为后端重构
 
-## 0. 2026-07-21 实施状态
+## 0. 2026-07-22 生产验证与最终清理
+
+P1 兼容接入后的生产验证已经完成：
+
+- 独立 Cloudflare R2 media bucket、custom domain、bucket-scoped token 和 Coolify 变量已配置；
+- 真实图片上传会生成 original、thumbnail、display 对象，公开 URL 使用 media custom domain；
+- 生产 6 条 Games 已全部关联 Payload Media，重复图片复用同一 Media；
+- `/games`、详情页和重新部署后的对象/relationship 持久性已经人工确认；
+- 本清理 PR 将 `Games.cover` 设为必填，mapper 改为 Media-only，并删除旧 `coverSrc`、`coverAlt`、`coverWidth`、`coverHeight` schema；
+- 清理 migration 在删除旧列前检查空 `cover_id`，并已在隔离数据库副本验证安全失败及完整 `up/down` 往返。
+
+下面的 2026-07-21 内容保留为第一阶段兼容接入的历史实施记录；当前事实以本节和 `current-project-status.md` 为准。
+
+## 0.1 2026-07-21 兼容接入状态（历史记录）
 
 当前分支已完成：
 
@@ -1028,8 +1041,8 @@ Cloudflare R2 media bucket
 | S3 endpoint 被误当公开 URL             | 前端 URL 错误                 | endpoint 与 public URL 使用不同变量                         |
 | 误用 backup bucket/token               | 权限边界和数据分类混乱        | 独立 bucket、独立最小权限 token                             |
 | Next Image 不允许远程域名              | 页面图片无法渲染              | 配置精确 `remotePatterns`，加入页面 smoke                   |
-| relationship 只返回 ID                 | mapper 取不到 URL             | getter 明确 depth；mapper 同时处理 ID 和 document           |
-| 数据还未绑定 Media                     | 旧游戏破图                    | 第一阶段保留 legacy fallback                                |
+| relationship 只返回 ID                 | mapper 取不到 URL             | getter 固定 `depth: 1`；mapper 对未展开关联明确报错         |
+| 数据还未绑定 Media                     | 清理 migration 会破坏旧内容   | migration 在删列前检查空 `cover_id`，存在时立即中止         |
 | 上传文件过大                           | 上传慢、代理 413、带宽浪费    | MIME/大小上限；固定尺寸；服务端上传 smoke                   |
 | 删除 Media 后仍被内容引用              | 页面破图                      | 先改引用再删；单管理员操作规则；暂不做复杂自动 GC           |
 | 本地误操作生产对象                     | 生产图片丢失                  | 本地默认 local storage，不持有生产 token                    |
@@ -1045,9 +1058,8 @@ Cloudflare R2 media bucket
 至少覆盖：
 
 - Media document 能映射为现有 `GameDetail.cover`；
-- Media relationship 只有 ID 时不会误生成坏 URL；
-- Games 没有 Media 时继续使用 legacy cover 字段；
-- legacy fallback 的现有测试继续通过；
+- Media relationship 只有 ID 时明确失败，不生成坏 URL；
+- Media 缺少可用 URL/宽高元数据时明确失败；
 - anonymous 只能读取公开 Media，不能创建、更新、删除；
 - production `r2` 模式缺配置时拒绝启动；
 - local 模式不需要 R2 secret；
@@ -1088,7 +1100,7 @@ Payload Admin 登录
 R2 bucket 出现新对象
 Media URL 使用 custom domain
 Games 绑定 Media 后前台图片正常
-旧 Games 未绑定 Media 时仍正常
+6 条 Games 均已绑定 Media 且页面正常
 重新部署一次 Web container 后图片仍正常
 ```
 
@@ -1182,7 +1194,7 @@ P4  releaseDate date field 数据迁移
   ↓
 P5  Trash（Games / Reviews / Media）
   ↓
-P6  Games legacy cover 清理
+P6  Games legacy cover 清理（本 PR 已完成）
   ↓
 P7  Reviews.cover -> Media
   ↓

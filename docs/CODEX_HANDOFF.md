@@ -1,6 +1,6 @@
 # Kita Codex 开发交接
 
-> 更新时间：2026-07-21
+> 更新时间：2026-07-22
 >
 > 推荐日常项目根目录：`C:\dev\Kita`
 >
@@ -27,10 +27,10 @@ Kita 的本地开发环境和 Coolify 生产运行链路已经搭建完成并通
 本地 PostgreSQL 16              healthy
 本地 Node                       v22.16.0
 本地 pnpm                       10.28.2
-pnpm test                       46 Vitest + 4 backup shell 场景通过
+pnpm test                       47 Vitest + 4 backup shell 场景通过
 pnpm check                      通过
 pnpm build                      通过
-当前 main 基线                 17d0995（PR #16）
+本清理 PR 基线                 73971a2（PR #17）
 GitHub Actions quality          已启用并通过
 main Ruleset                    必须 PR + quality
 Coolify Compose Production      正在运行
@@ -40,7 +40,8 @@ Recovery inventory              外部账户与关键 secret 已盘点到 Bitwar
 Coolify SSH recovery archive    已加密，C 盘与私有 R2 各有一份并核对 checksum
 C SSD clean rebuild drill       已通过（clone -> Dev Container -> dev/test/check/build）
 Payload Media 本地链路          已验证（upload -> thumbnail/display -> cleanup）
-Payload Media production R2     待 Cloudflare/Coolify 配置与真实上传 smoke
+Payload Media production R2     已验证；6 条 Games 已迁移并通过 Redeploy 持久性 smoke
+Games.cover                     必填 Media relationship；旧四个封面字段已删除
 https://kita.kral-koharu.com/   HTTP 200
 /tools                          HTTP 200
 /reviews                        HTTP 200
@@ -48,10 +49,10 @@ https://kita.kral-koharu.com/   HTTP 200
 /admin                          HTTP 200
 ```
 
-当前最新 main：
+本清理 PR 建立时的 main：
 
 ```text
-17d0995 Merge pull request #16 from koharu4ever/codex/docs-history-source-of-truth
+73971a2 Merge pull request #17 from koharu4ever/codex/feat-payload-media-r2
 ```
 
 ## 2. 项目架构
@@ -273,7 +274,7 @@ pnpm test
 pnpm check
 ```
 
-`pnpm test` 运行 11 个测试文件中的 46 个 Vitest，以及 4 个 backup shell 场景；`pnpm check` 依次执行 format、lint、typecheck。
+`pnpm test` 运行 11 个测试文件中的 47 个 Vitest，以及 4 个 backup shell 场景；`pnpm check` 依次执行 format、lint、typecheck。
 
 ### 生产构建检查
 

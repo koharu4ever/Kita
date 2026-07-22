@@ -111,35 +111,9 @@ export const Games: CollectionConfig = {
       name: "cover",
       type: "upload",
       admin: {
-        description:
-          "Preferred Payload Media cover. Legacy public asset fields remain available as a rollback fallback during migration.",
+        description: "Required Payload Media cover.",
       },
       relationTo: "media",
-    },
-    {
-      name: "coverSrc",
-      type: "text",
-      admin: {
-        description:
-          "Public asset URL, for example /games/covers/title-v1.webp",
-      },
-      required: true,
-    },
-    {
-      name: "coverAlt",
-      type: "text",
-      required: true,
-    },
-    {
-      name: "coverWidth",
-      type: "number",
-      min: 1,
-      required: true,
-    },
-    {
-      name: "coverHeight",
-      type: "number",
-      min: 1,
       required: true,
     },
     {
