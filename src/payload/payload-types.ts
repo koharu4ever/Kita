@@ -272,16 +272,9 @@ export interface Game {
     [k: string]: unknown;
   };
   /**
-   * Preferred Payload Media cover. Legacy public asset fields remain available as a rollback fallback during migration.
+   * Required Payload Media cover.
    */
-  cover?: (number | null) | Media;
-  /**
-   * Public asset URL, for example /games/covers/title-v1.webp
-   */
-  coverSrc: string;
-  coverAlt: string;
-  coverWidth: number;
-  coverHeight: number;
+  cover: number | Media;
   tags?:
     | {
         label: string;
@@ -501,10 +494,6 @@ export interface GamesSelect<T extends boolean = true> {
   summary?: T;
   body?: T;
   cover?: T;
-  coverSrc?: T;
-  coverAlt?: T;
-  coverWidth?: T;
-  coverHeight?: T;
   tags?:
     | T
     | {

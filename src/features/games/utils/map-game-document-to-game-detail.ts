@@ -7,10 +7,6 @@ export type PayloadGameDocument = Pick<
   Game,
   | "body"
   | "cover"
-  | "coverAlt"
-  | "coverHeight"
-  | "coverSrc"
-  | "coverWidth"
   | "developer"
   | "links"
   | "originalTitle"
@@ -67,7 +63,11 @@ function resolvePayloadMediaCover(
 export function mapGameDocumentToGameDetail(
   game: PayloadGameDocument,
 ): GameDetail {
-  const mediaCover = resolvePayloadMediaCover(game.cover);
+  const cover = resolvePayloadMediaCover(game.cover);
+
+  if (!cover) {
+    throw new Error(`Game "${game.slug}" has no resolvable Media cover`);
+  }
 
   return {
     slug: game.slug,
@@ -78,12 +78,7 @@ export function mapGameDocumentToGameDetail(
     status: game.playStatus,
     summary: game.summary,
     body: game.body as DefaultTypedEditorState,
-    cover: mediaCover ?? {
-      src: game.coverSrc,
-      alt: game.coverAlt,
-      width: game.coverWidth,
-      height: game.coverHeight,
-    },
+    cover,
     tags: game.tags?.map((tag) => tag.label) ?? [],
     links:
       game.links?.map((link) => ({

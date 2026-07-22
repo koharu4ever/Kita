@@ -50,11 +50,15 @@ export function createPayloadGameDocument(
 ): PayloadGameDocument {
   return {
     body: lexicalBody as PayloadGameDocument["body"],
-    cover: null,
-    coverAlt: "Test game cover",
-    coverHeight: 1200,
-    coverSrc: "/games/covers/test-game.jpg",
-    coverWidth: 1920,
+    cover: {
+      alt: "Test game cover",
+      createdAt: "2026-07-21T00:00:00.000Z",
+      height: 1200,
+      id: 42,
+      updatedAt: "2026-07-21T00:00:00.000Z",
+      url: "https://media.example.com/media/test-game.jpg",
+      width: 1920,
+    },
     developer: "Test Studio",
     links: [
       { href: "https://example.com/game", id: "link-1", label: "Official" },
