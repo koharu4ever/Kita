@@ -45,6 +45,7 @@ describe("getGames", () => {
     expect(find).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: "games",
+        depth: 1,
         overrideAccess: false,
         where: { publicationStatus: { equals: "published" } },
       }),
@@ -91,6 +92,7 @@ describe("getGames", () => {
     expect(result?.slug).toBe("payload-game");
     expect(find).toHaveBeenCalledWith(
       expect.objectContaining({
+        depth: 1,
         overrideAccess: false,
         where: {
           and: [

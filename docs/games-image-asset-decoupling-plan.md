@@ -1,5 +1,7 @@
 # Games 图片资源解耦方案
 
+> 2026-07-21 状态注记：本文主体是 `public/games/covers` + 普通图片字段方案的历史设计记录。兼容式 Payload Media + Games relationship 已在后续功能分支完成代码和本地验证，旧字段与旧图片仍保留作为回退；Cloudflare/Coolify 配置、生产上传 smoke 和真实内容迁移尚未完成。当前范围、回滚和验收边界见 [`payload-media-and-content-capabilities-evaluation-2026-07-21.md`](./payload-media-and-content-capabilities-evaluation-2026-07-21.md)。
+
 > 目标：把“游戏数据”“图片文件”“数据库结构”拆开。完成一次最终调整后，新增、替换或删除游戏不再修改 collection schema，也不再为每张图片生成 migration。
 
 ## 1. 结论先行

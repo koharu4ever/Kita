@@ -50,6 +50,7 @@ export function createPayloadGameDocument(
 ): PayloadGameDocument {
   return {
     body: lexicalBody as PayloadGameDocument["body"],
+    cover: null,
     coverAlt: "Test game cover",
     coverHeight: 1200,
     coverSrc: "/games/covers/test-game.jpg",

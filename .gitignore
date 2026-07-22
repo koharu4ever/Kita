@@ -4,6 +4,7 @@ node_modules/
 
 # Next.js
 .next/
+.payload-media/
 out/
 tsconfig.tsbuildinfo
 next-env.d.ts
