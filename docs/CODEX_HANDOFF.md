@@ -30,7 +30,7 @@ Kita 的本地开发环境和 Coolify 生产运行链路已经搭建完成并通
 pnpm test                       47 Vitest + 4 backup shell 场景通过
 pnpm check                      通过
 pnpm build                      通过
-本清理 PR 基线                 73971a2（PR #17）
+Media-only 验证基线            78776c8（PR #18 已合并并通过生产 smoke）
 GitHub Actions quality          已启用并通过
 main Ruleset                    必须 PR + quality
 Coolify Compose Production      正在运行
@@ -49,10 +49,10 @@ https://kita.kral-koharu.com/   HTTP 200
 /admin                          HTTP 200
 ```
 
-本清理 PR 建立时的 main：
+Media-only 功能验证基线：
 
 ```text
-73971a2 Merge pull request #17 from koharu4ever/codex/feat-payload-media-r2
+78776c8 Merge pull request #18 from koharu4ever/codex/remove-legacy-game-cover-fields
 ```
 
 ## 2. 项目架构
@@ -468,7 +468,9 @@ web runtime logs
 
 ## 12. Migration 注意事项
 
-仓库包含 4 个 production migration。项目所有者已确认首次生产部署使用全新 PostgreSQL Volume，`docker-entrypoint.sh` 成功执行全部 migration，随后 Admin、Tools、Reviews、Games 正常，因此生产空库链路已经验证。
+仓库包含 6 个 production migration。项目所有者已确认首次生产部署使用全新 PostgreSQL Volume，`docker-entrypoint.sh` 成功执行最初 4 个 migration，随后 Admin、Tools、Reviews、Games 正常，因此生产空库链路已经验证。PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 后续也已在生产成功执行；公开 API 返回 6 条完整 Media relationship 和 0 个 legacy cover 字段，页面与 Media URL smoke 全部返回 HTTP 200。当前 CI 尚未持续验证 6 个 migration 从全新 PostgreSQL 16 完整执行。
+
+PR #18 为什么必须在内容迁移后清理、`up/down` 分别保证什么、以及旧镜像回滚为什么必须先执行 `down`，统一以 [`payload-media-and-content-capabilities-evaluation-2026-07-21.md`](./payload-media-and-content-capabilities-evaluation-2026-07-21.md) 第 0.2 节为准。本交接文档不复制实现细节，避免两份回滚说明漂移。正常运行和重新部署当前 main 不执行 `down`。
 
 本地开发数据库历史上主要通过 Payload development schema push 建立，本地 migration status 不一定完整。因此：
 
@@ -510,11 +512,12 @@ OpenList storage 尚未定型是有意延期，不是配置丢失。当前测试
 当前代码与工程底座已经稳定，不需要继续扩张技术栈。建议顺序：
 
 ```text
-P1 评估 production Compose 数据库凭据 fail-fast
+P1 小型 PR：slug/URL validation + 显式写权限 + 共用 rich-text 配置
+P1 单独补 PostgreSQL 16 migration smoke + 真实 published access 集成测试
 P1 替换 About、Tools 等前台 placeholder，录入真实内容
 P1 补 error / empty / not-found 产品行为
-P1 补 slug、URL、资源路径校验
-P2 按内容增长决定临时 PostgreSQL/published 集成测试
+P2 修正生产 placeholder 日期后，再评估 releaseDate date migration
+P2 出现真实误删痛点后再启用 Trash
 P2 最后再考虑 Playwright smoke
 P2 数据价值提高后再做恢复演练和 last-success 监控
 ```
