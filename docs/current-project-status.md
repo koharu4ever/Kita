@@ -46,7 +46,7 @@ ESLint                通过
 TypeScript            通过
 Vitest                11 files / 47 tests 通过
 Backup shell tests     4 scenarios 通过
-本清理 PR 基线        73971a2（PR #17 已合并）
+Media-only 验证基线  78776c8（PR #18 已合并并通过生产 smoke）
 GitHub quality         通过并设为 main 必需检查
 ```
 
@@ -444,9 +444,13 @@ C:\dev\Kita
 20260628_133544
 20260702_161526
 20260703_132233
+20260721_131302_add_media_and_game_cover
+20260722_172809
 ```
 
-本地开发 schema 历史上主要由 Payload development schema push 建立，因此本地 migration status 不能用于反推生产状态。项目所有者已经确认：生产首次部署使用全新 PostgreSQL Volume，4 个 migration 成功执行，随后 Admin、Tools、Reviews 与 Games 正常读写，生产空库链路已经验证。
+本地开发 schema 历史上主要由 Payload development schema push 建立，因此本地 migration status 不能用于反推生产状态。项目所有者已经确认：生产首次部署使用全新 PostgreSQL Volume，最初 4 个 migration 成功执行，随后 Admin、Tools、Reviews 与 Games 正常读写，生产空库链路已经验证。PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 后续均在生产成功执行；公开 API 返回 6 条完整 Media relationship、0 个 legacy cover 字段，`/games`、6 个详情页和 6 个 Media URL 均返回 HTTP 200。CI 尚未持续验证 6 个 migration 从全新 PostgreSQL 16 完整执行，这仍是后续防回归增强。
+
+PR #18 的设计、代码边界、`up/down` 语义和正确回滚顺序统一记录在 [`payload-media-and-content-capabilities-evaluation-2026-07-21.md`](./payload-media-and-content-capabilities-evaluation-2026-07-21.md) 第 0.2 节。这里仅维护当前状态，不复制实现说明；正常运行当前 main 不执行 `down`。
 
 仍不要在已有数据的本地库或生产库上尝试“补跑全部初始 migration”。未来的一次性 PostgreSQL 16 验证属于防回归增强，不是当前阻断项，也不得以此为由删除现有 Volume。
 
@@ -481,7 +485,8 @@ C:\dev\Kita
 ### 数据库与部署收口
 
 - [x] 已确认 Coolify 使用 repository `compose.yaml`。
-- [x] 生产首次空库部署已成功执行 4 个 migration。
+- [x] 生产首次空库部署已成功执行最初 4 个 migration。
+- [x] Media/relationship 与 Media-only cleanup 两个后续 migration 已在生产成功执行并通过公开 API/page smoke。
 - [x] PostgreSQL 已增加 healthcheck，web 等待 `service_healthy`。
 - [x] PostgreSQL custom dump -> R2 backup sidecar 已启用并连续生成真实对象。
 - [x] backup shell 的 dump/校验/上传失败分支已自动测试且不会误报成功。
@@ -507,7 +512,7 @@ C:\dev\Kita
 
 - [x] GitHub Actions：install、format、lint、typecheck、test、build。
 - [x] main Ruleset：必须经过 PR 且 `quality` 成功。
-- [x] mapper/server getter/seed 的 30 个 Vitest，以及环境校验开关的 3 个 Vitest。
+- [x] 11 个测试文件中的 47 个 Vitest，覆盖 mapper、server getter、seed、Media 配置/权限和环境校验。
 - [x] backup shell 的 4 个 fake-command 场景。
 - [ ] 临时 PostgreSQL + published 权限集成测试。
 - [ ] 首页、内容页和 Admin 的 Playwright smoke。
@@ -597,4 +602,4 @@ ENABLE_DEV_SEED
   固定 false
 ```
 
-Kita 当前代码结构清晰，生产链路、备份、测试、CI 和 main 保护均已建立。D 盘单点丢失后的本地复建已在 C SSD 实际验证通过，但完整生产灾难恢复仍需 PostgreSQL restore、Coolify restore、OpenList 最终 storage/data backup 和端到端演练来证明。接下来优先补真实内容与产品体验；恢复演练、secret 轮换与 backup last-success 监控作为已知后续增强，不需要继续扩张技术栈。
+Kita 当前代码结构清晰，生产链路、备份、测试、CI 和 main 保护均已建立。D 盘单点丢失后的本地复建已在 C SSD 实际验证通过，但完整生产灾难恢复仍需 PostgreSQL restore、Coolify restore、OpenList 最终 storage/data backup 和端到端演练来证明。下一项技术工作应限制为 slug/URL validation、显式写权限和共用 rich-text 配置的小 PR；随后单独补 PostgreSQL 16 migration smoke 与真实 published access 集成测试。完成后优先回到真实内容与产品体验；恢复演练、secret 轮换与 backup last-success 监控作为已知后续增强，不继续扩张技术栈。
