@@ -47,12 +47,12 @@ pnpm test:backup
 
 `pnpm test` 会先运行 Vitest，再自动运行这组 shell 测试。测试直接执行真实 `backup.sh`，但通过临时 `PATH` 注入 fake `pg_isready`、`pg_dump`、`pg_restore`、`rclone` 和 `sleep`，覆盖 dump 失败、archive 校验失败、上传失败和成功四个场景。
 
-测试不连接 PostgreSQL 或 R2，不读取 production secret，不修改 Coolify，也不操作 Docker Volume。实现和断言说明见 `docs/testing-and-github-actions-guide-2026-07-10.md` 第十七节。
+测试不连接 PostgreSQL 或 R2，不读取 production secret，不修改 Coolify，也不操作 Docker Volume。实现和断言说明见 [`docs/testing-and-ci.md`](../../docs/testing-and-ci.md)。
 
 ## 验证与恢复
 
 R2 中出现对象、日志显示成功，只能证明导出和上传链路成功，不能替代恢复演练。正式依赖这套备份前，应下载一个 dump，并恢复到临时 PostgreSQL 16 数据库。
 
-第一次恢复演练不得直接操作生产数据库。完整的部署、保留、恢复和回滚说明见 `docs/postgres-r2-backup-workflow.md`。
+第一次恢复演练不得直接操作生产数据库。完整的备份边界与隔离恢复步骤见 [`docs/backup-and-recovery.md`](../../docs/backup-and-recovery.md)。
 
 Compose 将 `/tmp` 限制为 256 MiB。当前数据库 dump 远小于该限制；如果未来日志出现 `No space left on device`，应先评估数据库体积，再调整 `compose.yaml` 的 backup tmpfs 大小。

@@ -1,558 +1,111 @@
-# Kita Codex 开发交接
+# Kita Codex 交接
 
-> 更新时间：2026-08-12
+> 最后核对：2026-08-12
 >
-> 推荐日常项目根目录：`C:\dev\Kita`
->
-> 旧机械盘工作区已经退役，不再作为正常开发、提交或推送入口。
->
-> 用途：在新建 Codex 工作区并将 Project Root 选择为 `C:\dev\Kita` 后，先让 Codex 完整阅读本文，再开始任何修改。
+> 正常项目根目录：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
-## 给新 Codex 的第一条消息
+## 开始任何工作前
 
-复制下面这段到新 Codex 输入框：
+1. 完整阅读本文；
+2. 阅读 [当前项目状态](./current-project-status.md)；
+3. 根据任务从 [文档入口](./README.md) 选择一份专题文档；
+4. 只读检查 `git status --short --branch`、当前分支和最近提交；
+5. 确认 Dev Container 绑定的是 `C:\dev\Kita`；
+6. 不输出 secret、不删除 Volume、不修改 Production。
 
-```text
-请先完整阅读 docs/CODEX_HANDOFF.md，然后阅读 docs/current-project-status.md、docs/project-structure.md 和 docs/development-production-alignment.md。先只读检查 git status、当前分支、Dev Container、PostgreSQL 和环境变量键是否完整，不要输出任何 secret，不要删除 Volume，不要修改生产环境。确认状态后，按 CODEX_HANDOFF.md 中的架构、开发命令和安全边界继续协作。
-```
-
-## 1. 当前状态结论
-
-Kita 的本地开发环境和 Coolify 生产运行链路已经搭建完成并通过实际验证。
-
-可以确认：
+可直接复制给新 Codex：
 
 ```text
-本地 Dev Container              可用
-本地 PostgreSQL 16              healthy
-本地 Node                       v22.16.0
-本地 pnpm                       10.28.2
-pnpm test                       47 Vitest + 4 backup shell 场景通过
-pnpm check                      通过
-pnpm build                      通过
-Media-only 验证基线            78776c8（PR #18 已合并并通过生产 smoke）
-GitHub Actions quality          已启用并通过
-main Ruleset                    必须 PR + quality
-Coolify Compose Production      正在运行
-PostgreSQL -> R2 backup         已启用并有真实成功日志/对象
-OpenList                        独立 Coolify Application；Kita 只保存公开 URL
-Recovery inventory              外部账户与关键 secret 已盘点到 Bitwarden
-Coolify SSH recovery archive    已加密，C 盘与私有 R2 各有一份并核对 checksum
-C SSD clean rebuild drill       已通过（clone -> Dev Container -> dev/test/check/build）
-Payload Media 本地链路          已验证（upload -> thumbnail/display -> cleanup）
-Payload Media production R2     已验证；6 条 Games 已迁移并通过 Redeploy 持久性 smoke
-Games.cover                     必填 Media relationship；旧四个封面字段已删除
-https://kita.kral-koharu.com/   HTTP 200
-/tools                          HTTP 200
-/reviews                        HTTP 200
-/games                          HTTP 200
-/admin                          HTTP 200
+请先完整阅读 docs/CODEX_HANDOFF.md 和 docs/current-project-status.md，再从 docs/README.md 选择与任务相关的一份专题文档。先只读检查 Git、工作区和 Dev Container；不要读取或输出 secret，不要删除数据库/Volume，不要修改 Coolify、Cloudflare 或生产环境。确认状态后再提出或实施范围明确的修改。
 ```
 
-Media-only 功能验证基线：
+## 项目是什么
+
+Kita 是 Next.js 16 + Payload CMS + PostgreSQL 16 的个人内容站，包含 Home、About、Tools、Reviews、Games 和 Payload Admin。
+
+核心数据流：
 
 ```text
-78776c8 Merge pull request #18 from koharu4ever/codex/remove-legacy-game-cover-fields
+Route -> server getter -> Payload Local API -> PostgreSQL
+                          -> mapper -> feature DTO -> UI
+
+Games.cover -> Payload Media -> local storage (development)
+                              -> Cloudflare R2 (production)
 ```
 
-## 2. 项目架构
+Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 和 `backup`。OpenList 是独立 Application，Kita 只保存公开 archive URL。
 
-```text
-Browser
-  -> Next.js 16 App Router
-  -> Server Components / server getters
-  -> Payload CMS Local API
-  -> PostgreSQL 16（内容和 Media 元数据）
+详细结构只维护在 [architecture.md](./architecture.md)。
 
-Payload Media upload
-  -> 本地开发：.payload-media
-  -> 生产：独立 Cloudflare R2 media bucket
-```
+## 当前最重要的事实
 
-主要组成：
+- `main` 的功能基线包含 PR #17 Media/R2、PR #18 Games Media-only 和后续文档纠偏。
+- Games 封面以必填 Media relationship 为唯一事实源；旧 cover URL/alt/width/height 列已删除。
+- Production 数据库曾由项目所有者手动复建；后续增量 migration 和 Production smoke 通过，但不能据此声称完整 fresh-database migration 或 dump restore 已验证。
+- PostgreSQL -> private R2 backup 已有真实对象；隔离 restore 演练尚未完成。
+- C SSD 的本地 clone + Dev Container + 全新本地 PostgreSQL 复建曾验证通过。
+- OpenList 最终 storage/data backup 仍延期。
+- 当前代码已经有 Media 显式写权限，但 Tools/Reviews/Games 仍只显式声明 read；“显式写权限”仍是待办。
 
-```text
-src/app/(site)
-  前台页面：Home、About、Tools、Reviews、Games
+带日期的完整事实和待办只维护在 [current-project-status.md](./current-project-status.md)。
 
-src/app/(payload)
-  Payload Admin、REST API、GraphQL API
+## 正常开发入口
 
-src/features
-  按功能组织 UI、view model、mapper 和开发 fallback
-
-src/server
-  Payload Local API 查询与服务端数据编排
-
-src/payload
-  Users、Media、Tools、Reviews、Games collections
-
-src/migrations
-  生产数据库 migration
-```
-
-项目没有独立 Express 后端，也没有 Prisma。Payload 已承担 CMS、CRUD、权限、Local API 和 PostgreSQL schema 管理职责，不应无理由增加新的后端层。
-
-OpenList 是单独部署在 Coolify 的 Application，不属于 Kita Compose，也不与 Kita 共享源码、数据库或 Volume。Kita 只在 Games 内容的 `links[].href` 中保存公开 archive URL；OpenList 不可用时，不应阻止 Kita 页面本身渲染。
-
-## 3. 开发环境结构
-
-```text
-Windows
-  Docker Desktop
-    Dev Container
-      Node / pnpm / Next.js / Payload
-      Docker-in-Docker
-        PostgreSQL 16
-        postgres-data
-```
-
-Windows 宿主机只需要通用工具：
-
-```text
-Git for Windows
-Docker Desktop
-VS Code
-Dev Containers 扩展
-浏览器
-```
-
-不要为 Kita 在 Windows 全局安装：
-
-```text
-Node.js
-pnpm
-Payload CLI
-PostgreSQL Windows Service
-```
-
-所有项目命令默认在 Dev Container 终端执行，终端提示应类似：
-
-```text
-node ➜ /workspaces/Kita
-```
-
-### Dev Container 用户边界
-
-Docker-in-Docker 入口需要容器默认用户保持 root，但 VS Code 和生命周期命令使用 `remoteUser: node`。因此：
-
-```text
-VS Code Dev Container 终端       node
-裸 docker exec（未指定 -u）      可能是 root
-```
-
-Codex 或其他自动化通过 Docker 进入容器时，必须显式使用：
-
-```bash
-docker exec -u node -w /workspaces/Kita <container> ...
-```
-
-项目 package scripts 与 `next.config.ts` 已加入 bind-mounted workspace 用户守卫。root 在 `/workspaces/...` 运行项目命令会被拒绝；dev/build 冲突也会被拒绝。不得用 sudo 绕过守卫。
-
-如果守卫报告 `.next` 所有权异常，先停止所有 Next 进程，再按 `docs/first-priority-next-build-gate-remediation-2026-07-10.md` 的路径核验和清理流程处理。禁止把清理范围扩大到数据库、Volume、`node_modules` 或其他项目目录。
-
-## 4. Compose 分层
-
-### `compose.yaml`
-
-生产/基础服务定义：
-
-```text
-web
-postgres
-postgres-data
-PostgreSQL healthcheck
-web 等待 service_healthy
-```
-
-生产 PostgreSQL 不通过 repository Compose 发布宿主机 5432。
-
-### `compose.dev.yaml`
-
-仅用于本地开发：
-
-```text
-把内层 PostgreSQL 映射到 Dev Container localhost:5432
-```
-
-本地使用两份 Compose 叠加；Coolify 只读取 `compose.yaml`。
-
-Dev Container 当前有且仅有两个经过实测验证的性能例外：
-
-```text
-node_modules
-.next
-```
-
-它们使用 targeted named volumes，目的是避开 Windows `9p` 高频小文件 I/O；源码、`.env`、Git 和 `.pnpm-store` 仍按项目现有配置管理。不得把这一例外扩张到其他目录、数据库 Volume 或生产结构。
-
-## 5. 环境变量边界
-
-本地 `.env` 已被 `.gitignore` 忽略，不得提交。
-
-本地应存在这些键：
-
-```text
-NEXT_PUBLIC_SITE_URL
-PAYLOAD_SECRET
-ENABLE_DEV_SEED
-POSTGRES_DB
-POSTGRES_USER
-POSTGRES_PASSWORD
-DATABASE_URI
-MEDIA_STORAGE_MODE
-MEDIA_R2_BUCKET
-MEDIA_R2_ENDPOINT
-MEDIA_R2_PUBLIC_URL
-MEDIA_R2_ACCESS_KEY_ID
-MEDIA_R2_SECRET_ACCESS_KEY
-```
-
-只允许检查：
-
-```text
-键是否存在
-值是否为空
-长度/URL 形状是否合法
-```
-
-禁止在 Codex 输出、日志、Markdown、截图或 commit 中显示真实 secret。
-
-本地与生产不使用相同 secret：
-
-| 配置                   | 本地                    | Coolify Production             |
-| ---------------------- | ----------------------- | ------------------------------ |
-| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | `https://kita.kral-koharu.com` |
-| `PAYLOAD_SECRET`       | 本地专用                | 生产专用且稳定                 |
-| `POSTGRES_PASSWORD`    | 本地开发值              | 生产强密码                     |
-| `DATABASE_URI` host    | `localhost`             | `postgres`                     |
-| `ENABLE_DEV_SEED`      | 默认 `false`            | 必须 `false`                   |
-| `MEDIA_STORAGE_MODE`   | `local`                 | 必须为 `r2`                    |
-| Media R2 credentials   | 不需要                  | 独立 bucket 的最小权限 token   |
-
-同一环境内部必须满足：
-
-```text
-DATABASE_URI 中的数据库用户、密码和数据库名
-  与该环境 POSTGRES_USER、POSTGRES_PASSWORD、POSTGRES_DB 匹配
-```
-
-`PAYLOAD_SECRET` 与 `POSTGRES_PASSWORD` 是不同用途，不能使用同一个值。
-
-## 6. 标准开发流程
-
-### 开始开发
-
-在 Dev Container 终端执行：
+所有项目命令在 Dev Container 内以 `node` 用户运行：
 
 ```bash
 pnpm dev
 ```
 
-`pnpm dev` 是唯一正常开发入口：它会先幂等启动本地 PostgreSQL，并等待 healthcheck 通过，再启动 Next.js。`pnpm dev:services` 只用于“仅启动数据库”的诊断或维护场景，不是日常启动的前置步骤。
-
-Dev Container 将 `node_modules` 和 `.next` 挂载到只用于本地开发的 Docker named volumes，避免 Windows bind mount 的高频小文件 I/O。修改 `.devcontainer/devcontainer.json` 后必须执行一次 `Dev Containers: Rebuild Container`；两个 Volume 仍必须由 `node` 用户写入，现有 root 与 dev/build 并发守卫继续生效。
-
-访问：
-
-```text
-http://localhost:3000
-http://localhost:3000/tools
-http://localhost:3000/reviews
-http://localhost:3000/games
-http://localhost:3000/admin
-```
-
-Windows 机械盘 + bind mount 的首次 Next.js 编译可能需要一两分钟。Next.js 已报告 slow filesystem，这属于 I/O 性能，不等于代码或依赖错误。
-
-从 2026-07-14 起，`.next` 与 `node_modules` 改由 Linux named volumes 承载；源码仍在 Windows，但 Next 高频缓存和依赖读写不再经过 9p。第一次重建会重新安装依赖，后续冷编译与 HMR 才会受益。
-
-### 日常检查
+提交前停止 dev server，再按风险运行：
 
 ```bash
 pnpm test
 pnpm check
-```
-
-`pnpm test` 运行 11 个测试文件中的 47 个 Vitest，以及 4 个 backup shell 场景；`pnpm check` 依次执行 format、lint、typecheck。
-
-### 生产构建检查
-
-先在运行 `pnpm dev` 的终端按 `Ctrl+C`，再执行：
-
-```bash
 pnpm build
 ```
 
-不要同时运行 `pnpm dev` 与 `pnpm build`，因为它们会同时写入 `.next`。
+使用功能分支 -> commit -> push -> Pull Request -> required `quality` -> merge。具体流程与排障见 [development.md](./development.md)。
 
-构建完成后继续开发：
+## 数据与 Production 安全边界
 
-```bash
-pnpm dev
-```
+未经项目所有者明确授权，不得：
 
-### 停止本地数据库但保留数据
+- 修改 Coolify、Cloudflare、DNS、R2 或 VPS；
+- 读取、输出、复制或提交真实 secret；
+- 删除、重建或清空 PostgreSQL/Media/OpenList Volume；
+- 在 Production 首次尝试 restore 或破坏性 migration；
+- 删除真实 Payload 内容或 R2 对象；
+- 通过切旧镜像忽略数据库 schema 兼容性。
 
-```bash
-pnpm dev:services:stop
-```
+`.env` 永不提交。真实配置保存在 Coolify/Bitwarden。恢复边界见 [backup-and-recovery.md](./backup-and-recovery.md)。
 
-禁止在不明确需要删除数据库时执行：
+## 当前推荐工作顺序
 
-```bash
-docker compose down -v
-```
+1. 小型后端质量 PR：slug/URL validation、Tools/Reviews/Games 显式写权限、共用 Lexical 配置；
+2. 独立 PostgreSQL migration + published access 集成 smoke；
+3. About、Reviews、Games、Tools 的真实内容收口；
+4. empty/error/not-found 和最小浏览器 smoke；
+5. 根 README 与准确作品集描述。
 
-## 7. Payload 开发流程
+不要优先引入 Redis、Prisma、微服务、Kubernetes、复杂角色系统、Payload drafts/versions 或大型监控平台。选择依据见 [product-roadmap.md](./product-roadmap.md)。
 
-修改 collection 后：
+## 文档规则
 
-```bash
-pnpm payload:types
-pnpm payload:migrate:create
-pnpm check
-```
+`docs/README.md` 是唯一目录。当前工作树不保留历史计划或事故全文；需要追溯时查 Git 历史。发生冲突时以当前代码、Git 状态、`current-project-status.md` 和对应专题文档为准。
 
-必须人工审查 migration，再 commit。
-
-数据流：
-
-```text
-Payload Admin
-  -> collection
-  -> PostgreSQL
-  -> Payload Local API
-  -> src/server getter
-  -> mapper
-  -> feature component
-  -> route
-```
-
-生产环境数据库错误必须暴露，不能用本地 fallback 伪装成功。
-
-## 8. Seed 规则
-
-Seed 只允许在：
-
-```text
-NODE_ENV !== production
-ENABLE_DEV_SEED=true
-```
-
-时执行。
-
-当前脚本：
-
-```bash
-pnpm seed:tools
-pnpm seed:games
-```
-
-Games seed 已改成按 slug upsert，不再删除其他 Games。
-
-使用完成后立即恢复：
-
-```env
-ENABLE_DEV_SEED=false
-```
-
-生产环境必须一直为 `false`。
-
-## 9. Git 与 Pull Request 工作流
-
-项目真实 Git 根目录：
-
-```text
-C:\dev\Kita\.git
-```
-
-远程仓库：
-
-```text
-https://github.com/koharu4ever/Kita.git
-```
-
-日常工作不直接 push main。标准流程：
-
-```bash
-git fetch origin
-git switch -c codex/<task-name> origin/main
-
-# 修改后，在 Dev Container 中
-pnpm test
-pnpm check
-# 停止 pnpm dev
-pnpm build
-
-git status
-git diff
-git add -- <明确文件>
-git diff --cached --check
-git diff --cached
-git commit -m "..."
-git push -u origin codex/<task-name>
-```
-
-然后在 GitHub 创建目标为 `main` 的 Pull Request，等待 `CI / quality` 成功后 merge。main Ruleset 会阻止未通过 PR/quality 的日常修改，也会阻止 force push 和删除 main。
-
-避免无检查地使用 `git add .`，尤其不能提交 `.env`、真实密钥和不相关的自动生成变化。
-
-合并后同步并清理：
-
-```bash
-git switch main
-git pull --ff-only origin main
-git branch -d codex/<task-name>
-git fetch --prune origin
-```
-
-完整初学者说明见 `docs/git-pull-request-workflow-guide-2026-07-12.md`。
-
-## 10. Coolify Production
-
-当前部署模式已经确认：
-
-```text
-Coolify Compose Application
-  |-- web
-  |-- postgres
-  |-- backup（Compose 默认关闭；当前 production 已显式启用）
-  `-- postgres-data
-```
-
-生产变量：
-
-| 变量                                   | Buildtime | Runtime |
-| -------------------------------------- | --------: | ------: |
-| `NEXT_PUBLIC_SITE_URL`                 |        是 |      是 |
-| `DATABASE_URI`                         |        否 |      是 |
-| `PAYLOAD_SECRET`                       |        否 |      是 |
-| `ENABLE_DEV_SEED`                      |        否 |      是 |
-| `POSTGRES_DB`                          |        否 |      是 |
-| `POSTGRES_USER`                        |        否 |      是 |
-| `POSTGRES_PASSWORD`                    |        否 |      是 |
-| `POSTGRES_BACKUP_ENABLED`              |        否 |      是 |
-| `POSTGRES_BACKUP_R2_ENDPOINT`          |        否 |      是 |
-| `POSTGRES_BACKUP_R2_BUCKET`            |        否 |      是 |
-| `POSTGRES_BACKUP_R2_ACCESS_KEY_ID`     |        否 |      是 |
-| `POSTGRES_BACKUP_R2_SECRET_ACCESS_KEY` |        否 |      是 |
-
-仓库中的 `docker/postgres-backup` 是可审计的 PostgreSQL 16 custom dump -> Cloudflare R2 sidecar。它没有端口、数据库 volume 或 Docker socket；本地默认关闭。真实 R2 凭据只允许保存在 Coolify，不得写入 `.env.example` 的值、文档、聊天或 Git。
-
-Coolify 自动生成的 `SERVICE_FQDN_WEB`、`SERVICE_URL_WEB` 不复制到本地。
-
-Pull Request 通过 `quality` 并 merge main 后，由 Coolify 自动部署。部署检查顺序：
-
-```text
-build logs
-postgres healthcheck
-Payload migration
-web runtime logs
-公开页面 HTTP 状态
-```
-
-## 11. 已接受的安全增强边界
-
-生产 R2 backup 已启用并连续成功，bucket 对象与日志已核对；backup shell 的 4 个 fake-command 场景也已进入 CI。
-
-仍未执行：
-
-- 临时 PostgreSQL 16 完整恢复演练；
-- 生产 `PAYLOAD_SECRET` / PostgreSQL 密码轮换；
-- backup last-success healthcheck/告警。
-
-项目所有者已经明确决定现阶段暂缓恢复演练和 secret 轮换，并接受为非阻断后续增强。文档不得把它们写成已经完成，也不得重新提升为 P0。
-
-任何 Codex 都不得在未确认备份、未得到用户明确授权的情况下操作生产密码、数据库、Coolify 或 Volume。已有 `postgres-data` 时，只修改 `POSTGRES_PASSWORD` 环境变量不会自动修改数据库内部密码。
-
-## 12. Migration 注意事项
-
-仓库包含 6 个 production migration。生产数据库曾由项目所有者手动复建；手动复建后的 Admin、Tools、Reviews、Games 可以正常运行，PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 也已在生产成功执行。公开 API 当时返回 6 条完整 Media relationship 和 0 个 legacy cover 字段，页面与 Media URL smoke 全部返回 HTTP 200。
-
-这些证据证明当前生产 schema、增量 migration 和 Media-only 数据链路在该数据库上可用，但不能证明 6 个 migration 能从全新 PostgreSQL 16 全自动建立当前数据库，也不能替代 PostgreSQL dump restore 演练。此前文档中“首次生产空库链路已经验证”的表述不再作为当前事实；CI 仍未持续验证完整的 fresh-database migration 链。
-
-PR #18 为什么必须在内容迁移后清理、`up/down` 分别保证什么、以及旧镜像回滚为什么必须先执行 `down`，统一以 [`payload-media-and-content-capabilities-evaluation-2026-07-21.md`](./payload-media-and-content-capabilities-evaluation-2026-07-21.md) 第 0.2 节为准。本交接文档不复制实现细节，避免两份回滚说明漂移。正常运行和重新部署当前 main 不执行 `down`。
-
-本地开发数据库历史上主要通过 Payload development schema push 建立，本地 migration status 不一定完整。因此：
-
-- 不要在当前已有表的本地数据库上盲目补跑全部初始 migration；
-- 不要根据本地 migration status 反推生产状态；
-- 修改 collection 后必须生成并人工审查新 migration；
-- 未来可用一次性 PostgreSQL 16 做 CI 防回归，但它不再是关闭 P0 的前置条件；
-- 不得为了 migration 测试删除现有本地或生产 Volume。
-
-## 12.1 2026-07-20 恢复材料状态
-
-当前恢复事实以 `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md` 为准。不要把“已有备份材料”写成“完整灾难恢复已经演练”。
-
-已经确认：
-
-- 本轮文档分支建立前，本地 `main` 与 GitHub `origin/main` 同为 `78ad2d2`，工作区干净，没有只存在于 D 盘的未提交项目文件；
-- Git 仓库包含 Dev Container、Compose、Dockerfile、migration、lockfile、CI、`.env.example` 和恢复手册；
-- 生产、本地开发、Cloudflare、VPS、Coolify、Tailscale 与 OpenList 的关键登录/配置材料已经按用途盘点到 Bitwarden，真实值不进入 Git 或本文档；
-- Coolify SSH keys 与 VPS `authorized_keys` 已制作 AES256 加密归档；解密读取成功，C 盘副本与服务器生成的 SHA-256 一致；
-- 同一加密归档与 checksum 文件已上传到私有 R2 `kita-recovery-private`，Public Access 为 Disabled；
-- OpenList 已作为固定版本的独立 Application 运行，Kita 只保存 URL；
-- 已在 `C:\dev\Kita` 从 GitHub 全新 clone，并从 `.env.example` 与 Bitwarden 中的本地开发记录重建 `.env`；Dev Container 以 `node` 用户运行，`pnpm dev` 自动启动全新本地 PostgreSQL，页面 smoke、36 Vitest、4 个 backup shell 场景、`pnpm check` 与 `pnpm build` 全部通过，最终 Git 状态干净并与 `origin/main` 对齐。
-
-因此，**仅 D 盘工作区丢失后的本地复建已经实际演练通过**。`C:\dev\Kita` 是后续唯一的日常开发工作区；旧机械盘工作区已经退役，不再用于开发、提交或推送。这个结论不包含生产数据恢复、Coolify 控制面恢复或 VPS 整体重建。
-
-仍未完成或明确暂缓：
-
-- 从私有 R2 重新下载 Coolify SSH 归档并再次核对的 round-trip；
-- 临时 PostgreSQL 16 的真实 dump restore；
-- Coolify 控制面完整 backup/restore 演练；
-- OpenList 最终 storage provider、逐挂载凭据记录与 data Volume backup；
-- VPS 整体丢失后的端到端恢复演练；
-- 独立离线介质和密码库加密导出。
-
-OpenList storage 尚未定型是有意延期，不是配置丢失。当前测试挂载可以视为可丢弃状态；在最终公开存储确定前，不应编造一条“已完成”的 storage inventory，也不应声称 OpenList data 恢复已经闭环。
-
-## 13. 当前优先级
-
-当前代码与工程底座已经稳定，不需要继续扩张技术栈。建议顺序：
-
-```text
-P1 小型 PR：slug/URL validation + 显式写权限 + 共用 rich-text 配置
-P1 单独补 PostgreSQL 16 migration smoke + 真实 published access 集成测试
-P1 替换 About、Tools 等前台 placeholder，录入真实内容
-P1 补 error / empty / not-found 产品行为
-P2 修正生产 placeholder 日期后，再评估 releaseDate date migration
-P2 出现真实误删痛点后再启用 Trash
-P2 最后再考虑 Playwright smoke
-P2 数据价值提高后再做恢复演练和 last-success 监控
-```
-
-不要优先增加 Redis、Prisma、微服务、Kubernetes、大型监控平台或两个已验证性能例外之外的额外 named volume。
-
-## 14. 必读文档
-
-新 Codex 开始工作前按顺序阅读：
-
-1. `docs/CODEX_HANDOFF.md`
-2. `docs/current-project-status.md`
-3. `docs/project-structure.md`
-4. `docs/development-production-alignment.md`
-5. `docs/kita-code-review-2026-07-09.md`
-6. `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md`
-
-其他 docs 中有早期学习记录和历史计划，可能描述旧阶段。发生冲突时，以当前代码、Git 历史和上述 6 份文档为准。
-
-## 15. 新 Codex 的工作原则
+## 工作原则
 
 ```text
 先读后改
 先检查 Git 状态
 保留用户已有修改
-所有项目命令在 Dev Container 中运行
+所有项目命令在 Dev Container 运行
+只处理被授权的范围
 不输出 secret
 不提交 .env
 不删除 Volume
-不擅自操作生产环境
-不擅自增加两个已验证性能例外之外的 named volume 或新技术栈
+不擅自操作 Production
 修改后运行与风险相称的验证
-先本地验收，再 commit/push，再观察 Coolify
+事实只维护在一个位置
 ```
-
-当前项目已经可以立即进入正常功能开发；开始新任务前，只需先完成只读状态确认。

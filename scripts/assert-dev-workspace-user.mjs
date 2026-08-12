@@ -37,7 +37,7 @@ if (
 
   if (mismatchedPath) {
     fail(
-      `Detected a .next entry not owned by the current user: ${mismatchedPath}. Stop Next processes and follow docs/first-priority-next-build-gate-remediation-2026-07-10.md.`,
+      `Detected a .next entry not owned by the current user: ${mismatchedPath}. Stop Next processes and follow docs/development.md.`,
     );
   }
 }
