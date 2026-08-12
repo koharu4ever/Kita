@@ -7,6 +7,8 @@
 > 范围：Next.js/React、Payload CMS、PostgreSQL、migration、Dev Container、Docker/Coolify、R2 备份、测试与 CI。
 >
 > 边界：未读取或输出真实 secret，未修改生产环境，未删除 Volume，也未清理本地 `.next`。
+>
+> 2026-08-12 历史记录说明：本文保留 2026-07-09 至 2026-07-12 的审查与当时的关闭判断，不再作为当前数据库恢复事实源。项目所有者后来明确生产数据库曾手动复建，因此文中的“生产空库 migration 已验证”不能证明全部 migration 可从全新数据库自动执行，也不能替代 dump restore 演练。当前状态以 [`CODEX_HANDOFF.md`](./CODEX_HANDOFF.md) 和 [`current-project-status.md`](./current-project-status.md) 为准。
 
 ## 0. 2026-07-10 状态更新
 

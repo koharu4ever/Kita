@@ -1,6 +1,6 @@
 # Kita Codex 开发交接
 
-> 更新时间：2026-07-22
+> 更新时间：2026-08-12
 >
 > 推荐日常项目根目录：`C:\dev\Kita`
 >
@@ -468,7 +468,9 @@ web runtime logs
 
 ## 12. Migration 注意事项
 
-仓库包含 6 个 production migration。项目所有者已确认首次生产部署使用全新 PostgreSQL Volume，`docker-entrypoint.sh` 成功执行最初 4 个 migration，随后 Admin、Tools、Reviews、Games 正常，因此生产空库链路已经验证。PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 后续也已在生产成功执行；公开 API 返回 6 条完整 Media relationship 和 0 个 legacy cover 字段，页面与 Media URL smoke 全部返回 HTTP 200。当前 CI 尚未持续验证 6 个 migration 从全新 PostgreSQL 16 完整执行。
+仓库包含 6 个 production migration。生产数据库曾由项目所有者手动复建；手动复建后的 Admin、Tools、Reviews、Games 可以正常运行，PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 也已在生产成功执行。公开 API 当时返回 6 条完整 Media relationship 和 0 个 legacy cover 字段，页面与 Media URL smoke 全部返回 HTTP 200。
+
+这些证据证明当前生产 schema、增量 migration 和 Media-only 数据链路在该数据库上可用，但不能证明 6 个 migration 能从全新 PostgreSQL 16 全自动建立当前数据库，也不能替代 PostgreSQL dump restore 演练。此前文档中“首次生产空库链路已经验证”的表述不再作为当前事实；CI 仍未持续验证完整的 fresh-database migration 链。
 
 PR #18 为什么必须在内容迁移后清理、`up/down` 分别保证什么、以及旧镜像回滚为什么必须先执行 `down`，统一以 [`payload-media-and-content-capabilities-evaluation-2026-07-21.md`](./payload-media-and-content-capabilities-evaluation-2026-07-21.md) 第 0.2 节为准。本交接文档不复制实现细节，避免两份回滚说明漂移。正常运行和重新部署当前 main 不执行 `down`。
 

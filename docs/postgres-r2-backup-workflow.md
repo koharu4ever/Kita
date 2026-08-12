@@ -1,6 +1,6 @@
 # Kita PostgreSQL 到 Cloudflare R2 的备份工作流
 
-> 状态：仓库实现和本地隔离验证已完成；尚未在 Coolify 填写生产 R2 变量，尚未完成真实 R2 上传与恢复演练。
+> 2026-08-12 状态纠偏：仓库实现、本地隔离验证、Coolify 生产变量、真实 R2 上传与备份对象检查均已完成；隔离 PostgreSQL restore 演练仍未完成。生产数据库曾由项目所有者手动复建，该过程不能作为 dump restore 演练或全自动灾难恢复证据。当前恢复事实以 [`CODEX_HANDOFF.md`](./CODEX_HANDOFF.md) 与 [灾难恢复 Runbook](./kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md) 为准。
 >
 > 目标：在不拆分现有 Compose、不开放 PostgreSQL 端口、不污染开发电脑和 VPS 宿主环境的前提下，把生产 PostgreSQL 定期导出到私有 Cloudflare R2 Bucket。
 

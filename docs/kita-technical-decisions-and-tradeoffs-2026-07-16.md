@@ -6,6 +6,8 @@
 > 适用范围：Kita 主应用、本地开发环境、生产部署、备份、CI，以及与 OpenList 的边界
 >
 > 2026-07-20 状态更新：本轮文档分支基线为 `78ad2d2`（PR #13）。OpenList 已按本文决策作为独立 Coolify Application 运行，Kita 只保存公开 URL；`C:\dev\Kita` 已完成 GitHub 全新 clone、Dev Container、全新本地 PostgreSQL、页面 smoke、36 Vitest、4 个 backup shell 场景、`pnpm check` 与 `pnpm build` 的复建演练。最终 OpenList storage、PostgreSQL restore 与 Coolify/VPS 端到端恢复仍未完成。易变恢复事实只以灾难恢复 Runbook 为准。
+>
+> 2026-08-12 数据库事实纠偏：本文保留架构决策形成时的历史叙述，但其中“生产首次空库部署验证完整 migration 链”的说法不再作为当前证据。生产数据库曾由项目所有者手动复建；当前能够确认的是复建后的应用运行、后续增量 migration 和生产 smoke，而不是全新数据库自动建库或 dump restore。当前事实以 [`CODEX_HANDOFF.md`](./CODEX_HANDOFF.md) 和 [`current-project-status.md`](./current-project-status.md) 为准。
 
 ## 1. 这份文档为什么存在
 
