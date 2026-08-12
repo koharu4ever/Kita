@@ -1,6 +1,6 @@
 # Kita 当前项目状态与环境配置
 
-> 最后核对：2026-07-22
+> 最后核对：2026-08-12
 >
 > 文档定位：这是当前项目状态的入口文档。代码、开发环境和部署操作以本文为准；其他较早的学习笔记与实施计划可能记录的是历史阶段。
 
@@ -448,7 +448,9 @@ C:\dev\Kita
 20260722_172809
 ```
 
-本地开发 schema 历史上主要由 Payload development schema push 建立，因此本地 migration status 不能用于反推生产状态。项目所有者已经确认：生产首次部署使用全新 PostgreSQL Volume，最初 4 个 migration 成功执行，随后 Admin、Tools、Reviews 与 Games 正常读写，生产空库链路已经验证。PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 后续均在生产成功执行；公开 API 返回 6 条完整 Media relationship、0 个 legacy cover 字段，`/games`、6 个详情页和 6 个 Media URL 均返回 HTTP 200。CI 尚未持续验证 6 个 migration 从全新 PostgreSQL 16 完整执行，这仍是后续防回归增强。
+本地开发 schema 历史上主要由 Payload development schema push 建立，因此本地 migration status 不能用于反推生产状态。生产数据库曾由项目所有者手动复建；手动复建后的 Admin、Tools、Reviews 与 Games 可以正常读写，PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 后续均在生产成功执行。公开 API 当时返回 6 条完整 Media relationship、0 个 legacy cover 字段，`/games`、6 个详情页和 6 个 Media URL 均返回 HTTP 200。
+
+上述事实只验证当前生产 schema、增量 migration 与 Media-only 运行链路，不构成“6 个 migration 已从全新 PostgreSQL 16 自动建立当前数据库”的证据，也不构成 PostgreSQL dump restore 演练。完整的 fresh-database migration smoke 仍应固化进 CI；隔离 restore 演练仍是独立的已知缺口。
 
 PR #18 的设计、代码边界、`up/down` 语义和正确回滚顺序统一记录在 [`payload-media-and-content-capabilities-evaluation-2026-07-21.md`](./payload-media-and-content-capabilities-evaluation-2026-07-21.md) 第 0.2 节。这里仅维护当前状态，不复制实现说明；正常运行当前 main 不执行 `down`。
 

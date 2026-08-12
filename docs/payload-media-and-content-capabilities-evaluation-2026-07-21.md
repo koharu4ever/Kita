@@ -11,6 +11,8 @@
 > 实施状态：P1 Media/R2 与 P6 Games legacy cover 清理均已完成；生产 6 条 Games 已迁移到 Media-only
 >
 > 当前建议：下一项只做 slug/URL 验证、显式写权限与共用 rich-text 配置；随后再补 PostgreSQL 集成 smoke
+>
+> 2026-08-12 数据库事实边界：生产数据库曾由项目所有者手动复建。本文记录的生产成功只证明 PR #17/#18 增量 migration、Media relationship、公开 API 和页面在该数据库上通过验证，不证明全部 migration 已从全新数据库自动执行，也不替代备份恢复演练。
 
 ## 0. 2026-07-22 生产验证与最终清理（已完成）
 
