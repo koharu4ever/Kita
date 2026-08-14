@@ -12,15 +12,20 @@
 - 默认权限偏保守，Docker、数据库和生产环境操作继续受项目规则约束；
 - CLI 版本显式固定，通过小型 PR 升级，不在每次 rebuild 时静默漂移。
 
+Dev Container 镜像同时安装发行版提供的 `bubblewrap`。Codex 在 Linux 中优先使用 PATH 中的 `bwrap` 建立沙箱，因此正常启动不应出现“could not find bubblewrap on PATH”警告。
+
 ## 文件与存储边界
 
-| 位置                              | 内容                                             | 是否进入 Git     | 是否进入生产镜像 |
-| --------------------------------- | ------------------------------------------------ | ---------------- | ---------------- |
-| `.devcontainer/Dockerfile`        | 固定版本的 Codex CLI                             | 是               | 否               |
-| `.devcontainer/codex-config.toml` | 无 secret 的初始权限模板                         | 是               | 否               |
-| `AGENTS.md`                       | Kita 项目安全与工作规则                          | 是               | 否               |
-| `/home/node/.codex`               | 登录、个人配置、历史和会话状态                   | 否，named volume | 否               |
-| `kita-codex-home`                 | Docker Desktop 中承载 `CODEX_HOME` 的本机 volume | 否               | 否               |
+| 位置                                    | 单一职责                                                          | 是否进入 Git     | 是否进入生产镜像 |
+| --------------------------------------- | ----------------------------------------------------------------- | ---------------- | ---------------- |
+| `.devcontainer/devcontainer.json`       | 声明开发镜像、named volumes、远程用户和生命周期命令               | 是               | 否               |
+| `.devcontainer/Dockerfile`              | 在开发镜像中安装固定版本 Codex CLI 和系统 `bubblewrap`            | 是               | 否               |
+| `.devcontainer/post-create.sh`          | 首次创建时修正 volume 权限、写入默认 Codex 配置并安装项目依赖     | 是               | 否               |
+| `.devcontainer/normalize-git-config.sh` | 创建及连接时清理 Linux 容器中无效的 Windows `safe.directory` 副本 | 是               | 否               |
+| `.devcontainer/codex-config.toml`       | 无 secret 的 Codex 初始权限模板                                   | 是               | 否               |
+| `AGENTS.md`                             | Kita 项目安全与工作规则                                           | 是               | 否               |
+| `/home/node/.codex`                     | 登录、个人配置、历史和会话状态                                    | 否，named volume | 否               |
+| Docker Desktop volume `kita-codex-home` | 在本机 Docker engine 中持久化 `CODEX_HOME`                        | 否               | 否               |
 
 `.dockerignore` 排除了 `.devcontainer`，Coolify 的根 `Dockerfile` 不会收到 Dev Container 文件。生产镜像继续只由根 `Dockerfile` 和 `compose.yaml` 构建。
 
@@ -95,6 +100,42 @@ CLI 可以修改代码和运行本地检查，但不会因为安装完成就自�
 
 本项目没有因为 Codex CLI 而安装 GitHub CLI。是否使用 `gh` 是独立决定，不是 Codex CLI 的运行前提。
 
+### 为什么需要 Git 配置清理脚本
+
+VS Code Dev Containers 会在启动时把 Windows 的全局 `.gitconfig` 复制到容器。这个行为可以复用用户名、邮箱和 credential helper，但也可能带入 Windows 盘符形式的 `safe.directory`。例如 `C:/dev/example` 在 Windows 是绝对路径，在 Linux 容器中却不是，因此 Git 会反复输出 `safe.directory ... not absolute`。
+
+`.devcontainer/normalize-git-config.sh` 不是针对某一个仓库名称的特例。它遍历容器全局 Git 配置中的全部 `safe.directory`，只匹配通用的 Windows 盘符格式：
+
+```text
+C:/...
+D:/...
+C:\...
+```
+
+匹配项通过 `git config --global --fixed-value --unset-all` 从**容器中的配置副本**精确删除。脚本不会：
+
+- 删除目录、仓库或工作树内容；
+- 修改 Windows 主机上的 `.gitconfig`；
+- 修改用户名、邮箱、credential helper 或其他 Git 配置；
+- 删除 `/workspaces/Kita` 等 Linux 绝对路径；
+- 删除系统级 `/etc/gitconfig` 或仓库级 `.git/config` 中的配置。
+
+脚本是幂等的：没有匹配项时直接结束，可以安全重复执行。它在两个时间点被调用：
+
+1. `post-create.sh` 在容器首次创建时执行一次；
+2. `postAttachCommand` 在每次 VS Code 连接后执行，以处理启动时可能重新复制进来的 Windows 配置。
+
+清理逻辑单独放在一个小脚本中，是为了让 `postAttachCommand` 不必重复运行包含权限修正和 `pnpm install` 的完整 `post-create.sh`，同时避免把带转义的 Shell 逻辑隐藏在 `devcontainer.json` 一行字符串中。这个文件属于稳定的跨 Windows/Linux 兼容步骤；只有将来不再复制宿主机 Git 配置，或 Dev Containers 官方消除了这种无效路径时，才需要重新评估是否删除。
+
+如果仍看到 `safe.directory ... not absolute`，先退出当前 Codex 会话并重新连接 Dev Container；随后只读检查：
+
+```bash
+git config --global --show-origin --get-all safe.directory
+git config --system --show-origin --get-all safe.directory
+```
+
+正常结果不应包含盘符路径。不要用 `git config --global --unset-all safe.directory` 无差别删除全部信任项。
+
 ## 容量与维护
 
 Codex CLI 程序安装在 Dev Container 镜像中，不在 `/home/node/.codex`。named volume 主要增长来源是会话和历史；模板把 `history.jsonl` 上限设为 100 MiB，但这不是整个目录的总容量上限。
@@ -142,5 +183,6 @@ codex logout
 - [Codex CLI](https://learn.chatgpt.com/docs/codex/cli)
 - [Authentication](https://learn.chatgpt.com/docs/auth)
 - [Agent approvals and security](https://learn.chatgpt.com/docs/agent-approvals-security)
+- [Sandboxing](https://learn.chatgpt.com/docs/sandboxing)
 - [Configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)
 - [AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
