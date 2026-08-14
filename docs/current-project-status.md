@@ -1,607 +1,162 @@
-# Kita 当前项目状态与环境配置
+# Kita 当前项目状态
 
 > 最后核对：2026-08-12
 >
-> 文档定位：这是当前项目状态的入口文档。代码、开发环境和部署操作以本文为准；其他较早的学习笔记与实施计划可能记录的是历史阶段。
+> 本文是可变事实和待办的唯一来源。操作步骤见 [文档入口](./README.md) 中的专题文档。
 
-## 1. 当前结论
+## 代码与 Git
 
-Kita 已经不是“准备接入 Payload/PostgreSQL”的早期工程骨架，而是已经形成完整数据链路的 Next.js 全栈个人内容站。
-
-当前代码已经包含：
-
-- Next.js 16 App Router 前台。
-- Payload CMS Admin、REST API、GraphQL API 和 Local API。
-- PostgreSQL 16 数据库。
-- Users、Media、Tools、Reviews、Games collections。
-- Tools、Reviews、Games 的 server getter 和 mapper。
-- Reviews 与 Games 富文本详情页。
-- Payload generated types。
-- 6 个生产 migration。
-- Dev Container + Docker-in-Docker 开发环境。
-- Docker 多阶段生产构建。
-- 容器启动时自动执行 Payload migration。
-- Coolify 部署配置所需的环境变量边界。
-- 11 个 Vitest 文件、47 个单元测试。
-- backup shell 的 4 个 fake-command 场景。
-- GitHub Actions `quality`：install、format、lint、typecheck、test、build。
-- main Ruleset：必须通过 Pull Request 和 `quality`。
-- 已启用的生产 PostgreSQL -> R2 backup sidecar。
-- 独立部署的 OpenList Application；Kita 只保存公开 archive URL。
-- Payload Media + 必填 Games.cover 链路；本地文件与 Cloudflare R2 使用同一 Media schema。
-
-当前本地开发环境已经实际确认：
+本轮文档整理基线：
 
 ```text
-Dev Container        正在运行
-Node                 v22.16.0
-pnpm                 10.28.2
-PostgreSQL           postgres:16，正在运行
-/                     HTTP 200
-/tools                HTTP 200
-/reviews              HTTP 200
-/games                HTTP 200
-/admin                HTTP 200
-ESLint                通过
-TypeScript            通过
-Vitest                11 files / 47 tests 通过
-Backup shell tests     4 scenarios 通过
-Media-only 验证基线  78776c8（PR #18 已合并并通过生产 smoke）
-GitHub quality         通过并设为 main 必需检查
+main: 400fe8e (PR #20 merge)
+workspace: C:\dev\Kita
 ```
 
-目前应当把项目理解为：
+开始新任务时必须重新查询 Git；上述 SHA 是 2026-08-12 的基线证据，不代表永久 HEAD。
 
-```text
-核心功能与生产链路已经建立
-  -> Dev Container / PostgreSQL / Payload / Next.js 可用
-  -> Coolify + R2 backup 正在运行
-  -> 47 个 Vitest + 4 个 backup shell 场景进入 CI
-  -> main 由 Pull Request + quality Ruleset 保护
-  -> 当前重点转向真实内容、产品体验和少量高价值集成测试
-```
+仓库当前包含：
 
-Payload Media 当前边界：本地 storage、真实图片尺寸生成、migration 链路、Cloudflare media bucket、custom domain、Coolify 变量、生产上传、Games 页面和重新部署持久性均已验证。生产 6 条 Games 已全部关联 Media；Games 封面以必填 `cover` relationship 为唯一事实源，旧 `coverSrc`/`coverAlt`/宽高字段已由清理 migration 删除。
+- Next.js 16 App Router、React、TypeScript；
+- Payload CMS Admin、REST/GraphQL route 和 Local API；
+- PostgreSQL 16；
+- Users、Media、Tools、Reviews、Games collections；
+- server getter、mapper 和 feature DTO；
+- 6 个 production migration；
+- Dev Container + Docker-in-Docker；
+- Docker multi-stage standalone Production image；
+- repository Compose：web/postgres/backup；
+- GitHub Actions required `quality`；
+- 独立 OpenList Application 边界。
 
-### 1.1 当前恢复准备度
+## 本地开发
 
-2026-07-20 的核对和实际演练确认：本轮文档分支建立前，本地 `main` 与 GitHub `origin/main` 同为 `78ad2d2`，工作区干净，未发现只存在于 D 盘的未提交项目文件。随后已在 `C:\dev\Kita` 从 GitHub 全新 clone，并成功重建本地开发环境。仓库内的可重建配置与仓库外的 secret/账户材料已经分开管理。
+正常目录为 `C:\dev\Kita`；D 盘旧工作区不再开发或提交。
 
-| 范围                              | 当前状态     | 说明                                                                      |
-| --------------------------------- | ------------ | ------------------------------------------------------------------------- |
-| D 盘工作区丢失后的本地复建        | 已验证通过   | C SSD 全新 clone、`.env` 重建、Dev Container、dev/test/check/build 均通过 |
-| 外部账户与关键 secret inventory   | 已建立       | 保存在 Bitwarden；真实值不进入 Git 或本文档                               |
-| Coolify SSH key 恢复材料          | 已建立并核验 | AES256 加密；C 盘与私有 R2 各有副本；本地 checksum 一致                   |
-| PostgreSQL 自动 backup            | 正在运行     | 生产 custom dump 已上传 R2；shell 失败路径有自动测试                      |
-| PostgreSQL 完整 restore drill     | 未完成，暂缓 | 必须使用隔离 PostgreSQL 16，不触碰生产库                                  |
-| OpenList Application inventory    | 已建立       | 独立 Application、固定镜像版本、域名、端口、Volume 与账号边界已记录       |
-| OpenList 最终 storage/data backup | 有意延期     | provider 尚未定型，当前测试挂载按可丢弃状态处理                           |
-| VPS/Coolify 端到端灾难恢复        | 尚未演练     | 不能描述为“完整恢复已闭环”                                                |
+已确认设计：
 
-详细资产、重建顺序和未完成边界以 `docs/kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md` 为唯一恢复事实入口。
+- Dev Container 使用 Node 22 和 `node` 用户；
+- `node_modules` 与 `.next` 使用 targeted named volumes；
+- 本地 PostgreSQL 运行在 Dev Container 的 Docker-in-Docker；
+- `pnpm dev` 自动启动并等待 PostgreSQL healthy；
+- 本地 Media 使用 `.payload-media`，不需要 R2 credentials。
 
-## 2. 当前架构
+2026-07-20 曾完成 C SSD 全新 clone 复建：Dev Container、全新本地 PostgreSQL、主要页面、36 Vitest、4 个 backup shell 场景、check 和 build 通过。此记录只证明当时的本地复建；当前代码验证结果应重新运行命令获得。
 
-```text
-Browser
-  |
-  v
-Next.js App Router
-  |-- (site) 前台页面
-  |-- (payload) Admin / REST / GraphQL
-  |
-  v
-src/server getters
-  |
-  v
-Payload Local API
-  |
-  v
-PostgreSQL
-```
+## 内容与 Payload
 
-后台内容流：
+当前 Collections：Users、Media、Tools、Reviews、Games。
 
-```text
-Payload Admin
-  -> Collection
-  -> PostgreSQL（内容、Media 元数据和 relationship）
-  -> 本地 .payload-media / 生产 Cloudflare R2（图片对象）
-  -> Payload Local API
-  -> server getter
-  -> mapper
-  -> feature component
-  -> page
-```
+读取边界：
 
-项目没有独立 Express 后端，也没有 Prisma。Payload 已经同时承担 CMS、CRUD、权限、API 和数据库 schema 管理职责，当前不需要再增加一层后端框架。
+- Media/Tools 允许匿名读取；
+- Reviews 匿名只读 `published`；
+- Games 匿名只读 `published`；
+- getter 使用 `overrideAccess: false`；
+- Production 数据读取失败会抛错，不用静态 fallback 掩盖故障。
 
-OpenList 是独立 Coolify Application，不属于 Kita 的 Compose 或后端层。Kita 的 Games 内容只保存 `links[].href` URL，并把用户导航到 OpenList；两者不共享数据库、Volume 或 secret。
+写权限边界：
 
-## 3. 当前功能完成度
+- Media 显式要求登录才能 create/update/delete；
+- Tools、Reviews、Games 当前只显式声明 read；Payload 默认行为不是项目级明确契约，因此显式写权限仍待完成。
 
-### 首页 `/`
+Games Media-only 已完成：
+
+- `cover` 是必填 Payload Media upload relationship；
+- Production 图片在独立 Cloudflare R2 Media bucket；
+- 公开 URL 使用 `media.kral-koharu.com` custom domain；
+- 旧 `coverSrc`、`coverAlt`、`coverWidth`、`coverHeight` schema/列已删除；
+- mapper 从 Media metadata 构造前端 cover DTO；
+- 生产 6 条 Games 的 relationship、页面、Media URL 与 Redeploy 持久性曾于 2026-07-22 验证。
+
+## Production 与数据库
+
+Coolify 使用 repository `compose.yaml`。Production `web` 等待 PostgreSQL healthy，entrypoint 先执行 Payload migration，再启动 standalone server。
+
+数据库事实边界：
+
+- Production 数据库曾由项目所有者手动复建；
+- 手动复建后 Admin、Tools、Reviews、Games 正常运行；
+- PR #17 Media/relationship 和 PR #18 Media-only cleanup 增量 migration 成功；
+- 上述事实不证明全部 6 个 migration 能从全新 PostgreSQL 自动建立当前 schema；
+- 完整 fresh-database migration smoke 尚未进入 CI；
+- PostgreSQL dump restore 尚未在隔离数据库演练。
+
+不要在现有本地或 Production 数据库盲跑全部初始 migration，也不要为了测试删除 Volume。
+
+## Backup 与恢复
 
 已完成：
 
-- 全屏视觉首页。
-- 背景轮播。
-- WebGL 雨滴玻璃效果。
-- 桌面设备能力判断。
-- reduced-motion 降级。
-- 移动端静态降级。
-- 首屏导航和浮动导航。
+- PostgreSQL custom-format dump -> private R2 sidecar 已启用并有真实对象；
+- backup shell 的 dump/校验/上传失败不会误报成功；
+- 关键账户、配置键和 secret 位置已盘点到 Bitwarden；
+- Coolify SSH keys/`authorized_keys` 的加密恢复归档曾完成 checksum 核对并上传 private R2；
+- C SSD 本地工作区丢失复建已演练。
 
-### About `/about`
+未完成或暂缓：
 
-页面和导航已完成，但正文仍包含 placeholder 文案，需要换成真实个人介绍。
+- 隔离 PostgreSQL 16 dump restore；
+- private R2 SSH archive 再下载 round-trip；
+- OpenList 最终 storage、data inventory 和 backup/restore；
+- Coolify/VPS 端到端恢复；
+- Production secret 轮换；
+- backup last-success healthcheck/告警；
+- Bitwarden 独立离线恢复副本确认。
 
-### Tools `/tools`
+不能把“有 R2 对象”“手动复建数据库”或“本地 clone 成功”写成完整灾难恢复闭环。
 
-已完成：
+## OpenList
 
-- Payload Tools collection。
-- PostgreSQL 存储。
-- Payload Local API 查询。
-- server getter。
-- mapper。
-- 前台列表。
-- 开发 seed。
+OpenList 以独立 Coolify Application 运行在 `https://archive.kral-koharu.com`。Kita 只在 Games links 中保存公开 URL；不共享数据库、Volume、secret、构建流程或登录。
 
-生产数据库为空时返回空列表；只有开发环境允许使用静态 fallback。
+最终 storage provider 尚未确定，当前测试挂载按可丢弃处理。OpenList data backup/restore 未闭环。
 
-### Reviews `/reviews`、`/reviews/[slug]`
+## 测试与 CI
 
-已完成：
+GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tests 和 build；main ruleset 要求 PR 与 required check。
 
-- Reviews collection。
-- draft/published 读取权限。
-- 列表与详情查询。
-- Rich Text 正文。
-- mapper。
-- 动态 metadata。
-- production 不使用静态 fallback。
+最近文档记录的代码基线包含 47 个 Vitest 与 4 个 backup shell 场景。本轮纯文档整理不会把旧测试数量当成新验证结果；提交前将重新运行适合本 PR 的格式、链接和差异检查。
 
-仍需完成真实内容录入，并逐步删除演示文案。
+测试缺口：
 
-### Games `/games`、`/games/[slug]`
+- 完整 PostgreSQL 16 migration smoke；
+- 真实 Payload anonymous/published/authenticated write 集成测试；
+- 首页、内容页和 Admin 的最小 Playwright smoke；
+- Production health endpoint。
 
-已完成：
+## 当前待办
 
-- Games collection。
-- draft/published 读取权限。
-- 图片墙。
-- Lightbox。
-- 详情页。
-- Rich Text 正文。
-- server getter 与 mapper。
-- Games migrations。
-- 封面资源与数据库 schema 解耦。
-- 必填 Payload Media `cover` relationship。
-- mapper 只读取 Media display/original 元数据；未展开或损坏的关联会明确报错。
-- 旧 `coverSrc`、`coverAlt`、`coverWidth`、`coverHeight` 字段已从 Payload schema 和 PostgreSQL 删除。
+### 下一项工程 PR
 
-当前 `white-album-2` 同时存在于开发 fallback 和 seed 定义中，因此页面能显示它并不一定代表数据库已有该记录。
+- [ ] Games/Reviews slug 增加小写 ASCII、数字、连字符验证；
+- [ ] Tools URL 和 Games links 增加 `http/https` 绝对 URL 验证；
+- [ ] Games、Reviews、Tools 显式声明 create/update/delete 为登录用户；
+- [ ] 增加匿名/登录权限测试；
+- [ ] 抽取 Games/Reviews 共用 Lexical 配置。
 
-## 4. 开发环境变量
+### 随后独立完成
 
-开发环境使用项目根目录的 `.env`：
+- [ ] PostgreSQL 16 完整 migration smoke；
+- [ ] 真实 published access 集成测试；
+- [ ] About 替换 placeholder；
+- [ ] Reviews/Games 录入真实内容并清理 placeholder；
+- [ ] Tools 决定 CMS-only 还是保留 Development fallback；
+- [ ] 统一 empty/error/not-found；
+- [ ] 根 README 和准确作品集描述。
 
-```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-PAYLOAD_SECRET=<至少 32 位的本地开发密钥>
-ENABLE_DEV_SEED=false
-DATABASE_URI=postgres://postgres:postgres@localhost:5432/kita
-MEDIA_STORAGE_MODE=local
-```
+### 低优先级/条件触发
 
-当前本地 `.env` 的原有 4 个必需变量已经通过键、长度和格式检查；`MEDIA_STORAGE_MODE` 未填写时本地也会安全默认到 `local`，但建议按 `.env.example` 显式补上。真实值不会写入本文，也不应提交 Git。
+- [ ] 清理真实日期后再评估 `releaseDate` date migration；
+- [ ] 出现误删痛点后再评估 Trash；
+- [ ] 出现多人编辑后再评估角色和 drafts/versions；
+- [ ] 数据价值提高后安排 restore/DR 演练和 last-success 监控；
+- [ ] OpenList storage 定型后补 data backup。
 
-本地与生产环境不要求使用相同的 secret。正确关系是：
+## 当前不做
 
-| 配置                   | 本地开发                         | Coolify 生产                      | 是否应相同             |
-| ---------------------- | -------------------------------- | --------------------------------- | ---------------------- |
-| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000`          | `https://kita.kral-koharu.com`    | 否                     |
-| `PAYLOAD_SECRET`       | 新电脑自己的开发 secret          | 稳定的生产 secret                 | 否                     |
-| `ENABLE_DEV_SEED`      | 默认 `false`，临时 seed 时才开启 | 必须 `false`                      | 值通常相同，但原因不同 |
-| `DATABASE_URI`         | 主机为 `localhost`               | 主机为 Compose service `postgres` | 否                     |
-| PostgreSQL 密码        | 本地开发密码                     | 生产强密码                        | 否                     |
-| `MEDIA_STORAGE_MODE`   | `local`                          | `r2`                              | 否                     |
-| `MEDIA_R2_*`           | 不需要                           | 独立 media bucket 配置和凭据      | 否/凭据项为是          |
+不因为“后端看起来简单”而引入 Redis、Prisma、微服务、Kubernetes、自建上传服务、大型监控平台、复杂角色系统或深度 OpenList API 集成。
 
-旧电脑的本地 secret 曾经与生产相同，并不表示架构要求必须相同；那只是旧电脑当时复制了生产值。新电脑应使用独立的本地 secret 和本地数据库密码。
+## 下一步
 
-### `NEXT_PUBLIC_SITE_URL`
-
-开发环境：
-
-```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-它可以暴露给浏览器。
-
-### `PAYLOAD_SECRET`
-
-这是 Payload 的真实应用密钥：
-
-```env
-PAYLOAD_SECRET=<随机且至少 32 位>
-```
-
-要求：
-
-- 开发环境和生产环境使用不同值。
-- 生产值由项目所有者生成。
-- 不发送给 AI。
-- 不放入 Markdown、截图、GitHub issue 或 commit。
-- 生产部署后保持稳定，不要每次 redeploy 重新生成。
-
-### `ENABLE_DEV_SEED`
-
-默认：
-
-```env
-ENABLE_DEV_SEED=false
-```
-
-只有操作临时开发数据库时才短暂设置为 `true`。生产环境必须始终为 `false`。
-
-### `DATABASE_URI`
-
-本地 Next.js 运行在 Dev Container 中，PostgreSQL 由 Dev Container 内层 Docker 映射到 5432，因此使用：
-
-```env
-DATABASE_URI=postgres://postgres:postgres@localhost:5432/kita
-```
-
-生产环境不能照抄这个地址。
-
-## 5. Coolify 生产环境变量
-
-生产环境不需要把真实变量交给 AI。项目所有者应在 Coolify 面板中创建和保存。
-
-### 5.1 生产变量表
-
-| 变量                         | 值从哪里来                         | Buildtime | Runtime | 是否秘密 |
-| ---------------------------- | ---------------------------------- | --------: | ------: | -------: |
-| `DATABASE_URI`               | Compose 内部 `postgres` 服务连接串 |        否 |      是 |       是 |
-| `PAYLOAD_SECRET`             | 自己生成的随机密钥                 |        否 |      是 |       是 |
-| `NEXT_PUBLIC_SITE_URL`       | Kita 正式网站域名                  |        是 |      是 |       否 |
-| `ENABLE_DEV_SEED`            | 固定为 `false`                     |        否 |      是 |       否 |
-| `POSTGRES_DB`                | 当前为 `kita`                      |        否 |      是 |       否 |
-| `POSTGRES_USER`              | 当前为 `postgres`                  |        否 |      是 |       否 |
-| `POSTGRES_PASSWORD`          | 自己生成的生产数据库密码           |        否 |      是 |       是 |
-| `MEDIA_STORAGE_MODE`         | 固定为 `r2`                        |        是 |      是 |       否 |
-| `MEDIA_R2_PUBLIC_URL`        | Media custom domain                |        是 |      是 |       否 |
-| `MEDIA_R2_BUCKET`            | 独立 media bucket                  |        否 |      是 |       否 |
-| `MEDIA_R2_ENDPOINT`          | Cloudflare R2 S3 endpoint          |        否 |      是 |       否 |
-| `MEDIA_R2_ACCESS_KEY_ID`     | bucket-scoped token                |        否 |      是 |       是 |
-| `MEDIA_R2_SECRET_ACCESS_KEY` | bucket-scoped token secret         |        否 |      是 |       是 |
-
-### 5.2 `DATABASE_URI` 与 `POSTGRES_PASSWORD` 必须成对
-
-当前 Coolify 使用 repository `compose.yaml`。Compose 创建：
-
-```text
-web
-postgres
-postgres-data
-```
-
-生产 `DATABASE_URI` 的数据库主机使用 Compose service name：
-
-```text
-postgres
-```
-
-连接串内部的密码必须与同一次部署中的 `POSTGRES_PASSWORD` 一致：
-
-```text
-POSTGRES_PASSWORD=<生产数据库密码>
-DATABASE_URI=postgres://<用户>:<同一数据库密码>@postgres:5432/<数据库名>
-```
-
-这里的“一致”只发生在同一个生产环境内部：`DATABASE_URI` 必须携带 PostgreSQL 实际接受的密码。它不要求新电脑的本地数据库使用同一密码。
-
-开发环境则是：
-
-```text
-Next/Payload 在 Dev Container
-PostgreSQL 在 Dev Container 的内层 Docker
-DATABASE_URI 使用 localhost:5432
-```
-
-### 5.3 `PAYLOAD_SECRET` 由你自己生成
-
-推荐在可信的本地终端中生成 32 字节随机值：
-
-```bash
-openssl rand -hex 32
-```
-
-这会得到 64 个十六进制字符。生成后直接粘贴到 Coolify，不要发到聊天。
-
-也可以使用可信密码管理器的随机密码生成器。要求不是必须采用某个命令，而是：随机、足够长、只保存于安全位置、部署后保持稳定。
-
-### 5.4 `NEXT_PUBLIC_SITE_URL`
-
-填写 Kita 的正式公开域名，例如：
-
-```env
-NEXT_PUBLIC_SITE_URL=https://kita.example.com
-```
-
-`https://coolify.kral-koharu.com` 是 Coolify 管理后台域名，不是 Kita 网站地址。
-
-因为变量以 `NEXT_PUBLIC_` 开头，建议同时启用 Buildtime 和 Runtime。
-
-### 5.5 `ENABLE_DEV_SEED`
-
-生产固定：
-
-```env
-ENABLE_DEV_SEED=false
-```
-
-只启用 Runtime。它不是 secret，可以显示明文。
-
-### 5.6 不需要在 Coolify 额外配置
-
-当前通常不需要添加：
-
-```text
-NODE_ENV
-NEXT_TELEMETRY_DISABLED
-SKIP_ENV_VALIDATION
-```
-
-原因：
-
-- Dockerfile runner 已设置 `NODE_ENV=production`。
-- Dockerfile 已关闭 Next telemetry。
-- `SKIP_ENV_VALIDATION` 只在 Docker builder 阶段内部使用，runtime 不应跳过校验。
-
-### 5.7 当前截图中的秘密必须轮换
-
-2026-07-06 提供的 Coolify 截图直接显示了 `PAYLOAD_SECRET`，并显示了数据库连接凭据。即使截图只用于本次对话，这些值也应视为已经离开秘密存储边界。
-
-不要只删除截图后继续使用旧值。正确处理：
-
-1. 先完成 PostgreSQL 备份。
-2. 生成新的生产 `PAYLOAD_SECRET`。
-3. 生成新的生产数据库密码。
-4. 在数据库内部真正修改用户密码。
-5. 同步更新 Coolify 的 `POSTGRES_PASSWORD` 和 `DATABASE_URI`。
-6. Redeploy，并检查 migration、Admin 登录和前台查询。
-
-重要：对于已经有 `postgres-data` 的 PostgreSQL 容器，只修改 Compose/Coolify 的 `POSTGRES_PASSWORD` 环境变量，通常不会自动修改数据库内部已有用户的密码。该变量主要用于首次初始化空数据目录。必须先通过数据库管理方式执行密码修改，再让应用连接串使用新密码，否则 web 会连接失败。
-
-轮换 `PAYLOAD_SECRET` 会使现有 Payload 会话或相关签名失效，需要重新登录 Admin。这是预期行为。
-
-## 6. 已确认的 Coolify 部署模式
-
-最新 Coolify 截图已经确认：当前使用 repository `compose.yaml`，不是单独的 Coolify PostgreSQL resource。
-
-```text
-Coolify Compose application
-  |-- web
-  |-- postgres
-  |-- backup（仓库已实现，生产需显式启用）
-  `-- postgres-data
-```
-
-判断依据：
-
-- Coolify 环境变量中同时存在 `POSTGRES_DB`、`POSTGRES_USER`、`POSTGRES_PASSWORD`。
-- `DATABASE_URI` 的主机名是 `postgres`，对应 Compose service name。
-- Coolify 自动生成了 `SERVICE_FQDN_WEB` 和 `SERVICE_URL_WEB`。
-- `NODE_ENV` 与 `NEXT_TELEMETRY_DISABLED` 显示为 web service 的 hardcoded env，对应仓库 Compose 配置。
-
-当前需要确保：
-
-- `POSTGRES_PASSWORD` 使用生产强密码。
-- `DATABASE_URI` 中密码一致。
-- `postgres-data` 持久化。
-- PostgreSQL 5432 不对公网开放。
-- migration 启动前数据库已经 ready。
-- backup 不开放端口、不挂载数据库 volume，默认 `POSTGRES_BACKUP_ENABLED=false`。
-- 生产启用 backup 前，必须在 Coolify 填写 R2 Endpoint、Bucket 和受限凭据。
-
-Coolify 的 `SERVICE_FQDN_WEB`、`SERVICE_URL_WEB` 是平台自动变量，不需要复制到本地 `.env`。
-
-## 7. Dev Container 与宿主机边界
-
-当前代码目录使用 bind mount：
-
-```text
-C:\dev\Kita
-  -> /workspaces/Kita
-```
-
-因此：
-
-- Node、pnpm、Payload CLI、PostgreSQL 服务不安装到 Windows。
-- `.pnpm-store` 仍是项目局部生成物；`node_modules` 与 `.next` 使用 Dev Container targeted named volumes。
-- 这些目录不是 Windows 全局依赖，也不进入 PATH。
-- `.env` 是项目配置文件，不是系统环境变量。
-- Docker-in-Docker 数据存放在 Docker managed volumes。
-
-准确说法是：项目专属运行时与服务已隔离；项目源码和生成目录通过 bind mount 与宿主机共享。
-
-> 2026-07-14 更新：`node_modules` 与 `.next` 改为 Dev Container targeted named volumes，以避开 Windows `9p` 高频小文件瓶颈。PostgreSQL 继续使用独立的 Docker managed volume，生产结构不变。
->
-> 2026-07-20 更新：宿主机 bind mount 源已迁移到 `C:\dev\Kita`，容器内路径仍为 `/workspaces/Kita`；本地复建演练通过，旧机械盘工作区不再作为开发入口。
->
-> `pnpm dev` 会自动启动并等待本地 PostgreSQL healthy；无需再手工先运行 `pnpm dev:services`。
-
-## 8. 当前数据库与 migration 状态
-
-仓库包含：
-
-```text
-20260614_112311_init
-20260628_133544
-20260702_161526
-20260703_132233
-20260721_131302_add_media_and_game_cover
-20260722_172809
-```
-
-本地开发 schema 历史上主要由 Payload development schema push 建立，因此本地 migration status 不能用于反推生产状态。生产数据库曾由项目所有者手动复建；手动复建后的 Admin、Tools、Reviews 与 Games 可以正常读写，PR #17 的 Media/relationship migration 与 PR #18 的 Media-only cleanup migration 后续均在生产成功执行。公开 API 当时返回 6 条完整 Media relationship、0 个 legacy cover 字段，`/games`、6 个详情页和 6 个 Media URL 均返回 HTTP 200。
-
-上述事实只验证当前生产 schema、增量 migration 与 Media-only 运行链路，不构成“6 个 migration 已从全新 PostgreSQL 16 自动建立当前数据库”的证据，也不构成 PostgreSQL dump restore 演练。完整的 fresh-database migration smoke 仍应固化进 CI；隔离 restore 演练仍是独立的已知缺口。
-
-PR #18 的设计、代码边界、`up/down` 语义和正确回滚顺序统一记录在 [`payload-media-and-content-capabilities-evaluation-2026-07-21.md`](./payload-media-and-content-capabilities-evaluation-2026-07-21.md) 第 0.2 节。这里仅维护当前状态，不复制实现说明；正常运行当前 main 不执行 `down`。
-
-仍不要在已有数据的本地库或生产库上尝试“补跑全部初始 migration”。未来的一次性 PostgreSQL 16 验证属于防回归增强，不是当前阻断项，也不得以此为由删除现有 Volume。
-
-## 9. Seed 当前状态
-
-### Tools seed
-
-`seed:tools` 根据 title 查找并 update/create，基本是幂等行为。
-
-### Games seed
-
-`seed:games` 当前会：
-
-```text
-按 slug 查找现有 Game
-存在则 update
-不存在则 create
-```
-
-它现在是幂等 upsert，不再删除其他 Games。仍然只允许在 `NODE_ENV !== production` 且 `ENABLE_DEV_SEED=true` 时运行。
-
-## 10. 当前已知待办
-
-### 开发环境收口
-
-- [x] generated files 不再阻塞 `format:check`。
-- [x] `pnpm build` 已明确 exit 0。
-- [x] production 不再使用 Tools 静态 fallback。
-- [x] Games seed 已改成非破坏式 upsert。
-- [x] `postCreateCommand` 使用 `pnpm install --frozen-lockfile`。
-
-### 数据库与部署收口
-
-- [x] 已确认 Coolify 使用 repository `compose.yaml`。
-- [x] 生产首次空库部署已成功执行最初 4 个 migration。
-- [x] Media/relationship 与 Media-only cleanup 两个后续 migration 已在生产成功执行并通过公开 API/page smoke。
-- [x] PostgreSQL 已增加 healthcheck，web 等待 `service_healthy`。
-- [x] PostgreSQL custom dump -> R2 backup sidecar 已启用并连续生成真实对象。
-- [x] backup shell 的 dump/校验/上传失败分支已自动测试且不会误报成功。
-- [x] 外部账户、生产/开发配置键与关键 secret 的恢复 inventory 已存入 Bitwarden。
-- [x] Coolify SSH keys 与 VPS `authorized_keys` 已生成加密恢复归档，C 盘副本 checksum 已核对，并上传私有 R2。
-- [ ] 用临时 PostgreSQL 16 完成一次恢复演练（已接受为后续增强）。
-- [ ] 从私有 R2 重新下载 SSH 恢复归档并做一次 round-trip 核对（当前明确暂缓）。
-- [x] 在 C SSD 完成一次全新 clone + Dev Container 本地复建演练；页面 smoke、36 Vitest、4 个 shell 场景、check 与 build 全部通过。
-- [ ] 确定 OpenList 最终 storage 后，再补逐挂载 inventory 与 data Volume backup；当前测试挂载按可丢弃处理。
-- [ ] 完成 Coolify / VPS 端到端恢复演练。
-- [ ] 轮换生产 secret（项目所有者当前决定暂缓，不能写成已完成）。
-- [ ] 增加 backup last-success healthcheck/告警（内容量较少时可延后）。
-
-### 内容收口
-
-- [ ] About 替换 placeholder。
-- [ ] Reviews 录入真实内容。
-- [ ] Games 录入真实内容。
-- [ ] Tools 确认使用 CMS 内容还是内置静态内容。
-- [ ] 清理前台可见的 draft/implementation 说明。
-
-### 工程化收口
-
-- [x] GitHub Actions：install、format、lint、typecheck、test、build。
-- [x] main Ruleset：必须经过 PR 且 `quality` 成功。
-- [x] 11 个测试文件中的 47 个 Vitest，覆盖 mapper、server getter、seed、Media 配置/权限和环境校验。
-- [x] backup shell 的 4 个 fake-command 场景。
-- [ ] 临时 PostgreSQL + published 权限集成测试。
-- [ ] 首页、内容页和 Admin 的 Playwright smoke。
-- [ ] 健康检查 endpoint。
-- [ ] Payload 邮件适配器或明确暂不支持找回密码。
-- [ ] 根 README。
-
-## 11. 当前正确的开发启动流程
-
-在 Dev Container 中：
-
-```bash
-pnpm dev
-```
-
-`pnpm dev` 是唯一正常开发入口，会自动启动并等待 PostgreSQL healthy。`pnpm dev:services` 只在需要单独启动数据库进行诊断或维护时使用。
-
-检查：
-
-```text
-http://localhost:3000
-http://localhost:3000/tools
-http://localhost:3000/reviews
-http://localhost:3000/games
-http://localhost:3000/admin
-```
-
-提交前：
-
-```bash
-pnpm test
-pnpm check
-pnpm build
-```
-
-Git 使用功能分支 -> push 分支 -> Pull Request -> `quality` -> merge main。日常修改不再直接 push main。
-
-`pnpm check` 当前已通过。运行 `pnpm build` 前先停止 `pnpm dev`，避免二者同时写入 `.next`。
-
-## 12. 文档使用规则
-
-从现在开始建议：
-
-```text
-current-project-status.md
-  当前状态、环境变量、启动入口
-
-project-structure.md
-  当前代码目录、职责和依赖边界
-
-kita-code-review-2026-07-09.md
-  原始审查、最新关闭证据和仍存在的问题
-
-development-environment-architecture-review.md
-  2026-07-06 的完整架构审计与历史问题解释
-
-development-workflow.md
-  日常功能开发流程，后续需要按当前代码更新
-
-kita-disaster-recovery-inventory-and-rebuild-runbook-2026-07-16.md
-  外部账户、备份材料、故障场景、复建顺序和恢复完成定义
-
-deployment-roadmap.md
-  部署背景和历史路线，其中部分“尚未部署”描述已经过时
-
-其他 plan / notes
-  作为设计和实现历史，不应自动视为当前状态
-```
-
-后续可以整理旧文档，但在没有确认哪些历史信息需要保留前，不应直接批量删除。
-
-## 13. 最终结论
-
-生产 secret 不需要也不应该提供给 AI：
-
-```text
-PAYLOAD_SECRET
-  由你生成并保存在 Coolify
-
-DATABASE_URI
-  使用 Compose 内部 postgres service，并与 POSTGRES_PASSWORD 匹配
-
-NEXT_PUBLIC_SITE_URL
-  填 Kita 正式公开域名
-
-ENABLE_DEV_SEED
-  固定 false
-```
-
-Kita 当前代码结构清晰，生产链路、备份、测试、CI 和 main 保护均已建立。D 盘单点丢失后的本地复建已在 C SSD 实际验证通过，但完整生产灾难恢复仍需 PostgreSQL restore、Coolify restore、OpenList 最终 storage/data backup 和端到端演练来证明。下一项技术工作应限制为 slug/URL validation、显式写权限和共用 rich-text 配置的小 PR；随后单独补 PostgreSQL 16 migration smoke 与真实 published access 集成测试。完成后优先回到真实内容与产品体验；恢复演练、secret 轮换与 backup last-success 监控作为已知后续增强，不继续扩张技术栈。
+文档整理合并后，优先执行一个小型后端质量 PR（validation + explicit write access + shared Lexical config），再单独做 PostgreSQL/权限集成 smoke。随后暂停工程底座扩张，回到真实内容和产品体验。
