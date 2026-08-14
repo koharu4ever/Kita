@@ -1,6 +1,6 @@
 # Kita 当前项目状态
 
-> 最后核对：2026-08-12
+> 最后核对：2026-08-14
 >
 > 本文是可变事实和待办的唯一来源。操作步骤见 [文档入口](./README.md) 中的专题文档。
 
@@ -9,7 +9,7 @@
 本轮文档整理基线：
 
 ```text
-main: 400fe8e (PR #20 merge)
+main: 6d9897d (PR #21 merge)
 workspace: C:\dev\Kita
 ```
 
@@ -37,6 +37,7 @@ workspace: C:\dev\Kita
 
 - Dev Container 使用 Node 22 和 `node` 用户；
 - `node_modules` 与 `.next` 使用 targeted named volumes；
+- Codex CLI 固定安装在 Dev Container 镜像中，`CODEX_HOME` 使用独立的本机 named volume；
 - 本地 PostgreSQL 运行在 Dev Container 的 Docker-in-Docker；
 - `pnpm dev` 自动启动并等待 PostgreSQL healthy；
 - 本地 Media 使用 `.payload-media`，不需要 R2 credentials。

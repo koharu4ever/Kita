@@ -1,17 +1,18 @@
 # Kita Codex 交接
 
-> 最后核对：2026-08-12
+> 最后核对：2026-08-14
 >
 > 正常项目根目录：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
 ## 开始任何工作前
 
 1. 完整阅读本文；
-2. 阅读 [当前项目状态](./current-project-status.md)；
-3. 根据任务从 [文档入口](./README.md) 选择一份专题文档；
-4. 只读检查 `git status --short --branch`、当前分支和最近提交；
-5. 确认 Dev Container 绑定的是 `C:\dev\Kita`；
-6. 不输出 secret、不删除 Volume、不修改 Production。
+2. 遵守仓库根目录 `AGENTS.md` 的稳定安全规则；
+3. 阅读 [当前项目状态](./current-project-status.md)；
+4. 根据任务从 [文档入口](./README.md) 选择一份专题文档；
+5. 只读检查 `git status --short --branch`、当前分支和最近提交；
+6. 确认 Dev Container 绑定的是 `C:\dev\Kita`；
+7. 不输出 secret、不删除 Volume、不修改 Production。
 
 可直接复制给新 Codex：
 
@@ -56,6 +57,8 @@ Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 
 ```bash
 pnpm dev
 ```
+
+Dev Container 同时提供 Codex CLI；其凭据与会话只保存在本机 named volume。安装、登录和权限边界见 [Codex CLI 工作流](./codex-cli.md)。
 
 提交前停止 dev server，再按风险运行：
 
