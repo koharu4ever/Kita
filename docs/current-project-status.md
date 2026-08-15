@@ -117,7 +117,7 @@ OpenList 以独立 Coolify Application 运行在 `https://archive.kral-koharu.co
 
 GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tests 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含 47 个 Vitest 与 4 个 backup shell 场景。本轮纯文档整理不会把旧测试数量当成新验证结果；提交前将重新运行适合本 PR 的格式、链接和差异检查。
+最近文档记录的代码基线包含 50 个 Vitest 与 4 个 backup shell 场景；其中 3 个 Vitest 覆盖 Dev Container workspace guard 的所有权与 Next.js 进程冲突判断。2026-08-15 已从 Codex CLI 重新验证 `pnpm test`、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 测试缺口：
 

@@ -80,6 +80,28 @@ network_access = false
 
 `workspace-write` 允许修改当前工作区，默认不开放网络；`untrusted` 会让不在可信命令范围内的命令请求批准。它们是风险控制，不是对 Docker 和数据库语义的完整理解。根 `AGENTS.md` 还明确禁止删除 volume、清空数据库和擅自操作生产。
 
+审批提示本身不代表命令有问题，只表示该命令没有被当前可信规则自动放行。看不懂命令时可以拒绝，并要求 Codex 逐段解释用途、目标和是否写入；不要为了省事长期批准陌生的宽泛命令。尤其要仔细检查删除命令、Docker/Volume/数据库操作、Git 历史重写、secret 读取和生产环境操作。`&&` 表示前一段成功后才执行下一段，`|` 会把前一段输出交给下一段；应当逐段理解，而不是只看整行最后一个单词。
+
+## Workspace guard 与 Linux sandbox
+
+`scripts/assert-dev-workspace-user.mjs` 在项目脚本运行前提供三层本地保护：拒绝在 bind-mounted workspace 中以 root 运行、递归检查 `.next` 是否属于当前用户，以及阻止 `next dev` 与 `next build` 同时使用同一份 `.next`。
+
+Codex 的 Linux sandbox 会约束由 CLI 启动的子进程。guard 因此使用 Node 文件系统 API 检查 `.next`，并直接读取 Linux `/proc` 判断 Next.js 进程；不要改回由 Node 再启动外部 `find` 或 `ps`。后者在普通终端中可用，但可能在 `bubblewrap`/seccomp sandbox 中返回 `EPERM`，导致 `pnpm check`、`pnpm build` 等命令在真正执行前被误判失败。
+
+`node_modules` 和 `.next` 是 Dev Container 内的独立 named volumes。即使路径位于 `/workspaces/Kita` 下，严格 sandbox 仍可能把这些额外挂载视为只读；Vitest 写 `node_modules/.vite-temp`、Next 写 `.next` 时，CLI 因而可能对整条质量命令请求一次批准。这是可解释的项目内写入，不需要把日常配置改成完全访问。
+
+修改 Dev Container、Codex CLI 或 guard 后，必须从 Codex CLI 会话运行完整门禁：
+
+```bash
+pnpm test
+pnpm check
+SKIP_ENV_VALIDATION=true pnpm build
+```
+
+前两条应保留默认 `workspace-write` 配置；遇到 named-volume 写入审批时，只批准当前能理解的精确命令。构建命令与 GitHub Actions 一致：`SKIP_ENV_VALIDATION` 只跳过受控 build/CI 的外部环境校验，避免要求本机持有 R2 secret；它不会写入 `.env`，也不会削弱 Production 运行时强制使用 R2 的保护。build 需要写 `.next`，并可能初始化现有本地服务，因此可以只批准这一条命令在 sandbox 外执行。停止 `pnpm dev` 后再构建。
+
+如果 guard 报错，应先定位所有权或进程检查失败原因，不要绕过 guard，也不要开启长期完全访问。
+
 ## Docker-in-Docker 与本地数据库
 
 Kita 的 PostgreSQL 运行在 Dev Container 内部的 Docker-in-Docker daemon，和 Coolify/生产数据库无关。但 Codex CLI 与 Docker CLI 在同一个 Dev Container 中，获得批准的 Docker 命令仍可能影响本地 `postgres-data`。
