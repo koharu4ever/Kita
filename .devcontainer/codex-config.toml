@@ -1,0 +1,13 @@
+# Conservative defaults for Codex CLI inside the Kita Dev Container.
+# This template is copied to the local named volume only when config.toml
+# does not already exist, so personal settings are not overwritten.
+approval_policy = "untrusted"
+sandbox_mode = "workspace-write"
+cli_auth_credentials_store = "file"
+
+[history]
+persistence = "save-all"
+max_bytes = 104857600
+
+[sandbox_workspace_write]
+network_access = false

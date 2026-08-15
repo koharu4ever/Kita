@@ -1,6 +1,6 @@
 # Kita 开发指南
 
-> 最后核对：2026-08-12
+> 最后核对：2026-08-14
 >
 > 正常工作区：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
@@ -26,6 +26,12 @@ pnpm dev
 ```
 
 正常用户必须是 `node`。`pnpm dev` 是唯一日常入口，会启动并等待本地 PostgreSQL healthy，再启动 Next.js。
+
+## Codex CLI
+
+Dev Container 镜像内置固定版本的 Codex CLI，登录、个人配置与会话状态保存在本机 `kita-codex-home` named volume，不进入 Git 或生产镜像。第一次使用、权限边界、容量检查、升级和彻底删除步骤统一维护在 [Codex CLI 工作流](./codex-cli.md)。
+
+推荐由开发者手动运行 `pnpm dev`，再在另一个容器终端启动 `codex`。Codex 默认不管理 Docker 生命周期；不要同时让 Codex Desktop 和 CLI 修改同一个工作树。
 
 ## 日常流程
 

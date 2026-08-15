@@ -1,6 +1,11 @@
-import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import process from "node:process";
+
+import {
+  findConflictingNextProcess,
+  findMismatchedOwner,
+  readProcessLines,
+} from "./dev-workspace-inspection.mjs";
 
 const normalizedCwd = process.cwd().replaceAll("\\", "/");
 const isBindMountedDevWorkspace = normalizedCwd.startsWith("/workspaces/");
@@ -23,17 +28,13 @@ if (
   process.argv.includes("--check-next") &&
   existsSync(".next")
 ) {
-  const ownershipCheck = spawnSync(
-    "find",
-    [".next", "!", "-user", String(uid), "-print", "-quit"],
-    { encoding: "utf8" },
-  );
+  let mismatchedPath;
 
-  if (ownershipCheck.error || ownershipCheck.status !== 0) {
+  try {
+    mismatchedPath = findMismatchedOwner(".next", uid);
+  } catch {
     fail("Unable to verify .next ownership before running the command.");
   }
-
-  const mismatchedPath = ownershipCheck.stdout.trim();
 
   if (mismatchedPath) {
     fail(
@@ -48,28 +49,15 @@ const modeArgument = process.argv.find((argument) =>
 const mode = modeArgument?.slice("--mode=".length);
 
 if (isBindMountedDevWorkspace && (mode === "build" || mode === "dev")) {
-  const processList = spawnSync("ps", ["-eo", "comm=,args="], {
-    encoding: "utf8",
-  });
+  let processLines;
 
-  if (processList.error || processList.status !== 0) {
+  try {
+    processLines = readProcessLines();
+  } catch {
     fail("Unable to inspect active Next.js processes.");
   }
 
-  const processLines = processList.stdout
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-  const activeConflict = processLines.find((line) => {
-    if (mode === "build") {
-      return (
-        line.startsWith("next-server ") ||
-        /\/next(?:\.js)?\s+dev(?:\s|$)/.test(line)
-      );
-    }
-
-    return /\/next(?:\.js)?\s+build(?:\s|$)/.test(line);
-  });
+  const activeConflict = findConflictingNextProcess(mode, processLines);
 
   if (activeConflict) {
     fail(

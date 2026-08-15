@@ -1,13 +1,19 @@
 {
   "name": "kita",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:3": {}
   },
   "mounts": [
     "source=${devcontainerId}-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
-    "source=${devcontainerId}-next-cache,target=${containerWorkspaceFolder}/.next,type=volume"
+    "source=${devcontainerId}-next-cache,target=${containerWorkspaceFolder}/.next,type=volume",
+    "source=kita-codex-home,target=/home/node/.codex,type=volume"
   ],
+  "containerEnv": {
+    "CODEX_HOME": "/home/node/.codex"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -22,6 +28,7 @@
       }
     }
   },
-  "postCreateCommand": "sudo corepack enable && sudo chown node:node node_modules .next && pnpm install --frozen-lockfile",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postAttachCommand": "bash .devcontainer/normalize-git-config.sh",
   "remoteUser": "node"
 }
