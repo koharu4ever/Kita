@@ -1,17 +1,13 @@
 import type { CollectionConfig } from "payload";
+
+import { isAuthenticated } from "../access/is-authenticated";
+import { contentEditor } from "../fields/content-editor";
 import {
-  BlockquoteFeature,
-  BoldFeature,
-  FixedToolbarFeature,
-  HeadingFeature,
-  InlineToolbarFeature,
-  ItalicFeature,
-  LinkFeature,
-  OrderedListFeature,
-  ParagraphFeature,
-  UnorderedListFeature,
-  lexicalEditor,
-} from "@payloadcms/richtext-lexical";
+  validateHttpUrl,
+  validateRequiredText,
+  validateRequiredTextarea,
+  validateSlug,
+} from "../fields/validators";
 
 export const Games: CollectionConfig = {
   slug: "games",
@@ -26,6 +22,8 @@ export const Games: CollectionConfig = {
     useAsTitle: "title",
   },
   access: {
+    create: isAuthenticated,
+    delete: isAuthenticated,
     read: ({ req }) =>
       req.user
         ? true
@@ -34,18 +32,21 @@ export const Games: CollectionConfig = {
               equals: "published",
             },
           },
+    update: isAuthenticated,
   },
   fields: [
     {
       name: "title",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "slug",
       type: "text",
       required: true,
       unique: true,
+      validate: validateSlug,
     },
     {
       name: "originalTitle",
@@ -55,11 +56,13 @@ export const Games: CollectionConfig = {
       name: "developer",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "releaseDate",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "playStatus",
@@ -87,24 +90,12 @@ export const Games: CollectionConfig = {
       name: "summary",
       type: "textarea",
       required: true,
+      validate: validateRequiredTextarea,
     },
     {
       name: "body",
       type: "richText",
-      editor: lexicalEditor({
-        features: () => [
-          ParagraphFeature(),
-          HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
-          BoldFeature(),
-          ItalicFeature(),
-          UnorderedListFeature(),
-          OrderedListFeature(),
-          BlockquoteFeature(),
-          LinkFeature(),
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ],
-      }),
+      editor: contentEditor,
       required: true,
     },
     {
@@ -124,6 +115,7 @@ export const Games: CollectionConfig = {
           name: "label",
           type: "text",
           required: true,
+          validate: validateRequiredText,
         },
       ],
     },
@@ -135,11 +127,13 @@ export const Games: CollectionConfig = {
           name: "label",
           type: "text",
           required: true,
+          validate: validateRequiredText,
         },
         {
           name: "href",
           type: "text",
           required: true,
+          validate: validateHttpUrl,
         },
       ],
     },

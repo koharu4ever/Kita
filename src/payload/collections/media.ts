@@ -2,6 +2,7 @@ import path from "path";
 import type { CollectionConfig } from "payload";
 
 import { isAuthenticated } from "../access/is-authenticated";
+import { validateRequiredText } from "../fields/validators";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -27,6 +28,7 @@ export const Media: CollectionConfig = {
       maxLength: 240,
       minLength: 3,
       required: true,
+      validate: validateRequiredText,
     },
   ],
   upload: {

@@ -1,6 +1,6 @@
 # Kita 当前架构
 
-> 最后核对：2026-08-12
+> 最后核对：2026-08-31
 >
 > 本文只描述当前结构与长期边界；完成度和待办见 [current-project-status.md](./current-project-status.md)。
 
@@ -73,14 +73,14 @@ Games getter 使用 `depth: 1` 解析必填的 `cover` Media relationship。Mapp
 Collections：
 
 - `users`：Payload auth collection；
-- `media`：图片 upload collection；匿名可读，写操作要求登录；
+- `media`：图片 upload collection；匿名可读；
 - `tools`：公开读取；
 - `reviews`：匿名只读 `published`，登录用户可在 Admin 查看全部；
 - `games`：匿名只读 `published`，登录用户可在 Admin 查看全部，封面必须关联 Media。
 
-目前只有 Media 显式声明了 create/update/delete access。Tools、Reviews 和 Games 只显式声明 read；将写权限显式收敛到登录用户仍是已知小型改进，不应把它误写成已经完成。
+Media、Tools、Reviews 和 Games 的 create/update/delete 均复用 authenticated access helper，写操作要求登录。常用 text/textarea 字段的非空白、slug 和绝对 URL 规则集中在 `src/payload/fields`，并先保留 Payload 原生 required/长度校验。
 
-Reviews 与 Games 使用相同的一组 Lexical 功能，但配置仍重复。抽取共用 rich-text 配置是低风险维护项。
+Reviews 与 Games 共用同一份 Lexical editor 配置，避免两个内容模型的编辑能力分别漂移。
 
 ## Development 与 Production 的隔离
 

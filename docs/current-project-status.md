@@ -1,6 +1,6 @@
 # Kita 当前项目状态
 
-> 最后核对：2026-08-14
+> 最后核对：2026-08-31
 >
 > 本文是可变事实和待办的唯一来源。操作步骤见 [文档入口](./README.md) 中的专题文档。
 
@@ -9,7 +9,7 @@
 本轮文档整理基线：
 
 ```text
-main: 6d9897d (PR #21 merge)
+main: 592f067 (PR #22 merge)
 workspace: C:\dev\Kita
 ```
 
@@ -58,8 +58,15 @@ workspace: C:\dev\Kita
 
 写权限边界：
 
-- Media 显式要求登录才能 create/update/delete；
-- Tools、Reviews、Games 当前只显式声明 read；Payload 默认行为不是项目级明确契约，因此显式写权限仍待完成。
+- Media、Tools、Reviews、Games 均显式要求登录才能 create/update/delete；
+- collection 配置测试直接覆盖匿名写入被拒绝、登录写入被允许，以及现有公开读取边界；真实 Payload/PostgreSQL 集成测试仍单独待做。
+
+内容字段边界：
+
+- Games/Reviews slug 只接受以单个连字符分隔的小写 ASCII 字母和数字；
+- Tools URL 与 Games links 只接受 `http/https` 绝对 URL；
+- Media、Tools、Reviews、Games 的必填 text/textarea 字段拒绝纯空白，并保留 Payload 原生 required/长度校验；
+- Games/Reviews 共用同一份 Lexical feature 配置。
 
 Games Media-only 已完成：
 
@@ -117,7 +124,7 @@ OpenList 以独立 Coolify Application 运行在 `https://archive.kral-koharu.co
 
 GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tests 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含 50 个 Vitest 与 4 个 backup shell 场景；其中 3 个 Vitest 覆盖 Dev Container workspace guard 的所有权与 Next.js 进程冲突判断。2026-08-15 已从 Codex CLI 重新验证 `pnpm test`、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-08-31 已在 Dev Container 重新验证 `pnpm test`、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 测试缺口：
 
@@ -130,16 +137,11 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tes
 
 ### 下一项工程 PR
 
-- [ ] Games/Reviews slug 增加小写 ASCII、数字、连字符验证；
-- [ ] Tools URL 和 Games links 增加 `http/https` 绝对 URL 验证；
-- [ ] Games、Reviews、Tools 显式声明 create/update/delete 为登录用户；
-- [ ] 增加匿名/登录权限测试；
-- [ ] 抽取 Games/Reviews 共用 Lexical 配置。
+- [ ] PostgreSQL 16 完整 migration smoke；
+- [ ] 真实 Payload anonymous/published/authenticated access 集成测试。
 
 ### 随后独立完成
 
-- [ ] PostgreSQL 16 完整 migration smoke；
-- [ ] 真实 published access 集成测试；
 - [ ] About 替换 placeholder；
 - [ ] Reviews/Games 录入真实内容并清理 placeholder；
 - [ ] Tools 决定 CMS-only 还是保留 Development fallback；
@@ -160,4 +162,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tes
 
 ## 下一步
 
-文档整理合并后，优先执行一个小型后端质量 PR（validation + explicit write access + shared Lexical config），再单独做 PostgreSQL/权限集成 smoke。随后暂停工程底座扩张，回到真实内容和产品体验。
+下一项工程 PR 单独做 PostgreSQL migration 与真实权限集成 smoke。随后暂停工程底座扩张，回到真实内容和产品体验。

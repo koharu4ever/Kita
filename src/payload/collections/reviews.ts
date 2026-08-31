@@ -1,17 +1,12 @@
 import type { CollectionConfig } from "payload";
+
+import { isAuthenticated } from "../access/is-authenticated";
+import { contentEditor } from "../fields/content-editor";
 import {
-  BlockquoteFeature,
-  BoldFeature,
-  FixedToolbarFeature,
-  HeadingFeature,
-  InlineToolbarFeature,
-  ItalicFeature,
-  LinkFeature,
-  OrderedListFeature,
-  ParagraphFeature,
-  UnorderedListFeature,
-  lexicalEditor,
-} from "@payloadcms/richtext-lexical";
+  validateRequiredText,
+  validateRequiredTextarea,
+  validateSlug,
+} from "../fields/validators";
 
 export const Reviews: CollectionConfig = {
   slug: "reviews",
@@ -27,6 +22,8 @@ export const Reviews: CollectionConfig = {
     useAsTitle: "title",
   },
   access: {
+    create: isAuthenticated,
+    delete: isAuthenticated,
     read: ({ req }) =>
       req.user
         ? true
@@ -35,18 +32,21 @@ export const Reviews: CollectionConfig = {
               equals: "published",
             },
           },
+    update: isAuthenticated,
   },
   fields: [
     {
       name: "title",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "slug",
       type: "text",
       required: true,
       unique: true,
+      validate: validateSlug,
     },
     {
       name: "status",
@@ -63,6 +63,7 @@ export const Reviews: CollectionConfig = {
       name: "gameTitle",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "publishedAt",
@@ -73,11 +74,13 @@ export const Reviews: CollectionConfig = {
       name: "excerpt",
       type: "textarea",
       required: true,
+      validate: validateRequiredTextarea,
     },
     {
       name: "coverImage",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "rating",
@@ -90,6 +93,7 @@ export const Reviews: CollectionConfig = {
       name: "readingTime",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "tags",
@@ -99,26 +103,14 @@ export const Reviews: CollectionConfig = {
           name: "label",
           type: "text",
           required: true,
+          validate: validateRequiredText,
         },
       ],
     },
     {
       name: "body",
       type: "richText",
-      editor: lexicalEditor({
-        features: () => [
-          ParagraphFeature(),
-          HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
-          BoldFeature(),
-          ItalicFeature(),
-          UnorderedListFeature(),
-          OrderedListFeature(),
-          BlockquoteFeature(),
-          LinkFeature(),
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ],
-      }),
+      editor: contentEditor,
       required: true,
     },
   ],
