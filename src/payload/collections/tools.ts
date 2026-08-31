@@ -1,5 +1,12 @@
 import type { CollectionConfig } from "payload";
 
+import { isAuthenticated } from "../access/is-authenticated";
+import {
+  validateHttpUrl,
+  validateRequiredText,
+  validateRequiredTextarea,
+} from "../fields/validators";
+
 export const Tools: CollectionConfig = {
   slug: "tools",
   admin: {
@@ -7,23 +14,29 @@ export const Tools: CollectionConfig = {
     useAsTitle: "title",
   },
   access: {
+    create: isAuthenticated,
+    delete: isAuthenticated,
     read: () => true,
+    update: isAuthenticated,
   },
   fields: [
     {
       name: "title",
       type: "text",
       required: true,
+      validate: validateRequiredText,
     },
     {
       name: "description",
       type: "textarea",
       required: true,
+      validate: validateRequiredTextarea,
     },
     {
       name: "url",
       type: "text",
       required: true,
+      validate: validateHttpUrl,
     },
     {
       name: "category",

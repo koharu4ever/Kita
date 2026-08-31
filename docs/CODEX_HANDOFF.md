@@ -1,6 +1,6 @@
 # Kita Codex 交接
 
-> 最后核对：2026-08-14
+> 最后核对：2026-08-31
 >
 > 正常项目根目录：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
@@ -46,7 +46,7 @@ Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 
 - PostgreSQL -> private R2 backup 已有真实对象；隔离 restore 演练尚未完成。
 - C SSD 的本地 clone + Dev Container + 全新本地 PostgreSQL 复建曾验证通过。
 - OpenList 最终 storage/data backup 仍延期。
-- 当前代码已经有 Media 显式写权限，但 Tools/Reviews/Games 仍只显式声明 read；“显式写权限”仍是待办。
+- Media、Tools、Reviews 和 Games 的写操作均显式要求登录；详细字段规则与测试边界见 [Payload 内容与 Media](./payload-content-and-media.md)。
 
 带日期的完整事实和待办只维护在 [current-project-status.md](./current-project-status.md)。
 
@@ -85,11 +85,7 @@ pnpm build
 
 ## 当前推荐工作顺序
 
-1. 小型后端质量 PR：slug/URL validation、Tools/Reviews/Games 显式写权限、共用 Lexical 配置；
-2. 独立 PostgreSQL migration + published access 集成 smoke；
-3. About、Reviews、Games、Tools 的真实内容收口；
-4. empty/error/not-found 和最小浏览器 smoke；
-5. 根 README 与准确作品集描述。
+具体优先级只维护在 [current-project-status.md](./current-project-status.md) 和 [product-roadmap.md](./product-roadmap.md)，不要在交接页复制可变任务清单。
 
 不要优先引入 Redis、Prisma、微服务、Kubernetes、复杂角色系统、Payload drafts/versions 或大型监控平台。选择依据见 [product-roadmap.md](./product-roadmap.md)。
 

@@ -1,6 +1,6 @@
 # Payload 内容与 Media
 
-> 最后核对：2026-08-12
+> 最后核对：2026-08-31
 
 ## 当前 Collections
 
@@ -12,7 +12,9 @@
 | Reviews    | 仅 published | 标题、slug、状态、游戏名、日期、摘要、评分、标签、Lexical body                               |
 | Games      | 仅 published | 标题、slug、开发者、发布日期文本、游玩/发布状态、摘要、Lexical body、Media cover、标签和链接 |
 
-Media 显式要求登录用户才能 create/update/delete。Tools、Reviews 和 Games 当前只显式配置 read；显式写权限仍是待完成的防误配置工作。
+Media、Tools、Reviews 和 Games 均显式要求登录用户才能 create/update/delete。Tools 保持公开读取；Reviews 和 Games 的匿名读取仍只返回 published 内容。collection 配置测试固定这些匿名与登录权限边界；真实 Payload/PostgreSQL 请求链路仍需独立集成测试。
+
+Games/Reviews slug 只接受以单个连字符分隔的小写 ASCII 字母和数字。Tools URL 与 Games links 只接受不带首尾空白的 `http/https` 绝对 URL。必填 text/textarea 字段拒绝纯空白；自定义规则先执行 Payload 原生 validation，因此 required 和长度限制仍然生效。Games/Reviews 的正文共用一份 Lexical feature 配置，避免编辑能力随 collection 漂移。
 
 ## 内容读取链路
 
@@ -84,16 +86,8 @@ Production 数据库曾手动复建。PR #17/#18 的成功证明增量 migration
 
 Reviews 使用 Lexical rich text 和手写 draft/published 状态。Tools 按 `sortOrder` 排序。现阶段不需要 drafts/versions、角色系统或自建搜索。
 
-## 下一项低复杂度改进
+## 后续验证
 
-建议一个无 migration 或极小 schema 风险的 PR：
-
-1. Games/Reviews slug 增加小写 ASCII、数字、连字符验证；
-2. Tools URL 和 Games link 增加 `http/https` 绝对 URL 同步验证；
-3. Games、Reviews、Tools 显式声明 create/update/delete 只允许登录；
-4. 增加匿名/登录权限测试；
-5. 抽取 Games/Reviews 共用 Lexical 配置。
-
-之后单独增加真实 PostgreSQL/Payload published access 集成测试。`releaseDate` 暂不迁移为 date，先清理真实内容中的 placeholder。
+后续优先级以 [当前项目状态](./current-project-status.md) 和 [产品路线](./product-roadmap.md) 为准。Payload 侧仍缺 PostgreSQL migration smoke 和真实 anonymous/published/authenticated access 集成测试。`releaseDate` 暂不迁移为 date，先清理真实内容中的 placeholder。
 
 Trash、Reviews relationship、Globals、Payload drafts/versions、角色系统、Jobs 和搜索只有出现真实需求后再评估。
