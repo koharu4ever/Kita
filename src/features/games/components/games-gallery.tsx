@@ -22,7 +22,7 @@ export function GamesGallery({ games }: GamesGalleryProps) {
           <div
             aria-hidden="true"
             className="absolute inset-0 bg-cover bg-center opacity-0 transition duration-500 group-hover:opacity-75"
-            style={{ backgroundImage: "url('/home-rain-harbor.jpg')" }}
+            style={{ backgroundImage: "url('/home-rain-harbor.webp')" }}
           />
           <div
             aria-hidden="true"
@@ -46,14 +46,14 @@ export function GamesGallery({ games }: GamesGalleryProps) {
           />
           <div className="relative">
             <p className="mb-4 text-xs tracking-[0.35em] text-sky-100/70 uppercase">
-              Visual Novel Shelf
+              Curated Game Catalog
             </p>
             <h1 className="kita-display text-7xl leading-none text-white">
               GAMES
             </h1>
             <p className="mt-5 max-w-[34ch] text-sm leading-6 text-white/72">
-              Click a cover to open the image viewer. Details stay one small
-              step deeper.
+              Browse published games, open a cover in the gallery, or continue
+              to the full catalog entry.
             </p>
             <p className="mt-8 text-xs tracking-[0.32em] text-white/35 uppercase transition group-hover:text-sky-100/70">
               Return Home
@@ -61,9 +61,23 @@ export function GamesGallery({ games }: GamesGalleryProps) {
           </div>
         </Link>
 
-        {games.map((game) => (
-          <GameGalleryCard key={game.slug} game={game} />
-        ))}
+        {games.length > 0 ? (
+          games.map((game, index) => (
+            <GameGalleryCard key={game.slug} game={game} eager={index === 0} />
+          ))
+        ) : (
+          <section className="mb-5 break-inside-avoid rounded-lg border border-white/10 bg-slate-950/70 p-8 shadow-2xl shadow-black/35">
+            <p className="text-xs tracking-[0.3em] text-sky-100/55 uppercase">
+              Catalog status
+            </p>
+            <h2 className="mt-4 text-2xl font-semibold">
+              No published games yet
+            </h2>
+            <p className="mt-3 leading-7 text-white/58">
+              New catalog entries will appear here when published.
+            </p>
+          </section>
+        )}
       </div>
 
       <Suspense fallback={null}>

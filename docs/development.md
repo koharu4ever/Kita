@@ -1,6 +1,6 @@
 # Kita 开发指南
 
-> 最后核对：2026-08-14
+> 最后核对：2026-09-01
 >
 > 正常工作区：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
@@ -57,6 +57,7 @@ http://localhost:3000/admin
 
 ```bash
 pnpm test
+pnpm test:integration # when migrations, Payload access, or CI changes
 pnpm check
 pnpm build
 ```
@@ -71,6 +72,7 @@ pnpm build
 | `pnpm dev:services`           | 只启动并等待 PostgreSQL，供诊断使用          |
 | `pnpm dev:services:stop`      | 停止本地 PostgreSQL container，不删除 Volume |
 | `pnpm test`                   | Vitest + backup shell 场景                   |
+| `pnpm test:integration`       | 一次性 PostgreSQL 16 migration/access smoke  |
 | `pnpm check`                  | format、lint、typecheck                      |
 | `pnpm build`                  | production build                             |
 | `pnpm payload:types`          | 重新生成 Payload types                       |
@@ -84,9 +86,7 @@ pnpm build
 
 只记录键，不把真实值写入文档或提交：
 
-- `NEXT_PUBLIC_SITE_URL`
 - `PAYLOAD_SECRET`（至少 32 字符）
-- `ENABLE_DEV_SEED`
 - `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`
 - `DATABASE_URI`
 - `MEDIA_STORAGE_MODE=local`
@@ -108,7 +108,7 @@ pnpm build
 9. 运行 test/check/build；
 10. 在本地 Admin 和公开页面做 smoke。
 
-不要让 UI 直接消费 `Payload` generated document type。不要在 Production 添加静态 fallback。
+不要让 UI 直接消费 `Payload` generated document type。开发与生产都以 Payload 为内容事实源：空 Collection 使用页面 empty state，查询失败交给 error boundary，不用静态 fixture 掩盖后端状态。
 
 ## Schema 与 migration
 
@@ -122,18 +122,20 @@ Development 可以由 Payload schema push 维护本地数据库，因此本地 `
 - 不为了 migration 测试删除本地或生产 Volume；
 - 破坏性 migration 前先确认生产备份和内容前置条件；
 - 回滚旧镜像前确认旧 schema 契约，必要时先运行对应 `down`；
-- 完整 fresh-database migration 链尚未进入 CI，不能把手动复建当成该验证。
+- `pnpm test:integration` 和 CI 使用无 Volume 的一次性 PostgreSQL 16，验证完整 fresh migration、再次运行时无待执行 migration、当前 Media-only schema 和 Reviews 访问边界；
+- fresh smoke 不证明带真实数据升级、全部 `down`、dump restore 或 Production 状态，不能据此跳过 migration review 和备份前置条件。
 
-## Seed
+## 本地内容
 
-Seed route 只允许：
+本地内容通过 Payload Admin 手工创建，保存在 Docker-in-Docker 的开发 PostgreSQL 和 `.payload-media`，不会进入 Git 或 Production。仓库不提供可公开调用的 seed route，也不在数据库为空或不可用时注入演示内容；因此本地页面展示的是实际 CMS 状态。需要确定性测试数据时，使用单元测试 fixture 或一次性 integration 数据库，不污染日常开发库。
 
-```text
-NODE_ENV != production
-ENABLE_DEV_SEED=true
-```
+## 视觉素材与归属
 
-Games seed 使用非破坏式 upsert，不会删除其他 Games。Production 必须保持 `ENABLE_DEV_SEED=false`。
+- 内容封面通过 Payload Media 管理；Production 对象进入 R2，`public/` 只保存站点界面素材和仍需兼容的稳定路径。
+- 新增或替换素材前先搜索代码、migration 与现有 Production 字段引用；不要仅因文件名看似过时就删除兼容路径。
+- 裁切、压缩或转码不会改变原素材的许可状态。来源无法说明的公开素材应替换，而不是只改格式。
+- 项目原创素材和保留的第三方代码/纹理统一记录在根目录 `THIRD_PARTY_NOTICES.md`，不要另建重复的 asset audit 文档。
+- 替换后运行 `pnpm check`、production build，并对 Home、About、Games、Reviews 做桌面与窄屏 smoke；内容 Media 另需核对公开 URL 和 Redeploy 持久性。
 
 ## 常见排障
 

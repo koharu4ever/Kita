@@ -1,6 +1,6 @@
 # Kita Codex 交接
 
-> 最后核对：2026-08-31
+> 最后核对：2026-09-01
 >
 > 正常项目根目录：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
@@ -22,7 +22,7 @@
 
 ## 项目是什么
 
-Kita 是 Next.js 16 + Payload CMS + PostgreSQL 16 的个人内容站，包含 Home、About、Tools、Reviews、Games 和 Payload Admin。
+Kita 是基于 Next.js 16、Payload CMS 和 PostgreSQL 16 的自托管游戏目录与评论发布平台，包含 Home、About、Tools、Reviews、Games 和 Payload Admin。
 
 核心数据流：
 
@@ -34,7 +34,7 @@ Games.cover -> Payload Media -> local storage (development)
                               -> Cloudflare R2 (production)
 ```
 
-Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 和 `backup`。OpenList 是独立 Application，Kita 只保存公开 archive URL。
+Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 和 `backup`。OpenList 是独立 Application，不属于 Kita `v1.0` 核心架构。
 
 详细结构只维护在 [architecture.md](./architecture.md)。
 
@@ -42,7 +42,7 @@ Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 
 
 - `main` 的功能基线包含 PR #17 Media/R2、PR #18 Games Media-only 和后续文档纠偏。
 - Games 封面以必填 Media relationship 为唯一事实源；旧 cover URL/alt/width/height 列已删除。
-- Production 数据库曾由项目所有者手动复建；后续增量 migration 和 Production smoke 通过，但不能据此声称完整 fresh-database migration 或 dump restore 已验证。
+- Production 数据库曾由项目所有者手动复建；后续增量 migration 和 Production smoke 通过，全部 migration 也已在一次性 PostgreSQL 16 中完成 fresh `up` 验证；带真实数据的 Production 升级和 dump restore 仍未验证。
 - PostgreSQL -> private R2 backup 已有真实对象；隔离 restore 演练尚未完成。
 - C SSD 的本地 clone + Dev Container + 全新本地 PostgreSQL 复建曾验证通过。
 - OpenList 最终 storage/data backup 仍延期。
@@ -64,6 +64,7 @@ Dev Container 同时提供 Codex CLI；其凭据与会话只保存在本机 name
 
 ```bash
 pnpm test
+pnpm test:integration # migration、Payload access 或 CI 变更时
 pnpm check
 pnpm build
 ```

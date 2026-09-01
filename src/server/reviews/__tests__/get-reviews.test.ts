@@ -1,22 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getPayloadClientMock, mockEnv } = vi.hoisted(() => ({
+const { getPayloadClientMock } = vi.hoisted(() => ({
   getPayloadClientMock: vi.fn(),
-  mockEnv: {
-    NODE_ENV: "development" as "development" | "production" | "test",
-  },
 }));
-
-vi.mock("@/config/env", () => ({ env: mockEnv }));
 vi.mock("@/server/payload/get-payload", () => ({
   getPayloadClient: getPayloadClientMock,
 }));
 
 import { getReviewBySlug, getReviews } from "@/server/reviews/get-reviews";
-import {
-  getReviewBySlug as getFallbackReviewBySlug,
-  reviewItems,
-} from "@/features/reviews/data/review-items";
 import { createPayloadReviewDocument } from "@/testing/fixtures/payload-documents";
 
 function arrangeFind(docs: unknown[]) {
@@ -28,7 +19,10 @@ function arrangeFind(docs: unknown[]) {
 describe("getReviews", () => {
   beforeEach(() => {
     getPayloadClientMock.mockReset();
-    mockEnv.NODE_ENV = "development";
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("returns mapped published reviews", async () => {
@@ -51,34 +45,22 @@ describe("getReviews", () => {
     );
   });
 
-  it("uses local fallback when development data is empty", async () => {
-    arrangeFind([]);
-
-    await expect(getReviews()).resolves.toBe(reviewItems);
-  });
-
-  it("returns a real empty result when production data is empty", async () => {
-    mockEnv.NODE_ENV = "production";
+  it("returns an empty collection when Payload has no published reviews", async () => {
     arrangeFind([]);
 
     await expect(getReviews()).resolves.toEqual([]);
   });
 
-  it("uses local fallback when development Payload throws", async () => {
+  it("rethrows Payload errors so the route error boundary can respond", async () => {
     const error = new Error("Payload unavailable");
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-    getPayloadClientMock.mockRejectedValue(error);
-
-    await expect(getReviews()).resolves.toBe(reviewItems);
-  });
-
-  it("rethrows production Payload errors", async () => {
-    const error = new Error("Payload unavailable");
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    mockEnv.NODE_ENV = "production";
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     getPayloadClientMock.mockRejectedValue(error);
 
     await expect(getReviews()).rejects.toBe(error);
+    expect(log).toHaveBeenCalledWith(
+      "Failed to load reviews from Payload.",
+      error,
+    );
   });
 
   it("returns a mapped review by slug", async () => {
@@ -102,18 +84,21 @@ describe("getReviews", () => {
     );
   });
 
-  it("uses the matching development fallback when a slug is missing", async () => {
-    arrangeFind([]);
-
-    await expect(getReviewBySlug("quiet-after-rain")).resolves.toBe(
-      getFallbackReviewBySlug("quiet-after-rain"),
-    );
-  });
-
-  it("returns undefined for a missing production slug", async () => {
-    mockEnv.NODE_ENV = "production";
+  it("returns undefined for a missing slug", async () => {
     arrangeFind([]);
 
     await expect(getReviewBySlug("missing-review")).resolves.toBeUndefined();
+  });
+
+  it("rethrows detail query errors so the route error boundary can respond", async () => {
+    const error = new Error("Payload unavailable");
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    getPayloadClientMock.mockRejectedValue(error);
+
+    await expect(getReviewBySlug("test-review")).rejects.toBe(error);
+    expect(log).toHaveBeenCalledWith(
+      'Failed to load review "test-review" from Payload.',
+      error,
+    );
   });
 });

@@ -9,20 +9,30 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URI: ${DATABASE_URI:-postgres://postgres:postgres@postgres:5432/kita}
-      ENABLE_DEV_SEED: ${ENABLE_DEV_SEED:-false}
       MEDIA_R2_ACCESS_KEY_ID: ${MEDIA_R2_ACCESS_KEY_ID:-}
       MEDIA_R2_BUCKET: ${MEDIA_R2_BUCKET:-}
       MEDIA_R2_ENDPOINT: ${MEDIA_R2_ENDPOINT:-}
       MEDIA_R2_PUBLIC_URL: ${MEDIA_R2_PUBLIC_URL:-}
       MEDIA_R2_SECRET_ACCESS_KEY: ${MEDIA_R2_SECRET_ACCESS_KEY:-}
       MEDIA_STORAGE_MODE: ${MEDIA_STORAGE_MODE:-r2}
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       NEXT_TELEMETRY_DISABLED: "1"
       NODE_ENV: production
       PAYLOAD_SECRET: ${PAYLOAD_SECRET:?PAYLOAD_SECRET is required}
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   postgres:
     image: postgres:16

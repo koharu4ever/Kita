@@ -1,6 +1,6 @@
 # Kita 部署指南
 
-> 最后核对：2026-08-12
+> 最后核对：2026-09-01
 >
 > Production 使用 Coolify 的 repository Docker Compose 部署。本文不包含真实 secret。
 
@@ -13,10 +13,21 @@ Coolify Compose Application
   └─ backup    pg_dump/pg_restore/rclone sidecar
 
 Independent Coolify Application
-  └─ OpenList  archive.kral-koharu.com
+  └─ OpenList  outside Kita v1.0
 ```
 
 `web` 等待 PostgreSQL healthy。`docker-entrypoint.sh` 先执行 Payload migrations，再运行 `node server.js`。Production image 使用 multi-stage build 和 UID 1001 的非 root 用户。
+
+## Readiness health
+
+`GET /api/health` 是面向容器编排的最小 readiness 检查：
+
+- Next/Payload 初始化且 PostgreSQL `SELECT 1` 成功时返回 `200`、`{"status":"ready","database":"reachable"}`；
+- 初始化或数据库查询失败时返回 `503`、`{"status":"unavailable","database":"unreachable"}`；
+- 两种响应均使用 `Cache-Control: no-store`；
+- 响应不包含连接串、异常文本或 stack。
+
+Compose `web.healthcheck` 使用 Production image 已有的 Node 22 和内置 `fetch` 调用该路由，不额外安装 `curl`。这个检查只证明应用能够连接业务数据库；它不检查 R2、backup freshness、OpenList、外部 DNS 或完整用户流程，也不替代日志、告警和恢复演练。
 
 ## 环境变量
 
@@ -24,21 +35,19 @@ Independent Coolify Application
 
 ### Kita 应用
 
-| 变量                         | Build | Runtime | 说明                                    |
-| ---------------------------- | ----- | ------- | --------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`       | 否    | 是      | 公开站点 URL；当前代码只校验 runtime 值 |
-| `PAYLOAD_SECRET`             | 否    | 是      | 至少 32 字符，secret                    |
-| `DATABASE_URI`               | 否    | 是      | 指向 Compose `postgres`，包含凭据       |
-| `POSTGRES_DB`                | 否    | 是      | 数据库名                                |
-| `POSTGRES_USER`              | 否    | 是      | 数据库用户                              |
-| `POSTGRES_PASSWORD`          | 否    | 是      | secret；必须与 URI 一致                 |
-| `ENABLE_DEV_SEED`            | 否    | 是      | Production 固定 `false`                 |
-| `MEDIA_STORAGE_MODE`         | 是    | 是      | Production 固定 `r2`                    |
-| `MEDIA_R2_PUBLIC_URL`        | 是    | 是      | HTTPS custom domain                     |
-| `MEDIA_R2_BUCKET`            | 否    | 是      | Media 专用 bucket                       |
-| `MEDIA_R2_ENDPOINT`          | 否    | 是      | R2 S3 endpoint                          |
-| `MEDIA_R2_ACCESS_KEY_ID`     | 否    | 是      | bucket-scoped credential                |
-| `MEDIA_R2_SECRET_ACCESS_KEY` | 否    | 是      | secret                                  |
+| 变量                         | Build | Runtime | 说明                              |
+| ---------------------------- | ----- | ------- | --------------------------------- |
+| `PAYLOAD_SECRET`             | 否    | 是      | 至少 32 字符，secret              |
+| `DATABASE_URI`               | 否    | 是      | 指向 Compose `postgres`，包含凭据 |
+| `POSTGRES_DB`                | 否    | 是      | 数据库名                          |
+| `POSTGRES_USER`              | 否    | 是      | 数据库用户                        |
+| `POSTGRES_PASSWORD`          | 否    | 是      | secret；必须与 URI 一致           |
+| `MEDIA_STORAGE_MODE`         | 是    | 是      | Production 固定 `r2`              |
+| `MEDIA_R2_PUBLIC_URL`        | 是    | 是      | HTTPS custom domain               |
+| `MEDIA_R2_BUCKET`            | 否    | 是      | Media 专用 bucket                 |
+| `MEDIA_R2_ENDPOINT`          | 否    | 是      | R2 S3 endpoint                    |
+| `MEDIA_R2_ACCESS_KEY_ID`     | 否    | 是      | bucket-scoped credential          |
+| `MEDIA_R2_SECRET_ACCESS_KEY` | 否    | 是      | secret                            |
 
 Media 凭据不可作为 Build Variable。`MEDIA_R2_ENDPOINT` 是 S3 API endpoint，`MEDIA_R2_PUBLIC_URL` 是浏览器访问图片的 custom domain，不能互换。
 
@@ -64,7 +73,7 @@ Database backup bucket/token 与 Media bucket/token 必须分离。
 3. Required `quality` 通过后合并 `main`。
 4. Coolify 自动部署 `main`。
 5. 观察 build、migration、startup 日志。
-6. 验证公开站点、关键页面、Admin 和相关 API。
+6. 确认 `web` healthy，并验证公开站点、关键页面、Admin 和相关 API。
 7. 对 Media 变更验证 `media` custom domain；对数据变更验证 Redeploy 后持久性。
 
 不要为了普通发布手工清空 PostgreSQL 或重建 Volume。
@@ -72,7 +81,7 @@ Database backup bucket/token 与 Media bucket/token 必须分离。
 ## Migration 发布边界
 
 - 破坏性 migration 合并前确认生产内容满足前置条件，并确认最近备份对象存在。
-- Production 数据库曾由项目所有者手动复建；当前证据只证明复建后的运行和后续增量 migration，不证明 6 个 migration 能从全新数据库自动建立当前 schema。
+- Production 数据库曾由项目所有者手动复建；隔离 smoke 已证明 6 个 migration 能从全新 PostgreSQL 16 建立当前 schema，但不证明带真实 Production 数据升级、全部 `down` 或 dump restore。
 - Development schema push 与 Production migration 记录不是同一事实源。
 - 回滚旧镜像前确认旧代码需要的列和约束。不能只切镜像而忽略 schema。
 

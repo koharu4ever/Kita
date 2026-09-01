@@ -25,7 +25,7 @@ describe("mapToolDocumentToToolkitItem", () => {
       ],
       title: "VNDB",
     });
-    expect(result.postedOn).toContain("2026");
+    expect(result.addedOn).toContain("2026");
   });
 
   it("uses safe labels when optional metadata is empty", () => {
@@ -37,6 +37,6 @@ describe("mapToolDocumentToToolkitItem", () => {
     );
 
     expect(result.links[0]?.note).toBe("Tool");
-    expect(result.postedOn).toBe("Payload CMS");
+    expect(result.addedOn).toBe("Payload CMS");
   });
 });

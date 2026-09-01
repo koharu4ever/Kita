@@ -8,22 +8,16 @@ import type {
 
 export const homeNavItems: HomeNavItem[] = [
   {
-    label: "REVIEWS",
-    href: "/reviews" as Route,
-    mainAccentClassName: "hover:text-purple-500 focus-visible:text-purple-500",
-    floatingAccentClassName: "hover:bg-purple-500 focus-visible:bg-purple-500",
-  },
-  {
     label: "GAMES",
     href: "/games" as Route,
     mainAccentClassName: "hover:text-blue-500 focus-visible:text-blue-500",
     floatingAccentClassName: "hover:bg-blue-500 focus-visible:bg-blue-500",
   },
   {
-    label: "TOOLS",
-    href: "/tools" as Route,
-    mainAccentClassName: "hover:text-green-500 focus-visible:text-green-500",
-    floatingAccentClassName: "hover:bg-green-500 focus-visible:bg-green-500",
+    label: "REVIEWS",
+    href: "/reviews" as Route,
+    mainAccentClassName: "hover:text-purple-500 focus-visible:text-purple-500",
+    floatingAccentClassName: "hover:bg-purple-500 focus-visible:bg-purple-500",
   },
   {
     label: "ABOUT",
@@ -31,47 +25,53 @@ export const homeNavItems: HomeNavItem[] = [
     mainAccentClassName: "hover:text-amber-500 focus-visible:text-amber-500",
     floatingAccentClassName: "hover:bg-amber-500 focus-visible:bg-amber-500",
   },
+  {
+    label: "TOOLS",
+    href: "/tools" as Route,
+    mainAccentClassName: "hover:text-green-500 focus-visible:text-green-500",
+    floatingAccentClassName: "hover:bg-green-500 focus-visible:bg-green-500",
+  },
 ];
 
 export const homeWallpapers: HomeWallpaper[] = [
   {
     id: "cover",
-    name: "Cover",
+    name: "Rain Window",
     image: {
-      url: "/cover.png",
-      alt: "Kita cover artwork behind a rain glass layer",
+      url: "/cover.webp",
+      alt: "A rain-streaked window overlooking a coastal city at blue hour",
     },
   },
   {
     id: "rain-harbor",
     name: "Rain Harbor",
     image: {
-      url: "/home-rain-harbor.jpg",
-      alt: "Rain drops over a night harbor scene",
+      url: "/home-rain-harbor.webp",
+      alt: "A quiet harbor reflecting distant lights after rainfall",
     },
   },
   {
     id: "sunset-field",
     name: "Sunset Field",
     image: {
-      url: "/home-sunset-field.jpg",
-      alt: "A silhouetted figure standing in a sunset field",
+      url: "/home-sunset-field.webp",
+      alt: "An open field beneath a violet and amber sunset",
     },
   },
   {
-    id: "sea-girl",
-    name: "Sea Girl",
+    id: "quiet-shore",
+    name: "Quiet Shore",
     image: {
-      url: "/home-sea-girl.jpg",
-      alt: "A girl walking beside the sea at sunset",
+      url: "/home-sea-girl.webp",
+      alt: "An empty shoreline beneath storm clouds at twilight",
     },
   },
   {
     id: "night-sky",
     name: "Night Sky",
     image: {
-      url: "/home-night-sky.jpg",
-      alt: "A quiet night sky in deep blue tones",
+      url: "/home-night-sky.webp",
+      alt: "A starry night above distant lights reflected on dark water",
     },
   },
 ];

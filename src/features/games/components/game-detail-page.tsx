@@ -66,7 +66,7 @@ export function GameDetailPage({ game }: GameDetailPageProps) {
       <article className="mx-auto max-w-3xl px-6 py-14 md:py-20">
         <header className="border-b border-white/12 pb-9">
           <p className="text-xs tracking-[0.3em] text-white/42 uppercase">
-            Game archive
+            Game catalog
           </p>
           <h1 className="mt-4 text-4xl leading-tight font-semibold md:text-5xl">
             {game.title}

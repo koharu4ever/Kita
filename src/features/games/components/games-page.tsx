@@ -12,7 +12,7 @@ export function GamesPage({ games }: GamesPageProps) {
       <div
         aria-hidden="true"
         className="fixed inset-0 bg-cover bg-center opacity-30"
-        style={{ backgroundImage: "url('/home-night-sky.jpg')" }}
+        style={{ backgroundImage: "url('/home-night-sky.webp')" }}
       />
       <div
         aria-hidden="true"

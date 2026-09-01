@@ -1,6 +1,6 @@
 # Kita 当前项目状态
 
-> 最后核对：2026-08-31
+> 最后核对：2026-09-01
 >
 > 本文是可变事实和待办的唯一来源。操作步骤见 [文档入口](./README.md) 中的专题文档。
 
@@ -9,11 +9,11 @@
 本轮文档整理基线：
 
 ```text
-main: 592f067 (PR #22 merge)
+main: 78e2d85 (PR #23 merge)
 workspace: C:\dev\Kita
 ```
 
-开始新任务时必须重新查询 Git；上述 SHA 是 2026-08-12 的基线证据，不代表永久 HEAD。
+开始新任务时必须重新查询 Git；上述 SHA 是 2026-08-31 的基线证据，不代表永久 HEAD。
 
 仓库当前包含：
 
@@ -28,6 +28,10 @@ workspace: C:\dev\Kita
 - repository Compose：web/postgres/backup；
 - GitHub Actions required `quality`；
 - 独立 OpenList Application 边界。
+
+项目已经进入 `v1.0` 收尾阶段。固定定位是自托管游戏目录与评论发布平台；后续优先完成真实内容、隔离验证和最终展示，不再扩张技术栈或业务类型。
+
+截至 2026-09-01，未发布的作品集收尾代码集中在本地分支 `codex/portfolio-v1-readiness`，由一组小型提交组成，工作树干净。该分支尚未 push、创建 PR、合并或部署；Production 仍运行 `main` 基线。
 
 ## 本地开发
 
@@ -54,12 +58,12 @@ workspace: C:\dev\Kita
 - Reviews 匿名只读 `published`；
 - Games 匿名只读 `published`；
 - getter 使用 `overrideAccess: false`；
-- Production 数据读取失败会抛错，不用静态 fallback 掩盖故障。
+- 所有环境的数据读取失败都会抛错，不用静态 fallback 掩盖故障；空 Collection 使用页面 empty state。
 
 写权限边界：
 
 - Media、Tools、Reviews、Games 均显式要求登录才能 create/update/delete；
-- collection 配置测试直接覆盖匿名写入被拒绝、登录写入被允许，以及现有公开读取边界；真实 Payload/PostgreSQL 集成测试仍单独待做。
+- collection 配置测试覆盖全部内容 Collection 的公开读取和写权限声明；隔离 PostgreSQL smoke 另以 Reviews 验证真实 anonymous published 与 authenticated create/update/delete 链路。
 
 内容字段边界：
 
@@ -86,11 +90,24 @@ Coolify 使用 repository `compose.yaml`。Production `web` 等待 PostgreSQL he
 - Production 数据库曾由项目所有者手动复建；
 - 手动复建后 Admin、Tools、Reviews、Games 正常运行；
 - PR #17 Media/relationship 和 PR #18 Media-only cleanup 增量 migration 成功；
-- 上述事实不证明全部 6 个 migration 能从全新 PostgreSQL 自动建立当前 schema；
-- 完整 fresh-database migration smoke 尚未进入 CI；
+- 2026-09-01 已在无 Volume 的一次性 PostgreSQL 16 上验证全部 6 个 migration、再次运行时无待执行 migration 和最终 Media-only schema；同一路径已加入 CI；
+- fresh smoke 不证明带真实 Production 数据升级、全部 `down` 或 dump restore；
 - PostgreSQL dump restore 尚未在隔离数据库演练。
 
 不要在现有本地或 Production 数据库盲跑全部初始 migration，也不要为了测试删除 Volume。
+
+### Production 发布审计（2026-09-01）
+
+本次只读取公开页面和 REST API，没有登录 Admin、写入内容或修改基础设施。结果表明代码结构已经可以收尾，Production 仍需完成以下发布门禁：
+
+- 用真实编辑内容替换演示条目、测试说明和无效日期；
+- 删除未经确认授权的下载入口，只保留官方、资料库或合法商店链接；
+- 逐项确认 Games/Reviews 的内容、外部链接和 Media 来源，确保为原创或有明确公开授权；
+- 将需要保留的仓库原创素材通过 Payload Media 上传到 R2，并更新对应 relationship；仓库静态文件不会自动覆盖 R2 对象；
+- 清理 Tools 的标题格式和描述文案；
+- `/api/health` 当前尚未部署；合并发布后再验证 200/503 readiness 行为。
+
+以上是内容和发布阻塞项，不是新的架构缺陷。具体内容清单不进入公开仓库；Production 应由项目所有者在 Payload Admin 中逐条确认，代码任务不能替代版权与编辑判断。
 
 ## Backup 与恢复
 
@@ -116,37 +133,59 @@ Coolify 使用 repository `compose.yaml`。Production `web` 等待 PostgreSQL he
 
 ## OpenList
 
-OpenList 以独立 Coolify Application 运行在 `https://archive.kral-koharu.com`。Kita 只在 Games links 中保存公开 URL；不共享数据库、Volume、secret、构建流程或登录。
+OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用户流程。它不与 Kita 共享数据库、Volume、secret、构建流程或登录。
 
 最终 storage provider 尚未确定，当前测试挂载按可丢弃处理。OpenList data backup/restore 未闭环。
 
 ## 测试与 CI
 
-GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tests 和 build；main ruleset 要求 PR 与 required check。
+GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快速 tests、隔离 PostgreSQL/Payload integration smoke 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-08-31 已在 Dev Container 重新验证 `pnpm test`、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 115 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认 Home、About、Games、Reviews 的桌面与窄屏状态、新原创视觉和 Review 兼容封面，控制台无错误或警告。此前还验证了未发布 Game 的品牌化 404。减少的测试来自连同实现一起移除的 development seed/fallback，不代表当前行为失去覆盖。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+
+同日将 Next.js、Payload、Sharp 和 PostCSS 更新到修复已知高危 advisory 的同栈补丁版本，并在升级后重跑上述完整门禁。锁文件的 `pnpm audit --prod --audit-level high` 结果为 0 high、0 critical；剩余 low/moderate 项来自上游固定的 Admin/CLI 传递依赖，当前不使用未经上游验证的强制 override。
+
+首页和 Games gallery 的本地浏览器收尾已完成：
+
+- 首页、About 与仓库内 Review 兼容封面已在 2026-09-01 替换为专为 Kita 创建的原创视觉；生成与本地转码 provenance 统一记录在根目录 `THIRD_PARTY_NOTICES.md`；
+- 首页静态视觉资源使用 WebP，首次渲染只挂载当前背景 URL，后续壁纸随轮播按需加载；保留的旧 JPEG 文件名仅用于已有内容和 migration 的路径兼容；
+- rain WebGL 只在对应区块进入视口后初始化；
+- `prefers-reduced-motion` 会停止自动换图、持续动画、光标闪烁和平滑滚动；
+- Home 非活动导航使用 `inert`/`aria-hidden`，不会残留隐藏的键盘焦点；
+- Games lightbox 使用原生 modal dialog，控件始终存在，具有可见焦点、初始焦点和关闭后焦点恢复；
+- 本地浏览器已确认首页初始只引用一张壁纸、未提前初始化 WebGL，以及 gallery 打开/关闭焦点流程。这里是针对当前实现的手动 smoke，不等同于 Playwright 自动回归套件。
 
 测试缺口：
 
-- 完整 PostgreSQL 16 migration smoke；
-- 真实 Payload anonymous/published/authenticated write 集成测试；
 - 首页、内容页和 Admin 的最小 Playwright smoke；
-- Production health endpoint。
+- backup last-success healthcheck/告警。
 
 ## 当前待办
 
-### 下一项工程 PR
+### 当前收尾
 
-- [ ] PostgreSQL 16 完整 migration smoke；
-- [ ] 真实 Payload anonymous/published/authenticated access 集成测试。
+- [x] 根 README、Home/About 定位与公开 metadata；
+- [x] 清理公开页面的 placeholder/draft 工程文案；
+- [x] 移除 repository development seed、运行时静态 fallback 和 Games gallery 中针对商业游戏 archive 的专用入口；
+- [x] 统一列表 empty、站点 error/not-found/loading，并对详情查询做请求级去重；
+- [ ] 从 Production Games 删除未经授权的下载入口和测试说明，并确认公开 API 不再返回；
+- [x] 用原创素材替换仓库静态背景与兼容封面，并建立唯一 provenance/third-party notice；
+- [ ] 用真实 Game 内容替换演示条目，并清理无效发布日期；
+- [ ] 将 Production Games 的 R2 Media 替换为原创或明确授权素材，逐条复核外部链接；
+- [ ] 确认 Production Reviews 为原创或已获公开授权；
+- [ ] 修正 Production Tools 的标题格式与描述；
+- [x] PostgreSQL 16 完整 fresh migration、再次运行无待执行 migration 和 Media-only schema smoke；
+- [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
+- [x] 首页资源按需加载、reduced motion、Home 导航与 Games gallery 键盘焦点收尾；
+- [x] DB-backed `/api/health`、安全 503 响应与 Compose `web` healthcheck；
+- [ ] push `codex/portfolio-v1-readiness`、创建 Draft PR，并通过远端 required check；
+- [ ] 合并部署后验证 `/api/health`、Games、Reviews、Tools、Media URL 和 Redeploy 持久性；
+- [ ] 最终 Production 截图与准确发布材料。
 
 ### 随后独立完成
 
-- [ ] About 替换 placeholder；
-- [ ] Reviews/Games 录入真实内容并清理 placeholder；
-- [ ] Tools 决定 CMS-only 还是保留 Development fallback；
-- [ ] 统一 empty/error/not-found；
-- [ ] 根 README 和准确作品集描述。
+- [x] Tools、Reviews、Games 统一为 CMS-only；空数据与查询错误不再被演示内容掩盖；
+- [ ] 明确 Review 是否必须关联 Games 馆藏中的条目；只有业务规则成立后才做 relationship migration。
 
 ### 低优先级/条件触发
 
@@ -162,4 +201,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tes
 
 ## 下一步
 
-下一项工程 PR 单独做 PostgreSQL migration 与真实权限集成 smoke。随后暂停工程底座扩张，回到真实内容和产品体验。
+下一步按固定顺序执行：先在获得明确授权后 push 当前本地分支并创建 Draft PR；required check 和人工 review 通过后再合并部署；随后在 Payload Admin 完成上述 Production 内容与 Media 清理，做一次公开 API/页面/Redeploy smoke，最后采集 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

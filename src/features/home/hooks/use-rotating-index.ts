@@ -3,23 +3,50 @@
 import { useEffect, useState } from "react";
 
 export function useRotatingIndex(length: number, intervalMs: number) {
-  const [index, setIndex] = useState(0);
+  const [rotation, setRotation] = useState({
+    index: 0,
+    hasRotated: false,
+  });
 
   useEffect(() => {
     if (length <= 1) {
       return;
     }
 
-    const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % length);
-    }, intervalMs);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let timer = 0;
 
-    return () => window.clearInterval(timer);
+    const updateRotation = () => {
+      window.clearInterval(timer);
+
+      if (reducedMotion.matches) {
+        setRotation({ index: 0, hasRotated: false });
+        return;
+      }
+
+      timer = window.setInterval(() => {
+        setRotation((current) => ({
+          index: (current.index + 1) % length,
+          hasRotated: true,
+        }));
+      }, intervalMs);
+    };
+
+    updateRotation();
+    reducedMotion.addEventListener("change", updateRotation);
+
+    return () => {
+      window.clearInterval(timer);
+      reducedMotion.removeEventListener("change", updateRotation);
+    };
   }, [intervalMs, length]);
 
   if (length <= 1) {
-    return 0;
+    return { index: 0, hasRotated: false };
   }
 
-  return index % length;
+  return {
+    index: rotation.index % length,
+    hasRotated: rotation.hasRotated,
+  };
 }

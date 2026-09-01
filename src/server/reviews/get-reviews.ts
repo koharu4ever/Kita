@@ -1,8 +1,3 @@
-import { env } from "@/config/env";
-import {
-  getReviewBySlug as getFallbackReviewBySlug,
-  reviewItems,
-} from "@/features/reviews/data/review-items";
 import { mapReviewDocumentToReviewPreview } from "@/features/reviews/utils/map-review-document-to-review-preview";
 import { getPayloadClient } from "@/server/payload/get-payload";
 
@@ -21,25 +16,12 @@ export async function getReviews() {
       },
     });
 
-    if (reviews.docs.length === 0) {
-      return env.NODE_ENV === "production" ? [] : reviewItems;
-    }
-
     return reviews.docs.map((review) =>
       mapReviewDocumentToReviewPreview(review),
     );
   } catch (error) {
-    if (env.NODE_ENV === "production") {
-      console.error("Failed to load reviews from Payload.", error);
-      throw error;
-    }
-
-    console.warn(
-      "Failed to load reviews from Payload. Using local fallback.",
-      error,
-    );
-
-    return reviewItems;
+    console.error("Failed to load reviews from Payload.", error);
+    throw error;
   }
 }
 
@@ -68,24 +50,11 @@ export async function getReviewBySlug(slug: string) {
 
     const review = reviews.docs[0];
 
-    if (!review) {
-      return env.NODE_ENV === "production"
-        ? undefined
-        : getFallbackReviewBySlug(slug);
-    }
+    if (!review) return undefined;
 
     return mapReviewDocumentToReviewPreview(review);
   } catch (error) {
-    if (env.NODE_ENV === "production") {
-      console.error(`Failed to load review "${slug}" from Payload.`, error);
-      throw error;
-    }
-
-    console.warn(
-      `Failed to load review "${slug}" from Payload. Using local fallback.`,
-      error,
-    );
-
-    return getFallbackReviewBySlug(slug);
+    console.error(`Failed to load review "${slug}" from Payload.`, error);
+    throw error;
   }
 }

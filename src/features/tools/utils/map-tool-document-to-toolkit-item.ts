@@ -13,7 +13,7 @@ const categoryLabels: Record<string, string> = {
   capture: "Capture",
 };
 
-function formatPostedOn(value?: string | null) {
+function formatAddedOn(value?: string | null) {
   if (!value) {
     return "Payload CMS";
   }
@@ -35,7 +35,7 @@ export function mapToolDocumentToToolkitItem(
   return {
     id: String(tool.id),
     title: tool.title,
-    postedOn: formatPostedOn(tool.createdAt),
+    addedOn: formatAddedOn(tool.createdAt),
     summary: tool.description,
     links: [
       {

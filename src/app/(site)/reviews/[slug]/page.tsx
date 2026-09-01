@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { ReviewDetailPage } from "@/features/reviews/components/review-detail-page";
 import { getReviewBySlug } from "@/server/reviews/get-reviews";
@@ -12,11 +13,13 @@ type ReviewPageProps = {
 
 export const dynamic = "force-dynamic";
 
+const getCachedReviewBySlug = cache(getReviewBySlug);
+
 export async function generateMetadata({
   params,
 }: ReviewPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const review = await getReviewBySlug(slug);
+  const review = await getCachedReviewBySlug(slug);
 
   if (!review) {
     return {
@@ -32,7 +35,7 @@ export async function generateMetadata({
 
 export default async function ReviewPage({ params }: ReviewPageProps) {
   const { slug } = await params;
-  const review = await getReviewBySlug(slug);
+  const review = await getCachedReviewBySlug(slug);
 
   if (!review) {
     notFound();

@@ -1,12 +1,12 @@
 # Kita 当前架构
 
-> 最后核对：2026-08-31
+> 最后核对：2026-09-01
 >
 > 本文只描述当前结构与长期边界；完成度和待办见 [current-project-status.md](./current-project-status.md)。
 
 ## 一句话定义
 
-Kita 是一个 Next.js 16 + Payload CMS + PostgreSQL 的个人内容站。Payload 提供 Admin、内容模型和 Local API；Next.js server 层读取并映射数据；feature 组件只消费稳定的页面 DTO；生产通过 Docker Compose 和 Coolify 运行。
+Kita 是一个使用 Next.js 16、Payload CMS 和 PostgreSQL 构建的自托管游戏目录与评论发布平台。Payload 提供 Admin、内容模型和 Local API；Next.js server 层读取并映射数据；feature 组件只消费稳定的页面 DTO；生产通过 Docker Compose 和 Coolify 运行。
 
 ## 运行拓扑
 
@@ -19,10 +19,6 @@ Browser
                  -> Media metadata / relationship
                       -> local .payload-media (development)
                       -> Cloudflare R2 (production)
-
-Games archive link
-  -> public HTTPS URL
-       -> independent OpenList Application
 ```
 
 生产 Compose 另外运行 PostgreSQL backup sidecar，将 custom-format dump 上传到独立私有 R2 bucket。Media bucket 与 database backup bucket 不共享用途或凭据。
@@ -32,10 +28,10 @@ Games archive link
 ```text
 src/app/          路由、layout、Payload Admin/API 接入和页面组合
 src/features/     页面业务、稳定 DTO、mapper、组件与 feature 测试
-src/server/       Payload client、server getter 和 seed 逻辑
+src/server/       Payload client 与 server getter
 src/payload/      Collections、access helpers 和 generated types
 src/migrations/   可审查的生产 schema migration
-src/config/       环境变量和 Media storage 解析
+src/config/       环境变量、站点 metadata 与 Media storage 配置
 src/testing/      跨 feature 的测试 fixture
 docker/           PostgreSQL backup sidecar
 public/           仍由前端直接使用的版本化静态资源
@@ -64,7 +60,7 @@ Payload document
   -> route / page component
 ```
 
-Getter 明确使用 `overrideAccess: false`。匿名访问只读取 published Reviews/Games；production 查询失败会抛错，不使用静态 fallback 掩盖故障。Development 可以使用 feature 内的静态 fixture，方便空数据库和 UI 开发。
+Getter 明确使用 `overrideAccess: false`。匿名访问只读取 published Reviews/Games；查询失败在所有环境都会抛错，由站点 error boundary 处理。空 Collection 返回真实空结果，由页面 empty state 解释；Payload 是开发与生产内容的共同事实源，不再维护运行时静态 fallback。
 
 Games getter 使用 `depth: 1` 解析必填的 `cover` Media relationship。Mapper 从 Media 的 display/original 元数据构造封面 DTO；Game 表不再保存重复的 cover URL、alt、width 或 height。
 
@@ -107,9 +103,9 @@ Development 的 Docker daemon、PostgreSQL Volume 和 targeted volumes 与宿主
 
 - 使用 Payload，而不是自行开发 CRUD Admin、upload API 和权限框架。
 - 使用 server getter + mapper，隔离 CMS document 与 UI contract。
-- Development 允许 fallback，Production fail closed。
+- Development 与 Production 共用 CMS-only 数据路径；空数据与查询故障分别处理。
 - Development schema push 方便迭代；Production 只执行 migration。
-- 使用一个 repository Compose 管理 web/postgres/backup，OpenList 保持独立 Application。
+- 使用一个 repository Compose 管理 web/postgres/backup；其他外部工具不进入 Kita 核心运行链路。
 - Media/R2 使用 Payload storage adapter，不自建上传服务。
 - 保持单体，不引入 Redis、Prisma、微服务、Kubernetes或大型监控平台，除非出现具体需求。
 

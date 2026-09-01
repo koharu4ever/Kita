@@ -2,7 +2,7 @@ import type { Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
-import type { ReviewPreview } from "@/features/reviews/data/review-items";
+import type { ReviewPreview } from "@/features/reviews/types/review-preview";
 import {
   formatReviewDate,
   formatReviewScore,

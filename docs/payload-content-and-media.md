@@ -1,6 +1,6 @@
 # Payload 内容与 Media
 
-> 最后核对：2026-08-31
+> 最后核对：2026-09-01
 
 ## 当前 Collections
 
@@ -12,7 +12,7 @@
 | Reviews    | 仅 published | 标题、slug、状态、游戏名、日期、摘要、评分、标签、Lexical body                               |
 | Games      | 仅 published | 标题、slug、开发者、发布日期文本、游玩/发布状态、摘要、Lexical body、Media cover、标签和链接 |
 
-Media、Tools、Reviews 和 Games 均显式要求登录用户才能 create/update/delete。Tools 保持公开读取；Reviews 和 Games 的匿名读取仍只返回 published 内容。collection 配置测试固定这些匿名与登录权限边界；真实 Payload/PostgreSQL 请求链路仍需独立集成测试。
+Media、Tools、Reviews 和 Games 均显式要求登录用户才能 create/update/delete。Tools 保持公开读取；Reviews 和 Games 的匿名读取仍只返回 published 内容。Collection 配置测试固定这些边界；一次性 PostgreSQL/Payload integration smoke 另外验证完整 fresh migration、匿名 published 读取与登录写入。
 
 Games/Reviews slug 只接受以单个连字符分隔的小写 ASCII 字母和数字。Tools URL 与 Games links 只接受不带首尾空白的 `http/https` 绝对 URL。必填 text/textarea 字段拒绝纯空白；自定义规则先执行 Payload 原生 validation，因此 required 和长度限制仍然生效。Games/Reviews 的正文共用一份 Lexical feature 配置，避免编辑能力随 collection 漂移。
 
@@ -26,7 +26,7 @@ Payload Collection
   -> page component
 ```
 
-匿名请求必须受 collection access 和 getter 的 published filter 双重约束。Production 查询失败应报错；Development 可使用 feature fixture。
+匿名请求必须受 collection access 和 getter 的 published filter 双重约束。开发和生产使用同一条 CMS-only 路径：空 Collection 返回真实空结果，查询失败继续抛出，由站点 error boundary 安全处理。运行时代码不再维护第二份静态内容或 seed route。
 
 ## Media storage
 
@@ -63,7 +63,7 @@ Games 曾短暂同时保存 Media relationship 和旧 `coverSrc`/`coverAlt`/`cov
 
 `down` 会加回旧列并从当前 Media metadata 填充，恢复旧代码所需的数据库契约。它不把数据库倒带到历史时刻，也不保证旧字段的逐字原值。精确历史恢复依赖对应时间点的 dump。
 
-Production 数据库曾手动复建。PR #17/#18 的成功证明增量 migration 与 Media-only 链路在该数据库上可用，不证明完整 migration 链已从全新数据库自动执行。
+Production 数据库曾手动复建。PR #17/#18 的成功证明增量 migration 与 Media-only 链路在该数据库上可用；2026-09-01 的隔离 PostgreSQL 16 smoke 另外证明全部 6 个 migration 能从空数据库执行并收敛到当前 Media-only schema。两者都不证明带真实 Production 数据的升级、全部 `down` 或 dump restore。
 
 ## 日常内容操作
 
@@ -88,6 +88,6 @@ Reviews 使用 Lexical rich text 和手写 draft/published 状态。Tools 按 `s
 
 ## 后续验证
 
-后续优先级以 [当前项目状态](./current-project-status.md) 和 [产品路线](./product-roadmap.md) 为准。Payload 侧仍缺 PostgreSQL migration smoke 和真实 anonymous/published/authenticated access 集成测试。`releaseDate` 暂不迁移为 date，先清理真实内容中的 placeholder。
+后续优先级以 [当前项目状态](./current-project-status.md) 和 [产品路线](./product-roadmap.md) 为准。`releaseDate` 暂不迁移为 date，先清理真实内容中的 placeholder。最小浏览器 smoke 与隔离 dump restore 仍是可选的后续验证，不是继续扩张内容模型的理由。
 
 Trash、Reviews relationship、Globals、Payload drafts/versions、角色系统、Jobs 和搜索只有出现真实需求后再评估。
