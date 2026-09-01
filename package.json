@@ -27,6 +27,7 @@
     "test": "pnpm test:unit && pnpm test:backup",
     "test:unit": "node scripts/assert-dev-workspace-user.mjs && vitest run",
     "test:backup": "node scripts/assert-dev-workspace-user.mjs && sh docker/postgres-backup/tests/backup.test.sh",
+    "test:integration": "node scripts/assert-dev-workspace-user.mjs && sh scripts/run-payload-integration-smoke.sh",
     "test:watch": "node scripts/assert-dev-workspace-user.mjs && vitest"
   },
   "dependencies": {

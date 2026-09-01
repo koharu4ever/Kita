@@ -53,5 +53,8 @@ jobs:
       - name: Tests
         run: pnpm test
 
+      - name: PostgreSQL and Payload integration smoke
+        run: pnpm test:integration
+
       - name: Production build
         run: pnpm build

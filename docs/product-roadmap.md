@@ -46,9 +46,9 @@ slug/URL/必填文本验证、显式写权限和共用 rich-text 配置已经收
 
 Games、Reviews 和 Tools 具有明确 empty state；站点路由统一处理 error/not-found/loading；详情页通过 React request cache 让 metadata 与页面共享一次 Payload 查询，不引入跨请求缓存。
 
-### 4. 数据链路集成 smoke
+### 4. 数据链路集成 smoke（已完成）
 
-使用隔离 PostgreSQL 验证完整 migration 和真实 Payload published access。不要操作现有 Production/本地数据 Volume。
+无 Volume 的一次性 PostgreSQL 16 已验证完整 fresh migration、再次运行时无待执行 migration、Media-only schema 和 Reviews 的 anonymous published/authenticated write 边界；同一路径进入 CI。它不代表带数据升级、down 或 restore 已验证。
 
 ### 5. 真实内容
 

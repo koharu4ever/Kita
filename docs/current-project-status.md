@@ -61,7 +61,7 @@ workspace: C:\dev\Kita
 写权限边界：
 
 - Media、Tools、Reviews、Games 均显式要求登录才能 create/update/delete；
-- collection 配置测试直接覆盖匿名写入被拒绝、登录写入被允许，以及现有公开读取边界；真实 Payload/PostgreSQL 集成测试仍单独待做。
+- collection 配置测试覆盖全部内容 Collection 的公开读取和写权限声明；隔离 PostgreSQL smoke 另以 Reviews 验证真实 anonymous published 与 authenticated create/update/delete 链路。
 
 内容字段边界：
 
@@ -88,8 +88,8 @@ Coolify 使用 repository `compose.yaml`。Production `web` 等待 PostgreSQL he
 - Production 数据库曾由项目所有者手动复建；
 - 手动复建后 Admin、Tools、Reviews、Games 正常运行；
 - PR #17 Media/relationship 和 PR #18 Media-only cleanup 增量 migration 成功；
-- 上述事实不证明全部 6 个 migration 能从全新 PostgreSQL 自动建立当前 schema；
-- 完整 fresh-database migration smoke 尚未进入 CI；
+- 2026-09-01 已在无 Volume 的一次性 PostgreSQL 16 上验证全部 6 个 migration、再次运行时无待执行 migration 和最终 Media-only schema；同一路径已加入 CI；
+- fresh smoke 不证明带真实 Production 数据升级、全部 `down` 或 dump restore；
 - PostgreSQL dump restore 尚未在隔离数据库演练。
 
 不要在现有本地或 Production 数据库盲跑全部初始 migration，也不要为了测试删除 Volume。
@@ -124,14 +124,12 @@ OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用�
 
 ## 测试与 CI
 
-GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tests 和 build；main ruleset 要求 PR 与 required check。
+GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快速 tests、隔离 PostgreSQL/Payload integration smoke 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 121 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 121 个 Vitest、4 个 backup shell 场景、4 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 测试缺口：
 
-- 完整 PostgreSQL 16 migration smoke；
-- 真实 Payload anonymous/published/authenticated write 集成测试；
 - 首页、内容页和 Admin 的最小 Playwright smoke；
 - Production health endpoint。
 
@@ -145,8 +143,8 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tes
 - [x] 统一列表 empty、站点 error/not-found/loading，并对详情查询做请求级去重；
 - [ ] 从 Production Game 内容删除未经确认授权的 archive URL，并确认公开 API 不再返回；
 - [ ] 确认公开背景图、封面与最终截图的来源/许可边界；
-- [ ] PostgreSQL 16 完整 migration smoke；
-- [ ] 真实 Payload anonymous/published/authenticated access 集成测试；
+- [x] PostgreSQL 16 完整 fresh migration、再次运行无待执行 migration 和 Media-only schema smoke；
+- [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
 - [ ] 最终 Production 截图与准确发布材料。
 
 ### 随后独立完成
@@ -169,4 +167,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tes
 
 ## 下一步
 
-下一项使用隔离 PostgreSQL 做完整 migration 与真实 Payload 权限集成 smoke；随后处理首页资源/键盘体验和小型 readiness health。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一项处理首页资源加载、reduced motion 和键盘焦点，再补小型 DB-backed readiness health。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

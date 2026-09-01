@@ -57,6 +57,7 @@ http://localhost:3000/admin
 
 ```bash
 pnpm test
+pnpm test:integration # when migrations, Payload access, or CI changes
 pnpm check
 pnpm build
 ```
@@ -71,6 +72,7 @@ pnpm build
 | `pnpm dev:services`           | 只启动并等待 PostgreSQL，供诊断使用          |
 | `pnpm dev:services:stop`      | 停止本地 PostgreSQL container，不删除 Volume |
 | `pnpm test`                   | Vitest + backup shell 场景                   |
+| `pnpm test:integration`       | 一次性 PostgreSQL 16 migration/access smoke  |
 | `pnpm check`                  | format、lint、typecheck                      |
 | `pnpm build`                  | production build                             |
 | `pnpm payload:types`          | 重新生成 Payload types                       |
@@ -121,7 +123,8 @@ Development 可以由 Payload schema push 维护本地数据库，因此本地 `
 - 不为了 migration 测试删除本地或生产 Volume；
 - 破坏性 migration 前先确认生产备份和内容前置条件；
 - 回滚旧镜像前确认旧 schema 契约，必要时先运行对应 `down`；
-- 完整 fresh-database migration 链尚未进入 CI，不能把手动复建当成该验证。
+- `pnpm test:integration` 和 CI 使用无 Volume 的一次性 PostgreSQL 16，验证完整 fresh migration、再次运行时无待执行 migration、当前 Media-only schema 和 Reviews 访问边界；
+- fresh smoke 不证明带真实数据升级、全部 `down`、dump restore 或 Production 状态，不能据此跳过 migration review 和备份前置条件。
 
 ## Seed
 

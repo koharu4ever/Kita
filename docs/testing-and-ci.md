@@ -1,6 +1,6 @@
 # Kita 测试与 CI
 
-> 最后核对：2026-08-12
+> 最后核对：2026-09-01
 
 ## 当前质量门禁
 
@@ -8,11 +8,12 @@
 
 ```bash
 pnpm test
+pnpm test:integration
 pnpm check
 pnpm build
 ```
 
-`pnpm test` 运行 Vitest 与 PostgreSQL backup shell 场景。`pnpm check` 运行 Prettier check、ESLint 和 TypeScript。Build 前停止 dev server。
+`pnpm test` 运行快速 Vitest 与 PostgreSQL backup shell 场景。`pnpm test:integration` 启动一次性 PostgreSQL 16，验证 migration 和真实 Payload access。`pnpm check` 运行 Prettier check、ESLint 和 TypeScript。Build 前停止 dev server。
 
 GitHub Actions `quality` 在对 `main` 的 Pull Request 和 `main` push 上运行：
 
@@ -21,7 +22,8 @@ GitHub Actions `quality` 在对 `main` 的 Pull Request 和 `main` push 上运�
 3. lint；
 4. typecheck；
 5. tests；
-6. production build。
+6. PostgreSQL/Payload integration smoke；
+7. production build。
 
 Workflow 使用 Node 22、pnpm packageManager 版本和只读 contents permission，不读取 Production secret。Main ruleset 要求 PR 和 required `quality`。
 
@@ -60,6 +62,26 @@ Workflow 使用 Node 22、pnpm packageManager 版本和只读 contents permissio
 
 这些测试不连接 PostgreSQL/R2、不读取 Production secret、不修改 Coolify 或 Docker Volume。
 
+### PostgreSQL 与 Payload integration smoke
+
+`pnpm test:integration` 使用固定专用名称创建 `postgres:16` 临时容器：
+
+- 数据目录是 `tmpfs`，不创建或挂载 named volume；
+- 使用随机 localhost 端口，不连接现有 `kita-postgres-1`；
+- 同名容器已存在时直接拒绝，不擅自删除；
+- 结束时先核对 purpose label，再强制停止并移除这个精确命名的临时容器；
+- 显式启用 `PAYLOAD_MIGRATING=true`，阻止测试初始化时的 development schema push。
+
+Smoke 先执行全部注册 migration，再重复执行一次确认无待办，然后验证：
+
+- `payload_migrations` 与当前注册列表一致；
+- Users、Media、Tools、Reviews、Games 核心表存在；
+- `games.cover_id` 为 `NOT NULL`，旧 4 个 cover 列不存在；
+- 匿名只能读取 published Review，登录用户可以读取 draft；
+- 匿名 create/update/delete 返回 403，登录用户可以完成对应写入。
+
+它不验证带 Production 数据升级、migration `down`、dump restore、R2 上传或所有 Collection 的完整 CRUD。不要把 fresh smoke 写成灾难恢复或 Production 验收。
+
 ## 新测试放在哪里
 
 ```text
@@ -68,6 +90,7 @@ src/server/<feature>/__tests__/           getter / seed orchestration
 src/config/__tests__/                     env / storage config
 src/payload/access/__tests__/             access helper
 docker/postgres-backup/tests/             shell workflow
+tests/integration/                        real PostgreSQL / Payload smoke
 src/testing/                              shared fixtures only
 ```
 
@@ -77,22 +100,20 @@ src/testing/                              shared fixtures only
 
 按价值排序：
 
-1. PostgreSQL 16 service 上执行完整 migration smoke；
-2. 真实 Payload Local API 的匿名 published / 未登录写入 / 登录写入集成测试；
-3. 首页、内容页和 Admin 的最小 Playwright smoke；
-4. Production health endpoint 与 backup last-success 检查。
+1. 首页、内容页和 Admin 的最小 Playwright smoke；
+2. Production health endpoint 与 backup last-success 检查。
 
-第一项不能使用当前手动复建的数据库作为证据；应创建隔离临时数据库，并保证不触碰现有 Volume。
+浏览器 smoke 不应连接 Production；health endpoint 只证明应用 readiness，不代替备份和恢复验证。
 
 ## PR 验证策略
 
-| 变更              | 最低验证                                                 |
-| ----------------- | -------------------------------------------------------- |
-| 纯 Markdown       | Prettier + link audit + `git diff --check`               |
-| 纯 UI             | mapper/unit（如适用）+ check + build + 页面 smoke        |
-| Collection/getter | targeted tests + full test/check/build + Admin/API smoke |
-| Migration         | up/down 审查 + 隔离数据库验证 + backup 前置条件          |
-| Docker/Compose    | config/build/startup smoke，不删除既有 Volume            |
-| Backup            | shell tests + 非生产隔离验证                             |
+| 变更              | 最低验证                                                    |
+| ----------------- | ----------------------------------------------------------- |
+| 纯 Markdown       | Prettier + link audit + `git diff --check`                  |
+| 纯 UI             | mapper/unit（如适用）+ check + build + 页面 smoke           |
+| Collection/getter | targeted + full test/check/build；access 变化加 integration |
+| Migration         | up/down 审查 + `test:integration` + backup 前置条件         |
+| Docker/Compose    | config/build/startup smoke，不删除既有 Volume               |
+| Backup            | shell tests + 非生产隔离验证                                |
 
 测试通过只证明所覆盖的边界，不自动证明 Production、恢复能力或未覆盖的外部服务。

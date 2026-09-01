@@ -126,14 +126,18 @@ user:
 
 ```bash
 pnpm test
+pnpm test:integration
 pnpm check
 SKIP_ENV_VALIDATION=true pnpm build
 ```
 
 GitHub Actions repeats frozen dependency installation, formatting, linting,
-type checking, tests, and the production build for pull requests and `main`.
-The build-only validation escape hatch matches CI; production runtime validation
-still requires complete database and R2 configuration.
+type checking, tests, an isolated PostgreSQL/Payload integration smoke, and the
+production build for pull requests and `main`. The integration command creates
+an ephemeral PostgreSQL 16 container backed by `tmpfs`; it does not use the
+development or production database volume. The build-only validation escape
+hatch matches CI; production runtime validation still requires complete
+database and R2 configuration.
 
 ## Deployment
 
@@ -185,8 +189,9 @@ backup surface, or deployment responsibility.
 
 - The final production content and screenshot pass is still in progress.
 - Production content and visual assets still require a final rights/source audit.
-- The full migration chain and real access policies are not yet exercised by an
-  isolated PostgreSQL integration job in CI.
+- The isolated database smoke proves fresh migration `up`, current schema, and
+  Review publication/write access. It does not prove a data-bearing production
+  upgrade, every migration `down`, dump restore, or every Collection workflow.
 - Backup creation is automated, but full end-to-end disaster recovery is not
   claimed.
 - Kita has one trusted content owner; public registration, multi-role RBAC,

@@ -17,7 +17,15 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    PAYLOAD_MIGRATING: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
     PAYLOAD_SECRET: z.string().min(32),
+    SKIP_ENV_VALIDATION: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
   },
   client: {},
   runtimeEnv: {
@@ -30,7 +38,9 @@ export const env = createEnv({
     MEDIA_R2_SECRET_ACCESS_KEY: process.env.MEDIA_R2_SECRET_ACCESS_KEY,
     MEDIA_STORAGE_MODE: process.env.MEDIA_STORAGE_MODE,
     NODE_ENV: process.env.NODE_ENV,
+    PAYLOAD_MIGRATING: process.env.PAYLOAD_MIGRATING,
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
+    SKIP_ENV_VALIDATION: process.env.SKIP_ENV_VALIDATION,
   },
   skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
   emptyStringAsUndefined: true,
