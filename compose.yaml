@@ -9,7 +9,6 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URI: ${DATABASE_URI:-postgres://postgres:postgres@postgres:5432/kita}
-      ENABLE_DEV_SEED: ${ENABLE_DEV_SEED:-false}
       MEDIA_R2_ACCESS_KEY_ID: ${MEDIA_R2_ACCESS_KEY_ID:-}
       MEDIA_R2_BUCKET: ${MEDIA_R2_BUCKET:-}
       MEDIA_R2_ENDPOINT: ${MEDIA_R2_ENDPOINT:-}

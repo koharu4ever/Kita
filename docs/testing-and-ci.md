@@ -40,16 +40,12 @@ Workflow 使用 Node 22、pnpm packageManager 版本和只读 contents permissio
 - collection、sort、where 和 `depth`；
 - `overrideAccess: false`；
 - published 过滤；
-- Development fallback 与 Production fail-closed；
+- 空 Collection 返回空结果，查询故障继续抛给 error boundary；
 - slug 查询和缺失结果。
 
 ### 配置和权限
 
 验证环境变量解析、Media local/R2 fail-fast、公开 URL 构造和 Media authenticated write access。
-
-### Seed
-
-验证 Games seed 的 upsert 行为与非破坏性边界。
 
 ### Backup shell
 
@@ -87,7 +83,7 @@ Smoke 先执行全部注册 migration，再重复执行一次确认无待办，�
 
 ```text
 src/features/<feature>/utils/__tests__/   mapper / pure rule
-src/server/<feature>/__tests__/           getter / seed orchestration
+src/server/<feature>/__tests__/           getter query and failure behavior
 src/config/__tests__/                     env / storage config
 src/payload/access/__tests__/             access helper
 docker/postgres-backup/tests/             shell workflow

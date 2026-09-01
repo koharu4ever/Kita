@@ -94,8 +94,9 @@ contain.
 | Use Payload Admin                 | No                | Yes                 |
 
 Server getters keep Payload access checks enabled with `overrideAccess: false`.
-Production data failures are surfaced instead of being hidden behind development
-fixtures.
+Empty collections use explicit page states, while query failures are surfaced to
+the site error boundary in every environment instead of being hidden behind
+development fixtures.
 
 ## What Payload provides and what Kita implements
 

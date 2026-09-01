@@ -86,7 +86,6 @@ port_binding="$(docker port "$container_name" 5432/tcp)"
 database_port="${port_binding##*:}"
 
 export DATABASE_URI="postgres://$database_user:$database_password@127.0.0.1:$database_port/$database_name"
-export ENABLE_DEV_SEED="false"
 export MEDIA_STORAGE_MODE="local"
 export NODE_ENV="test"
 export PAYLOAD_SECRET="integration-only-payload-secret-at-least-32-characters"

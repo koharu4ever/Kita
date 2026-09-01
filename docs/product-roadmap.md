@@ -27,7 +27,7 @@ Kita 是一个具有视觉小说氛围的自托管游戏目录与评论发布平
 - Reviews 需要录入真实文章；
 - Games 需要以真实资料替换 placeholder 字段；
 - 公开 archive URL 和视觉素材需要完成来源/授权核对；
-- Tools 需要决定由 CMS 维护还是保留内置 fallback；
+- Tools、Reviews 和 Games 已统一由 Payload CMS 维护，不再保留内置 fallback；
 - 最终 Production 截图和发布文案尚需与真实内容对齐。
 
 根 README、Home/About 定位、公开 metadata 和开发期文案已在 2026-08-31 的 portfolio positioning 工作中收敛；最终 Production 截图留到真实内容完成后获取。
@@ -60,7 +60,7 @@ Games、Reviews 和 Tools 具有明确 empty state；站点路由统一处理 er
 
 ### 7. 真实内容
 
-优先完成至少一篇真实 Review、Games 的真实元数据、Tools 决策和素材授权核对。删除前台 placeholder。
+优先完成至少一篇真实 Review、Games 的真实元数据和素材授权核对。Tools、Reviews 与 Games 已收敛为 CMS-only：空数据使用 empty state，查询故障使用 error boundary，仓库不再携带可被误认为正式内容的 runtime fixture 或 seed route。
 
 在真实 Review 和 Games 清理后，再决定 Review 是否必须关联一个馆藏 Game。只有规则成立时才增加 relationship；不为了展示数据库关系强制耦合内容模型。
 

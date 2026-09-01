@@ -22,8 +22,6 @@
     "payload:types": "node scripts/assert-dev-workspace-user.mjs && payload generate:types --use-swc",
     "check": "node scripts/assert-dev-workspace-user.mjs --check-next && pnpm format:check && pnpm lint && pnpm typecheck",
     "typecheck": "node scripts/assert-dev-workspace-user.mjs --check-next && tsc --noEmit",
-    "seed:games": "node scripts/assert-dev-workspace-user.mjs && curl -X POST http://localhost:3000/api/dev/seed-games",
-    "seed:tools": "node scripts/assert-dev-workspace-user.mjs && curl -X POST http://localhost:3000/api/dev/seed-tools",
     "test": "pnpm test:unit && pnpm test:backup",
     "test:unit": "node scripts/assert-dev-workspace-user.mjs && vitest run",
     "test:backup": "node scripts/assert-dev-workspace-user.mjs && sh docker/postgres-backup/tests/backup.test.sh",

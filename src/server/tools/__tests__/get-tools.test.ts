@@ -1,18 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getPayloadClientMock, mockEnv } = vi.hoisted(() => ({
+const { getPayloadClientMock } = vi.hoisted(() => ({
   getPayloadClientMock: vi.fn(),
-  mockEnv: {
-    NODE_ENV: "development" as "development" | "production" | "test",
-  },
 }));
-
-vi.mock("@/config/env", () => ({ env: mockEnv }));
 vi.mock("@/server/payload/get-payload", () => ({
   getPayloadClient: getPayloadClientMock,
 }));
 
-import { toolkitItems } from "@/features/tools/data/toolkit-items";
 import { getTools } from "@/server/tools/get-tools";
 import { createPayloadToolDocument } from "@/testing/fixtures/payload-documents";
 
@@ -25,7 +19,10 @@ function arrangeFind(docs: unknown[]) {
 describe("getTools", () => {
   beforeEach(() => {
     getPayloadClientMock.mockReset();
-    mockEnv.NODE_ENV = "development";
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("returns mapped Payload documents and preserves the public access query", async () => {
@@ -44,35 +41,15 @@ describe("getTools", () => {
     );
   });
 
-  it("uses local fallback when development data is empty", async () => {
-    arrangeFind([]);
-
-    await expect(getTools()).resolves.toBe(toolkitItems);
-  });
-
-  it("returns a real empty result when production data is empty", async () => {
-    mockEnv.NODE_ENV = "production";
+  it("returns an empty collection when Payload has no tools", async () => {
     arrangeFind([]);
 
     await expect(getTools()).resolves.toEqual([]);
   });
 
-  it("uses local fallback when development Payload throws", async () => {
-    const error = new Error("Payload unavailable");
-    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
-    getPayloadClientMock.mockRejectedValue(error);
-
-    await expect(getTools()).resolves.toBe(toolkitItems);
-    expect(warning).toHaveBeenCalledWith(
-      "Failed to load tools from Payload. Using local fallback.",
-      error,
-    );
-  });
-
-  it("rethrows production Payload errors instead of hiding them", async () => {
+  it("rethrows Payload errors so the route error boundary can respond", async () => {
     const error = new Error("Payload unavailable");
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
-    mockEnv.NODE_ENV = "production";
     getPayloadClientMock.mockRejectedValue(error);
 
     await expect(getTools()).rejects.toBe(error);

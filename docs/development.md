@@ -87,7 +87,6 @@ pnpm build
 只记录键，不把真实值写入文档或提交：
 
 - `PAYLOAD_SECRET`（至少 32 字符）
-- `ENABLE_DEV_SEED`
 - `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`
 - `DATABASE_URI`
 - `MEDIA_STORAGE_MODE=local`
@@ -109,7 +108,7 @@ pnpm build
 9. 运行 test/check/build；
 10. 在本地 Admin 和公开页面做 smoke。
 
-不要让 UI 直接消费 `Payload` generated document type。不要在 Production 添加静态 fallback。
+不要让 UI 直接消费 `Payload` generated document type。开发与生产都以 Payload 为内容事实源：空 Collection 使用页面 empty state，查询失败交给 error boundary，不用静态 fixture 掩盖后端状态。
 
 ## Schema 与 migration
 
@@ -126,16 +125,9 @@ Development 可以由 Payload schema push 维护本地数据库，因此本地 `
 - `pnpm test:integration` 和 CI 使用无 Volume 的一次性 PostgreSQL 16，验证完整 fresh migration、再次运行时无待执行 migration、当前 Media-only schema 和 Reviews 访问边界；
 - fresh smoke 不证明带真实数据升级、全部 `down`、dump restore 或 Production 状态，不能据此跳过 migration review 和备份前置条件。
 
-## Seed
+## 本地内容
 
-Seed route 只允许：
-
-```text
-NODE_ENV != production
-ENABLE_DEV_SEED=true
-```
-
-Games seed 使用非破坏式 upsert，不会删除其他 Games。Production 必须保持 `ENABLE_DEV_SEED=false`。
+本地内容通过 Payload Admin 手工创建，保存在 Docker-in-Docker 的开发 PostgreSQL 和 `.payload-media`，不会进入 Git 或 Production。仓库不提供可公开调用的 seed route，也不在数据库为空或不可用时注入演示内容；因此本地页面展示的是实际 CMS 状态。需要确定性测试数据时，使用单元测试 fixture 或一次性 integration 数据库，不污染日常开发库。
 
 ## 常见排障
 

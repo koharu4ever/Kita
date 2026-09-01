@@ -4,10 +4,6 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     DATABASE_URI: z.string().url(),
-    ENABLE_DEV_SEED: z
-      .enum(["true", "false"])
-      .default("false")
-      .transform((value) => value === "true"),
     MEDIA_R2_ACCESS_KEY_ID: z.string().min(1).optional(),
     MEDIA_R2_BUCKET: z.string().min(1).optional(),
     MEDIA_R2_ENDPOINT: z.string().url().optional(),
@@ -30,7 +26,6 @@ export const env = createEnv({
   client: {},
   runtimeEnv: {
     DATABASE_URI: process.env.DATABASE_URI,
-    ENABLE_DEV_SEED: process.env.ENABLE_DEV_SEED,
     MEDIA_R2_ACCESS_KEY_ID: process.env.MEDIA_R2_ACCESS_KEY_ID,
     MEDIA_R2_BUCKET: process.env.MEDIA_R2_BUCKET,
     MEDIA_R2_ENDPOINT: process.env.MEDIA_R2_ENDPOINT,

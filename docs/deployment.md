@@ -42,7 +42,6 @@ Compose `web.healthcheck` 使用 Production image 已有的 Node 22 和内置 `f
 | `POSTGRES_DB`                | 否    | 是      | 数据库名                          |
 | `POSTGRES_USER`              | 否    | 是      | 数据库用户                        |
 | `POSTGRES_PASSWORD`          | 否    | 是      | secret；必须与 URI 一致           |
-| `ENABLE_DEV_SEED`            | 否    | 是      | Production 固定 `false`           |
 | `MEDIA_STORAGE_MODE`         | 是    | 是      | Production 固定 `r2`              |
 | `MEDIA_R2_PUBLIC_URL`        | 是    | 是      | HTTPS custom domain               |
 | `MEDIA_R2_BUCKET`            | 否    | 是      | Media 专用 bucket                 |

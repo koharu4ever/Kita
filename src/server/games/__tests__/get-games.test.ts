@@ -1,21 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getPayloadClientMock, mockEnv } = vi.hoisted(() => ({
+const { getPayloadClientMock } = vi.hoisted(() => ({
   getPayloadClientMock: vi.fn(),
-  mockEnv: {
-    NODE_ENV: "development" as "development" | "production" | "test",
-  },
 }));
-
-vi.mock("@/config/env", () => ({ env: mockEnv }));
 vi.mock("@/server/payload/get-payload", () => ({
   getPayloadClient: getPayloadClientMock,
 }));
 
-import {
-  gameItems,
-  getGameBySlug as getFallbackGameBySlug,
-} from "@/features/games/data/game-items";
 import { getGameBySlug, getGames } from "@/server/games/get-games";
 import { createPayloadGameDocument } from "@/testing/fixtures/payload-documents";
 
@@ -28,7 +19,10 @@ function arrangeFind(docs: unknown[]) {
 describe("getGames", () => {
   beforeEach(() => {
     getPayloadClientMock.mockReset();
-    mockEnv.NODE_ENV = "development";
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("returns mapped published games", async () => {
@@ -52,34 +46,22 @@ describe("getGames", () => {
     );
   });
 
-  it("uses local fallback when development data is empty", async () => {
-    arrangeFind([]);
-
-    await expect(getGames()).resolves.toBe(gameItems);
-  });
-
-  it("returns a real empty result when production data is empty", async () => {
-    mockEnv.NODE_ENV = "production";
+  it("returns an empty collection when Payload has no published games", async () => {
     arrangeFind([]);
 
     await expect(getGames()).resolves.toEqual([]);
   });
 
-  it("uses local fallback when development Payload throws", async () => {
+  it("rethrows Payload errors so the route error boundary can respond", async () => {
     const error = new Error("Payload unavailable");
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-    getPayloadClientMock.mockRejectedValue(error);
-
-    await expect(getGames()).resolves.toBe(gameItems);
-  });
-
-  it("rethrows production Payload errors", async () => {
-    const error = new Error("Payload unavailable");
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    mockEnv.NODE_ENV = "production";
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     getPayloadClientMock.mockRejectedValue(error);
 
     await expect(getGames()).rejects.toBe(error);
+    expect(log).toHaveBeenCalledWith(
+      "Failed to load games from Payload.",
+      error,
+    );
   });
 
   it("returns a mapped game by slug", async () => {
@@ -104,18 +86,21 @@ describe("getGames", () => {
     );
   });
 
-  it("uses the matching development fallback when a slug is missing", async () => {
-    arrangeFind([]);
-
-    await expect(getGameBySlug("white-album-2")).resolves.toBe(
-      getFallbackGameBySlug("white-album-2"),
-    );
-  });
-
-  it("returns undefined for a missing production slug", async () => {
-    mockEnv.NODE_ENV = "production";
+  it("returns undefined for a missing slug", async () => {
     arrangeFind([]);
 
     await expect(getGameBySlug("missing-game")).resolves.toBeUndefined();
+  });
+
+  it("rethrows detail query errors so the route error boundary can respond", async () => {
+    const error = new Error("Payload unavailable");
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    getPayloadClientMock.mockRejectedValue(error);
+
+    await expect(getGameBySlug("test-game")).rejects.toBe(error);
+    expect(log).toHaveBeenCalledWith(
+      'Failed to load game "test-game" from Payload.',
+      error,
+    );
   });
 });

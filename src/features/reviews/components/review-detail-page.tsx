@@ -1,7 +1,7 @@
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import Link from "next/link";
 
-import type { ReviewPreview } from "@/features/reviews/data/review-items";
+import type { ReviewPreview } from "@/features/reviews/types/review-preview";
 import {
   formatReviewDate,
   formatReviewReadingTime,

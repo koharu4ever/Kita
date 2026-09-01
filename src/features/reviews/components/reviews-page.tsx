@@ -1,4 +1,4 @@
-import type { ReviewPreview } from "@/features/reviews/data/review-items";
+import type { ReviewPreview } from "@/features/reviews/types/review-preview";
 
 import { ReviewCard } from "./review-card";
 import { ReviewsTopNav } from "./reviews-top-nav";

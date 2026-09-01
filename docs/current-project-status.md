@@ -56,7 +56,7 @@ workspace: C:\dev\Kita
 - Reviews 匿名只读 `published`；
 - Games 匿名只读 `published`；
 - getter 使用 `overrideAccess: false`；
-- Production 数据读取失败会抛错，不用静态 fallback 掩盖故障。
+- 所有环境的数据读取失败都会抛错，不用静态 fallback 掩盖故障；空 Collection 使用页面 empty state。
 
 写权限边界：
 
@@ -126,7 +126,7 @@ OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用�
 
 GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快速 tests、隔离 PostgreSQL/Payload integration smoke 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 124 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 115 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。减少的测试来自连同实现一起移除的 development seed/fallback，不代表当前行为失去覆盖。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 首页和 Games gallery 的本地浏览器收尾已完成：
 
@@ -148,7 +148,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 - [x] 根 README、Home/About 定位与公开 metadata；
 - [x] 清理公开页面的 placeholder/draft 工程文案；
-- [x] 移除 repository development seed 和 Games gallery 中针对商业游戏 archive 的专用入口；
+- [x] 移除 repository development seed、运行时静态 fallback 和 Games gallery 中针对商业游戏 archive 的专用入口；
 - [x] 统一列表 empty、站点 error/not-found/loading，并对详情查询做请求级去重；
 - [ ] 从 Production Game 内容删除未经确认授权的 archive URL，并确认公开 API 不再返回；
 - [ ] 确认公开背景图、封面与最终截图的来源/许可边界；
@@ -161,7 +161,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 ### 随后独立完成
 
 - [ ] Reviews/Games 录入真实内容并清理 placeholder；
-- [ ] Tools 决定 CMS-only 还是保留 Development fallback；
+- [x] Tools、Reviews、Games 统一为 CMS-only；空数据与查询错误不再被演示内容掩盖；
 - [ ] 明确 Review 是否必须关联 Games 馆藏中的条目；只有业务规则成立后才做 relationship migration。
 
 ### 低优先级/条件触发

@@ -1,7 +1,7 @@
 import type { DefaultTypedEditorState } from "@payloadcms/richtext-lexical";
 
 import type { Review } from "@/payload/payload-types";
-import type { ReviewPreview } from "@/features/reviews/data/review-items";
+import type { ReviewPreview } from "@/features/reviews/types/review-preview";
 
 export type PayloadReviewDocument = Pick<
   Review,

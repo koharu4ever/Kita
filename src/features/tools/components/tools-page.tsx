@@ -33,7 +33,7 @@ export function ToolsPage({ items }: ToolsPageProps) {
                     </a>
                   </h2>
                   <p className="mt-2 pl-4 text-sm text-lime-400/65 uppercase">
-                    POSTED ON: {item.postedOn}
+                    ADDED: {item.addedOn}
                   </p>
                   <p className="mt-4 max-w-5xl pl-4 text-lg leading-relaxed text-lime-300/90">
                     {item.summary}
