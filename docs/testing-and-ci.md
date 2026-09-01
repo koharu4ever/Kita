@@ -77,6 +77,7 @@ Smoke 先执行全部注册 migration，再重复执行一次确认无待办，�
 - `payload_migrations` 与当前注册列表一致；
 - Users、Media、Tools、Reviews、Games 核心表存在；
 - `games.cover_id` 为 `NOT NULL`，旧 4 个 cover 列不存在；
+- `/api/health` 能通过 Payload 对临时 PostgreSQL 执行真实 readiness 查询；
 - 匿名只能读取 published Review，登录用户可以读取 draft；
 - 匿名 create/update/delete 返回 403，登录用户可以完成对应写入。
 
@@ -101,7 +102,7 @@ src/testing/                              shared fixtures only
 按价值排序：
 
 1. 首页、内容页和 Admin 的最小 Playwright smoke；
-2. Production health endpoint 与 backup last-success 检查。
+2. backup last-success 检查。
 
 浏览器 smoke 不应连接 Production；health endpoint 只证明应用 readiness，不代替备份和恢复验证。
 

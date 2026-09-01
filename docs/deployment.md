@@ -18,6 +18,17 @@ Independent Coolify Application
 
 `web` 等待 PostgreSQL healthy。`docker-entrypoint.sh` 先执行 Payload migrations，再运行 `node server.js`。Production image 使用 multi-stage build 和 UID 1001 的非 root 用户。
 
+## Readiness health
+
+`GET /api/health` 是面向容器编排的最小 readiness 检查：
+
+- Next/Payload 初始化且 PostgreSQL `SELECT 1` 成功时返回 `200`、`{"status":"ready","database":"reachable"}`；
+- 初始化或数据库查询失败时返回 `503`、`{"status":"unavailable","database":"unreachable"}`；
+- 两种响应均使用 `Cache-Control: no-store`；
+- 响应不包含连接串、异常文本或 stack。
+
+Compose `web.healthcheck` 使用 Production image 已有的 Node 22 和内置 `fetch` 调用该路由，不额外安装 `curl`。这个检查只证明应用能够连接业务数据库；它不检查 R2、backup freshness、OpenList、外部 DNS 或完整用户流程，也不替代日志、告警和恢复演练。
+
 ## 环境变量
 
 真实值保存在 Coolify/Bitwarden；Git 只记录键和作用域。
@@ -63,7 +74,7 @@ Database backup bucket/token 与 Media bucket/token 必须分离。
 3. Required `quality` 通过后合并 `main`。
 4. Coolify 自动部署 `main`。
 5. 观察 build、migration、startup 日志。
-6. 验证公开站点、关键页面、Admin 和相关 API。
+6. 确认 `web` healthy，并验证公开站点、关键页面、Admin 和相关 API。
 7. 对 Media 变更验证 `media` custom domain；对数据变更验证 Redeploy 后持久性。
 
 不要为了普通发布手工清空 PostgreSQL 或重建 Volume。

@@ -54,9 +54,9 @@ Games、Reviews 和 Tools 具有明确 empty state；站点路由统一处理 er
 
 首页背景改用体积更小的 WebP，并从一次挂载全部壁纸改为随轮播按需挂载；rain WebGL 延迟到对应区块进入视口。Reduced Motion 会停止自动换图和持续动画，Home 非活动导航退出焦点顺序，Games gallery 使用原生 modal dialog 完成初始焦点、关闭后恢复和始终可见的键盘控件。没有引入 UI 框架、图片服务或额外运行时。
 
-### 6. Readiness health
+### 6. Readiness health（已完成）
 
-增加一个只验证 Next/Payload 与 PostgreSQL 可达性的轻量 `/api/health`，并让 Compose `web` 使用 Node 内置 `fetch` 探测。它不扩张为 R2、backup、OpenList 或完整监控平台。
+`/api/health` 只验证 Next/Payload 与 PostgreSQL 可达性，Compose `web` 使用 Node 内置 `fetch` 探测。成功返回 200，失败返回不含内部错误的 503，并禁止缓存。它没有扩张为 R2、backup、OpenList 或完整监控平台。
 
 ### 7. 真实内容
 

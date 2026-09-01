@@ -126,7 +126,7 @@ OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用�
 
 GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快速 tests、隔离 PostgreSQL/Payload integration smoke 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 121 个 Vitest、4 个 backup shell 场景、4 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 124 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 首页和 Games gallery 的本地浏览器收尾已完成：
 
@@ -140,7 +140,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 测试缺口：
 
 - 首页、内容页和 Admin 的最小 Playwright smoke；
-- Production health endpoint。
+- backup last-success healthcheck/告警。
 
 ## 当前待办
 
@@ -155,6 +155,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - [x] PostgreSQL 16 完整 fresh migration、再次运行无待执行 migration 和 Media-only schema smoke；
 - [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
 - [x] 首页资源按需加载、reduced motion、Home 导航与 Games gallery 键盘焦点收尾；
+- [x] DB-backed `/api/health`、安全 503 响应与 Compose `web` healthcheck；
 - [ ] 最终 Production 截图与准确发布材料。
 
 ### 随后独立完成
@@ -177,4 +178,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-下一项补小型 DB-backed readiness health；随后回到真实内容、素材来源核对和最终 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一项回到真实内容、素材来源核对和最终 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

@@ -48,8 +48,8 @@ business database and Cloudflare R2 stores production media.
 - Stable feature DTOs between Payload documents and React components.
 - Local filesystem media in development and Cloudflare R2 in production.
 - Reviewable PostgreSQL migrations and migration-before-start deployment.
-- Multi-stage Docker image, Docker Compose runtime, health-gated PostgreSQL, and
-  a scheduled PostgreSQL backup sidecar.
+- Multi-stage Docker image, Docker Compose runtime, DB-backed web readiness,
+  health-gated PostgreSQL, and a scheduled PostgreSQL backup sidecar.
 - Required CI for formatting, linting, type checking, tests, and production
   build.
 
@@ -152,7 +152,9 @@ Production uses the repository `compose.yaml` with three services:
 
 The web entrypoint runs committed Payload migrations before starting the server.
 Coolify supplies production secrets and runtime configuration; no real secret is
-stored in this repository.
+stored in this repository. The public `/api/health` route returns readiness only
+after Payload can query PostgreSQL; it never returns credentials or internal
+error details.
 
 ## Local development
 

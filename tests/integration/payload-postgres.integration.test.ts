@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { env } from "@/config/env";
 import { migrations } from "@/migrations";
+import { GET as getHealth } from "@/app/api/health/route";
 
 const expectedDatabaseName = "kita_integration";
 const allowedDatabaseHosts = new Set(["127.0.0.1", "localhost", "::1"]);
@@ -131,6 +132,19 @@ describe("fresh PostgreSQL migrations", () => {
     );
 
     expect(legacyColumns.rows).toEqual([{ count: "0" }]);
+  });
+});
+
+describe("application readiness against PostgreSQL", () => {
+  it("reports ready through the public health route", async () => {
+    const response = await getHealth();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    await expect(response.json()).resolves.toEqual({
+      status: "ready",
+      database: "reachable",
+    });
   });
 });
 
