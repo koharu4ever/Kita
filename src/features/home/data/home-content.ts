@@ -39,15 +39,15 @@ export const homeWallpapers: HomeWallpaper[] = [
     name: "Rain Window",
     image: {
       url: "/cover.webp",
-      alt: "A rain-streaked window overlooking a coastal city at blue hour",
+      alt: "A rain-streaked window overlooking a city at blue hour",
     },
   },
   {
     id: "rain-harbor",
-    name: "Rain Harbor",
+    name: "Sea Girl",
     image: {
       url: "/home-rain-harbor.webp",
-      alt: "A quiet harbor reflecting distant lights after rainfall",
+      alt: "A silhouetted girl carrying a case along the sea at sunset",
     },
   },
   {
@@ -55,23 +55,23 @@ export const homeWallpapers: HomeWallpaper[] = [
     name: "Sunset Field",
     image: {
       url: "/home-sunset-field.webp",
-      alt: "An open field beneath a violet and amber sunset",
+      alt: "A silhouetted figure holding a small tree in a field at sunset",
     },
   },
   {
     id: "quiet-shore",
-    name: "Quiet Shore",
+    name: "Violet Shore",
     image: {
       url: "/home-sea-girl.webp",
-      alt: "An empty shoreline beneath storm clouds at twilight",
+      alt: "A lone figure beneath a flock of birds at a violet lakeshore",
     },
   },
   {
     id: "night-sky",
-    name: "Night Sky",
+    name: "Rain Harbor",
     image: {
       url: "/home-night-sky.webp",
-      alt: "A starry night above distant lights reflected on dark water",
+      alt: "Raindrops on glass above waterfront lights at night",
     },
   },
 ];

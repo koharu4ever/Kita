@@ -134,7 +134,7 @@ Development 可以由 Payload schema push 维护本地数据库，因此本地 `
 - 内容封面通过 Payload Media 管理；Production 对象进入 R2，`public/` 只保存站点界面素材和仍需兼容的稳定路径。
 - 新增或替换素材前先搜索代码、migration 与现有 Production 字段引用；不要仅因文件名看似过时就删除兼容路径。
 - 裁切、压缩或转码不会改变原素材的许可状态。来源无法说明的公开素材应替换，而不是只改格式。
-- 项目原创素材和保留的第三方代码/纹理统一记录在根目录 `THIRD_PARTY_NOTICES.md`，不要另建重复的 asset audit 文档。
+- 仓库公开视觉素材和保留的第三方代码/纹理统一记录在根目录 `THIRD_PARTY_NOTICES.md`，不要另建重复的 asset audit 文档。“由项目所有者提供或选择”不等于“项目原创或已获许可”；必要时还需记录作者、原始来源和许可。
 - 替换后运行 `pnpm check`、production build，并对 Home、About、Games、Reviews 做桌面与窄屏 smoke；内容 Media 另需核对公开 URL 和 Redeploy 持久性。
 
 ## 常见排障

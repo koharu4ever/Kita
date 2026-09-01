@@ -122,8 +122,8 @@ requires the S3-compatible adapter and a dedicated Cloudflare R2 bucket; it
 refuses to fall back to a temporary container filesystem. Game covers use a
 Payload Media relationship as their single source of truth.
 
-Repository-owned interface backgrounds use original, project-created artwork.
-Retained third-party runtime material and asset provenance are documented in
+Repository interface backgrounds use artwork selected by the project owner.
+Retained third-party runtime material and visual provenance are documented in
 [Third-Party Notices](./THIRD_PARTY_NOTICES.md).
 
 ## Testing and CI

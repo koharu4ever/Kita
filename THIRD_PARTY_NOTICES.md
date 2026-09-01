@@ -4,12 +4,14 @@ This file records third-party material incorporated into Kita. It applies only
 to the material listed below and does not grant or describe a license for the
 rest of the Kita repository.
 
-## Project-created visual assets
+## Project-owner supplied legacy visual assets
 
-The following visual assets were created specifically for Kita with OpenAI
-image generation on 2026-09-01, then cropped, resized, and encoded locally with
-Sharp. Their prompts excluded people, recognizable intellectual property,
-brands, text, signatures, and watermarks.
+On 2026-09-01, the project owner chose to restore the visual set used by Kita
+immediately before the later generated-art replacement and explicitly confirmed
+that Kita may use the corresponding image resources from the owner's local Kral
+blog source. The files were restored from the pre-replacement repository tree at
+commit `ff957aa`; the optimized homepage WebP versions were first introduced at
+commit `3507651`.
 
 - `public/cover.webp`
 - `public/home-rain-harbor.webp` and its legacy-path JPEG counterpart
@@ -19,9 +21,10 @@ brands, text, signatures, and watermarks.
 - `public/about-bg.jpg`
 - `public/P3F.jpg`
 
-The legacy filenames remain stable because historical migrations and existing
-content may still reference them. Keeping a filename does not imply that the
-previous file contents or their provenance were retained.
+This records project-specific authorization and repository provenance; it does
+not represent every image as generally redistributable under an open-source
+license. The public filenames remain stable because historical migrations, code
+references, and existing content may still reference them.
 
 ## RainEffect
 
