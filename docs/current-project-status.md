@@ -143,6 +143,8 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 115 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认 Home、About、Games、Reviews 的桌面与窄屏状态、新原创视觉和 Review 兼容封面，控制台无错误或警告。此前还验证了未发布 Game 的品牌化 404。减少的测试来自连同实现一起移除的 development seed/fallback，不代表当前行为失去覆盖。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
+同日将 Next.js、Payload、Sharp 和 PostCSS 更新到修复已知高危 advisory 的同栈补丁版本，并在升级后重跑上述完整门禁。锁文件的 `pnpm audit --prod --audit-level high` 结果为 0 high、0 critical；剩余 low/moderate 项来自上游固定的 Admin/CLI 传递依赖，当前不使用未经上游验证的强制 override。
+
 首页和 Games gallery 的本地浏览器收尾已完成：
 
 - 首页、About 与仓库内 Review 兼容封面已在 2026-09-01 替换为专为 Kita 创建的原创视觉；生成与本地转码 provenance 统一记录在根目录 `THIRD_PARTY_NOTICES.md`；
