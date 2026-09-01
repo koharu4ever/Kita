@@ -126,11 +126,12 @@ OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用�
 
 GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快速 tests、隔离 PostgreSQL/Payload integration smoke 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 115 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。减少的测试来自连同实现一起移除的 development seed/fallback，不代表当前行为失去覆盖。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 115 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认 Home、About、Games、Reviews 的桌面与窄屏状态、新原创视觉和 Review 兼容封面，控制台无错误或警告。此前还验证了未发布 Game 的品牌化 404。减少的测试来自连同实现一起移除的 development seed/fallback，不代表当前行为失去覆盖。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 首页和 Games gallery 的本地浏览器收尾已完成：
 
-- 首页静态视觉资源使用 WebP，首次渲染只挂载当前背景 URL，后续壁纸随轮播按需加载；保留的旧 JPEG 仅用于已有内容和 migration 的路径兼容；
+- 首页、About 与仓库内 Review 兼容封面已在 2026-09-01 替换为专为 Kita 创建的原创视觉；生成与本地转码 provenance 统一记录在根目录 `THIRD_PARTY_NOTICES.md`；
+- 首页静态视觉资源使用 WebP，首次渲染只挂载当前背景 URL，后续壁纸随轮播按需加载；保留的旧 JPEG 文件名仅用于已有内容和 migration 的路径兼容；
 - rain WebGL 只在对应区块进入视口后初始化；
 - `prefers-reduced-motion` 会停止自动换图、持续动画、光标闪烁和平滑滚动；
 - Home 非活动导航使用 `inert`/`aria-hidden`，不会残留隐藏的键盘焦点；
@@ -151,7 +152,8 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - [x] 移除 repository development seed、运行时静态 fallback 和 Games gallery 中针对商业游戏 archive 的专用入口；
 - [x] 统一列表 empty、站点 error/not-found/loading，并对详情查询做请求级去重；
 - [ ] 从 Production Game 内容删除未经确认授权的 archive URL，并确认公开 API 不再返回；
-- [ ] 确认公开背景图、封面与最终截图的来源/许可边界；
+- [x] 用原创素材替换仓库静态背景与兼容封面，并建立唯一 provenance/third-party notice；
+- [ ] 逐项确认 Production Games/Reviews 的 Payload Media 与外部链接来源/许可；
 - [x] PostgreSQL 16 完整 fresh migration、再次运行无待执行 migration 和 Media-only schema smoke；
 - [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
 - [x] 首页资源按需加载、reduced motion、Home 导航与 Games gallery 键盘焦点收尾；
@@ -178,4 +180,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-下一项回到真实内容、素材来源核对和最终 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一项回到 Production 真实内容与 Media 来源核对；完成后再采集最终 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

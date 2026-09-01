@@ -44,6 +44,7 @@
 - 不使用“当前”“下一步”描述历史计划；历史证据必须带明确日期。
 - 不在多个文件复制环境变量表、恢复清单或待办列表。
 - 不记录 secret、token、密码、完整连接串、private key 或恢复码。
+- 第三方归属与仓库视觉 provenance 只维护在根目录 `THIRD_PARTY_NOTICES.md`；完成进度只维护在 `current-project-status.md`。
 - 文档中的 commit SHA 只能作为带日期的验证快照，不能冒充当前 `main`。
 - 删除文档时同步修复仓库内链接，并运行格式与链接检查。
 

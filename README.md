@@ -122,6 +122,10 @@ requires the S3-compatible adapter and a dedicated Cloudflare R2 bucket; it
 refuses to fall back to a temporary container filesystem. Game covers use a
 Payload Media relationship as their single source of truth.
 
+Repository-owned interface backgrounds use original, project-created artwork.
+Retained third-party runtime material and asset provenance are documented in
+[Third-Party Notices](./THIRD_PARTY_NOTICES.md).
+
 ## Testing and CI
 
 The local quality gate runs inside the Dev Container as the non-root `node`
@@ -193,7 +197,8 @@ backup surface, or deployment responsibility.
 ## Known limitations
 
 - The final production content and screenshot pass is still in progress.
-- Production content and visual assets still require a final rights/source audit.
+- Production CMS content, Media, and external links still require a final
+  item-by-item rights/source audit.
 - The isolated database smoke proves fresh migration `up`, current schema, and
   Review publication/write access. It does not prove a data-bearing production
   upgrade, every migration `down`, dump restore, or every Collection workflow.
@@ -213,3 +218,4 @@ backup surface, or deployment responsibility.
 - [Deployment](./docs/deployment.md)
 - [Backup and recovery](./docs/backup-and-recovery.md)
 - [Payload content and media](./docs/payload-content-and-media.md)
+- [Third-party notices and visual provenance](./THIRD_PARTY_NOTICES.md)
