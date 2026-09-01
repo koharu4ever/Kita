@@ -34,18 +34,18 @@ export const reviewItems: ReviewPreview[] = [
   {
     slug: "quiet-after-rain",
     title: "雨后仍然停在屏幕上的故事",
-    gameTitle: "Placeholder Visual Novel",
+    gameTitle: "Rain Harbor",
     date: "2026-06-09",
     excerpt:
-      "一篇关于氛围、记忆和结尾余韵的短评。这里先保留静态文字，后续可以替换成 Payload CMS 的 review excerpt。",
+      "一篇关于氛围、记忆和结尾余韵的短评，记录画面暗下之后仍然留在脑海里的部分。",
     coverImage: "/home-rain-harbor.jpg",
     rating: 8.5,
     readingTime: "6 min read",
     tags: ["Atmosphere", "Memory", "VN"],
     body: createReviewBody([
-      "这篇演示文本只负责撑起详情页的节奏。真正的数据库内容以后可以映射成同样的字段，前端模板不需要知道它来自哪里。",
+      "雨停之后，画面里的灯光反而更容易被记住。故事没有急着解释人物的选择，而是让港口、窗户和很慢的对白承担情绪。",
       "我更喜欢把评测页面做得像一页安静的读书笔记：先给图像和标题留空间，再让正文慢慢进入。这里没有复杂交互，只保留阅读感。",
-      "如果以后要接 Payload，这个页面只需要替换数据源，不需要把 layout、导航或卡片结构重写。",
+      "结尾没有把所有关系说透，却让前面的停顿获得了新的含义。这种余韵比单纯的反转更值得反复回想。",
     ]),
   },
   {
@@ -53,15 +53,14 @@ export const reviewItems: ReviewPreview[] = [
     title: "夏日海边的光为什么会留下来",
     gameTitle: "Sea Side Fragment",
     date: "2026-06-08",
-    excerpt:
-      "这个卡片只负责展示评测摘要，不关心后端来自哪里。真正接 Payload 时，只需要把 CMS 文档转成这个形状。",
+    excerpt: "关于夏日海边、短暂相遇和离开之后仍然留在记忆里的光。",
     coverImage: "/home-sea-girl.jpg",
     rating: 8,
     readingTime: "4 min read",
     tags: ["Summer", "Slice of Life"],
     body: createReviewBody([
-      "海边、夏天和回忆是很容易被写得过满的题材，所以这个模板故意留白。它更像一个入口，而不是完整文章系统。",
-      "卡片和详情页共用同一份 mock data，说明这个功能现在仍然是纯前端展示层，不需要数据库参与。",
+      "海边、夏天和回忆是很容易被写得过满的题材，所以这个故事反而把大部分情绪留在光线和停顿里。",
+      "真正让场景留下来的不是海面本身，而是人物知道这段时间不会持续太久。",
     ]),
   },
   {
@@ -69,15 +68,14 @@ export const reviewItems: ReviewPreview[] = [
     title: "夜空、城市灯和很慢的对白",
     gameTitle: "Night Archive",
     date: "2026-06-07",
-    excerpt:
-      "老项目里评测组件直接读 author、game、content 等后端字段；这一版先只保留页面真正需要的预览数据。",
+    excerpt: "一篇关于城市夜景、留白和慢对白如何共同维持戏剧张力的短评。",
     coverImage: "/home-night-sky.jpg",
     rating: 7.5,
     readingTime: "5 min read",
     tags: ["Drama", "Essay"],
     body: createReviewBody([
       "夜空题材适合慢一点的排版。这里的正文宽度、行高和背景遮罩都偏克制，主要服务阅读，而不是做资讯站。",
-      "后续如果需要更成熟的模板，可以继续沿着这个数据形状扩展：增加作者、平台、游玩时间、外部链接，都不会破坏页面边界。",
+      "当对白愿意停下来，城市灯光便不再只是背景，而会成为人物之间没有说出口的另一层语言。",
     ]),
   },
 ];

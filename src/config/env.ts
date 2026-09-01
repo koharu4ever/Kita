@@ -19,9 +19,7 @@ export const env = createEnv({
       .default("development"),
     PAYLOAD_SECRET: z.string().min(32),
   },
-  client: {
-    NEXT_PUBLIC_SITE_URL: z.string().url(),
-  },
+  client: {},
   runtimeEnv: {
     DATABASE_URI: process.env.DATABASE_URI,
     ENABLE_DEV_SEED: process.env.ENABLE_DEV_SEED,
@@ -33,7 +31,6 @@ export const env = createEnv({
     MEDIA_STORAGE_MODE: process.env.MEDIA_STORAGE_MODE,
     NODE_ENV: process.env.NODE_ENV,
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
   skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
   emptyStringAsUndefined: true,

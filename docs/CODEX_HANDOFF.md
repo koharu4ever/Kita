@@ -1,6 +1,6 @@
 # Kita Codex 交接
 
-> 最后核对：2026-08-31
+> 最后核对：2026-09-01
 >
 > 正常项目根目录：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
@@ -22,7 +22,7 @@
 
 ## 项目是什么
 
-Kita 是 Next.js 16 + Payload CMS + PostgreSQL 16 的个人内容站，包含 Home、About、Tools、Reviews、Games 和 Payload Admin。
+Kita 是基于 Next.js 16、Payload CMS 和 PostgreSQL 16 的自托管游戏目录与评论发布平台，包含 Home、About、Tools、Reviews、Games 和 Payload Admin。
 
 核心数据流：
 
@@ -34,7 +34,7 @@ Games.cover -> Payload Media -> local storage (development)
                               -> Cloudflare R2 (production)
 ```
 
-Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 和 `backup`。OpenList 是独立 Application，Kita 只保存公开 archive URL。
+Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 和 `backup`。OpenList 是独立 Application，不属于 Kita `v1.0` 核心架构。
 
 详细结构只维护在 [architecture.md](./architecture.md)。
 

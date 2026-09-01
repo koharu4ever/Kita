@@ -7,8 +7,8 @@ const navItems: Array<{
 }> = [
   { href: "/", label: "Home" },
   { href: "/games", label: "Games" },
-  { href: "/tools", label: "Tools" },
   { href: "/about", label: "About" },
+  { href: "/tools", label: "Tools" },
 ];
 
 export function ReviewsTopNav() {

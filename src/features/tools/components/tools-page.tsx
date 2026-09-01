@@ -57,7 +57,7 @@ export function ToolsPage({ items }: ToolsPageProps) {
           </div>
 
           <footer className="mt-20 border-t border-lime-400/25 pt-8 text-center text-sm text-lime-400/60">
-            KITA TOOLKIT / STATIC FRONT-END DRAFT
+            KITA TOOLKIT / CURATED RESOURCES
           </footer>
         </div>
       </main>

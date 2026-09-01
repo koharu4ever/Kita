@@ -46,14 +46,14 @@ export function GamesGallery({ games }: GamesGalleryProps) {
           />
           <div className="relative">
             <p className="mb-4 text-xs tracking-[0.35em] text-sky-100/70 uppercase">
-              Visual Novel Shelf
+              Curated Game Catalog
             </p>
             <h1 className="kita-display text-7xl leading-none text-white">
               GAMES
             </h1>
             <p className="mt-5 max-w-[34ch] text-sm leading-6 text-white/72">
-              Click a cover to open the image viewer. Details stay one small
-              step deeper.
+              Browse published games, open a cover in the gallery, or continue
+              to the full catalog entry.
             </p>
             <p className="mt-8 text-xs tracking-[0.32em] text-white/35 uppercase transition group-hover:text-sky-100/70">
               Return Home

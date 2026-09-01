@@ -31,7 +31,7 @@ export const gameItems: GameDetail[] = [
       "A long-form winter romance in which music, timing, and an earnest love triangle bind three people together before pulling them apart.",
     body: createGameBody([
       "The story begins with three separate sounds meeting at school: guitar, piano, and a voice from the rooftop. That brief harmony becomes the emotional center of a relationship shaped by late autumn, winter snow, and choices that arrive too late.",
-      "This local entry is intentionally compact. It tests the real cover ratio and the new asset-path data flow without turning the game archive into a second review section.",
+      "The catalog entry stays concise so the synopsis, release context, and external references remain distinct from the longer editorial review format.",
     ]),
     cover: {
       src: "/games/covers/white-album-2-v2.jpg",
@@ -41,10 +41,6 @@ export const gameItems: GameDetail[] = [
     },
     tags: ["Romance", "Drama", "Winter", "Musical Themes"],
     links: [
-      {
-        href: "https://archive.kral-koharu.com/White%20Album%202.zip",
-        label: "Game archive",
-      },
       { href: "https://vndb.org/v7771", label: "VNDB" },
       {
         href: "https://en.wikipedia.org/wiki/White_Album_2",

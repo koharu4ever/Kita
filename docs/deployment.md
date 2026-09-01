@@ -1,6 +1,6 @@
 # Kita 部署指南
 
-> 最后核对：2026-08-12
+> 最后核对：2026-09-01
 >
 > Production 使用 Coolify 的 repository Docker Compose 部署。本文不包含真实 secret。
 
@@ -13,7 +13,7 @@ Coolify Compose Application
   └─ backup    pg_dump/pg_restore/rclone sidecar
 
 Independent Coolify Application
-  └─ OpenList  archive.kral-koharu.com
+  └─ OpenList  outside Kita v1.0
 ```
 
 `web` 等待 PostgreSQL healthy。`docker-entrypoint.sh` 先执行 Payload migrations，再运行 `node server.js`。Production image 使用 multi-stage build 和 UID 1001 的非 root 用户。
@@ -24,21 +24,20 @@ Independent Coolify Application
 
 ### Kita 应用
 
-| 变量                         | Build | Runtime | 说明                                    |
-| ---------------------------- | ----- | ------- | --------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`       | 否    | 是      | 公开站点 URL；当前代码只校验 runtime 值 |
-| `PAYLOAD_SECRET`             | 否    | 是      | 至少 32 字符，secret                    |
-| `DATABASE_URI`               | 否    | 是      | 指向 Compose `postgres`，包含凭据       |
-| `POSTGRES_DB`                | 否    | 是      | 数据库名                                |
-| `POSTGRES_USER`              | 否    | 是      | 数据库用户                              |
-| `POSTGRES_PASSWORD`          | 否    | 是      | secret；必须与 URI 一致                 |
-| `ENABLE_DEV_SEED`            | 否    | 是      | Production 固定 `false`                 |
-| `MEDIA_STORAGE_MODE`         | 是    | 是      | Production 固定 `r2`                    |
-| `MEDIA_R2_PUBLIC_URL`        | 是    | 是      | HTTPS custom domain                     |
-| `MEDIA_R2_BUCKET`            | 否    | 是      | Media 专用 bucket                       |
-| `MEDIA_R2_ENDPOINT`          | 否    | 是      | R2 S3 endpoint                          |
-| `MEDIA_R2_ACCESS_KEY_ID`     | 否    | 是      | bucket-scoped credential                |
-| `MEDIA_R2_SECRET_ACCESS_KEY` | 否    | 是      | secret                                  |
+| 变量                         | Build | Runtime | 说明                              |
+| ---------------------------- | ----- | ------- | --------------------------------- |
+| `PAYLOAD_SECRET`             | 否    | 是      | 至少 32 字符，secret              |
+| `DATABASE_URI`               | 否    | 是      | 指向 Compose `postgres`，包含凭据 |
+| `POSTGRES_DB`                | 否    | 是      | 数据库名                          |
+| `POSTGRES_USER`              | 否    | 是      | 数据库用户                        |
+| `POSTGRES_PASSWORD`          | 否    | 是      | secret；必须与 URI 一致           |
+| `ENABLE_DEV_SEED`            | 否    | 是      | Production 固定 `false`           |
+| `MEDIA_STORAGE_MODE`         | 是    | 是      | Production 固定 `r2`              |
+| `MEDIA_R2_PUBLIC_URL`        | 是    | 是      | HTTPS custom domain               |
+| `MEDIA_R2_BUCKET`            | 否    | 是      | Media 专用 bucket                 |
+| `MEDIA_R2_ENDPOINT`          | 否    | 是      | R2 S3 endpoint                    |
+| `MEDIA_R2_ACCESS_KEY_ID`     | 否    | 是      | bucket-scoped credential          |
+| `MEDIA_R2_SECRET_ACCESS_KEY` | 否    | 是      | secret                            |
 
 Media 凭据不可作为 Build Variable。`MEDIA_R2_ENDPOINT` 是 S3 API endpoint，`MEDIA_R2_PUBLIC_URL` 是浏览器访问图片的 custom domain，不能互换。
 

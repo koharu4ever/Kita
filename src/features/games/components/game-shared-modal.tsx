@@ -4,7 +4,6 @@ import type { Route } from "next";
 import { useState } from "react";
 
 import type { GameDetail } from "@/features/games/types/game-detail";
-import { getGameArchiveLink } from "@/features/games/utils/get-game-archive-link";
 
 type GameSharedModalProps = {
   index: number;
@@ -94,25 +93,6 @@ function ArrowTopRightOnSquareIcon({ className }: IconProps) {
   );
 }
 
-function ArrowDownTrayIcon({ className }: IconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      aria-hidden="true"
-      className={className}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M7.5 12 12 16.5m0 0 4.5-4.5M12 16.5V3"
-      />
-    </svg>
-  );
-}
-
 function range(start: number, end: number) {
   const output = [];
 
@@ -142,8 +122,6 @@ export function GameSharedModal({
   if (!currentGame) {
     return null;
   }
-
-  const archiveLink = getGameArchiveLink(currentGame.links);
 
   return (
     <div className="relative z-50 flex h-dvh w-full items-center">
@@ -202,18 +180,6 @@ export function GameSharedModal({
               >
                 <ArrowTopRightOnSquareIcon className="h-5 w-5" />
               </Link>
-              {archiveLink ? (
-                <a
-                  href={archiveLink.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-full bg-black/50 p-2 text-white/75 backdrop-blur-lg transition hover:bg-black/75 hover:text-white"
-                  title="Open download page"
-                  aria-label={`Open ${currentGame.title} download page`}
-                >
-                  <ArrowDownTrayIcon className="h-5 w-5" />
-                </a>
-              ) : null}
             </div>
 
             <div className="absolute top-0 left-0 flex items-center gap-2 p-3 text-white">

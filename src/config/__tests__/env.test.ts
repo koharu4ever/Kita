@@ -6,7 +6,6 @@ function stubValidRuntimeEnv() {
     "postgres://postgres:postgres@localhost:5432/kita",
   );
   vi.stubEnv("ENABLE_DEV_SEED", "false");
-  vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
   vi.stubEnv("NODE_ENV", "test");
   vi.stubEnv("PAYLOAD_SECRET", "test-payload-secret-at-least-32-characters");
 }

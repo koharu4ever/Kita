@@ -1,19 +1,18 @@
 # Kita 产品路线
 
-> 最后核对：2026-08-31
+> 最后核对：2026-09-01
 
 ## 产品定位
 
-Kita 是一个具有视觉小说氛围的个人内容站：
+Kita 是一个具有视觉小说氛围的自托管游戏目录与评论发布平台：
 
 - Home 负责视觉和导航；
-- About 解释作者与项目；
+- About 解释产品与实现方式；
 - Tools 展示个人工具箱；
 - Reviews 承载长篇评论；
-- Games 作为视觉馆藏和资料入口；
-- OpenList 只提供低耦合的附属 archive。
+- Games 作为视觉馆藏和资料入口。
 
-技术底座已经足够。下一阶段成功标准不是增加框架，而是让真实内容、错误状态和项目叙述完整。
+站主通过 Payload Admin 管理 Games、Reviews 和 Media；访客浏览已经发布的公开内容。技术底座已经足够，`v1.0` 成功标准不是增加框架，而是让真实内容、错误状态、隔离验证和项目叙述完整。
 
 ## 已完成的产品/后台能力
 
@@ -21,18 +20,18 @@ Kita 是一个具有视觉小说氛围的个人内容站：
 - Payload Admin 与 Users/Media/Tools/Reviews/Games；
 - Reviews/Games 列表和详情的真实数据链路；
 - Games Media/R2 封面；
-- Games archive 公开链接；
 - Docker/Coolify Production、CI 和 database backup 基础。
 
 ## 当前内容缺口
 
-- About 仍需替换 placeholder；
 - Reviews 需要录入真实文章；
 - Games 需要以真实资料替换 placeholder 字段；
+- 公开 archive URL 和视觉素材需要完成来源/授权核对；
 - Tools 需要决定由 CMS 维护还是保留内置 fallback；
-- 前台可见的 draft/implementation 文案需要清理；
 - error、empty、not-found 和 loading 体验尚需统一；
-- 根 README 和作品集/简历描述尚需与真实实现对齐。
+- 最终 Production 截图和发布文案尚需与真实内容对齐。
+
+根 README、Home/About 定位、公开 metadata 和开发期文案已在 2026-08-31 的 portfolio positioning 工作中收敛；最终 Production 截图留到真实内容完成后获取。
 
 ## 推荐顺序
 
@@ -40,21 +39,27 @@ Kita 是一个具有视觉小说氛围的个人内容站：
 
 slug/URL/必填文本验证、显式写权限和共用 rich-text 配置已经收敛到 Payload collection 边界，没有引入新服务。
 
-### 2. 数据链路集成 smoke
+### 2. 仓库入口与公开定位（已完成）
+
+根 README、Home/About 产品定义、页面 metadata 和公开开发期文案已经统一。最终截图必须在真实内容收口后从 Production 获取，不使用 mockup。
+
+### 3. 产品状态
+
+补统一的 empty/error/not-found/loading 和详情查询去重，让空数据与后端故障都有可解释的界面。
+
+### 4. 数据链路集成 smoke
 
 使用隔离 PostgreSQL 验证完整 migration 和真实 Payload published access。不要操作现有 Production/本地数据 Volume。
 
-### 3. 真实内容
+### 5. 真实内容
 
-优先完成 About、至少一篇真实 Review、Games 的真实元数据和 Tools 决策。删除前台 placeholder。
+优先完成至少一篇真实 Review、Games 的真实元数据、Tools 决策和素材授权核对。删除前台 placeholder。
 
-### 4. 产品状态
+在真实 Review 和 Games 清理后，再决定 Review 是否必须关联一个馆藏 Game。只有规则成立时才增加 relationship；不为了展示数据库关系强制耦合内容模型。
 
-补统一的 empty/error/not-found 行为和关键页面 smoke。再评估 Playwright。
+### 6. 项目展示
 
-### 5. 项目展示
-
-编写根 README、架构图、Production 截图和准确简历描述。只描述实际实现，不声称高并发、微服务或完整灾备。
+在真实内容收口后补 Production 截图和准确发布/简历描述。只描述实际实现，不声称高并发、微服务或完整灾备。
 
 ## 延期项
 

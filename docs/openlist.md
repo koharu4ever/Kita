@@ -1,17 +1,16 @@
 # Kita 与 OpenList
 
-> 最后核对：2026-08-12
+> 最后核对：2026-09-01
 
 ## 当前决策
 
-OpenList 是独立的 Coolify Application，不属于 Kita repository、Compose、Payload 或 PostgreSQL。Kita 只在 Game `links` 中保存公开 HTTPS archive URL。
+OpenList 是独立的 Coolify Application，不属于 Kita repository、Compose、Payload 或 PostgreSQL，也不属于 Kita `v1.0` 核心用户流程。Game 的通用 `links` 可以指向经确认可公开的外部资料，但不为商业游戏提供专用下载入口。
 
 ```text
-Kita Games UI
-  -> public archive URL
-       -> https://archive.kral-koharu.com
-            -> OpenList independent Application
-                 -> storage provider
+Authorized external resource
+  -> public HTTPS URL
+       -> independent OpenList Application
+            -> storage provider
 ```
 
 两边不共享数据库、Volume、secret、容器网络、构建流程或登录状态。OpenList 故障不能阻止 Kita 的 Games/Reviews/Media 正常工作。
@@ -28,13 +27,13 @@ Kita Games UI
 
 ## 产品边界
 
-Games 是视觉馆藏和资料入口，Reviews 是主观内容，OpenList 只是用户明确寻找附属资源时出现的入口。公开内容必须有权分享并带有语境；不要让 Kita 变成无说明下载站。
+Games 是视觉馆藏和资料入口，Reviews 是主观内容，OpenList 只可承载项目所有者有权公开分发的附属资源。Kita 不为商业游戏提供专用下载入口；公开内容必须有明确授权和语境，不要让 Kita 变成无说明下载站。
 
-Game 可以复用现有 `links`：
+Game 仅在资源的授权和用途都清楚时复用现有 `links`：
 
 ```text
-label: Game archive
-href: https://archive.kral-koharu.com/<public-path>
+label: Authorized project files
+href: https://<authorized-public-host>/<public-path>
 ```
 
 Kita 不调用 OpenList API，不缓存目录，不保存 storage credential，也不根据 OpenList 可用性决定页面是否渲染。
@@ -63,7 +62,7 @@ Storage 定型后，先完成 inventory 和独立 backup/restore，再增加数�
 
 ## 变更原则
 
-- 修改 archive URL 不生成 Kita migration；它是普通 Game 内容更新。
+- 修改外部资源 URL 不生成 Kita migration；它是普通 Game 内容更新。
 - 不把 OpenList 加入 `compose.yaml`。
 - 不为定制 UI 创建 fork，除非标准 UI 出现明确且持续的产品限制。
 - 不复用 Kita PostgreSQL、Media R2 或 database backup token。

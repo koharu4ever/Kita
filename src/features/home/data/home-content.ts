@@ -8,28 +8,28 @@ import type {
 
 export const homeNavItems: HomeNavItem[] = [
   {
-    label: "REVIEWS",
-    href: "/reviews" as Route,
-    mainAccentClassName: "hover:text-purple-500 focus-visible:text-purple-500",
-    floatingAccentClassName: "hover:bg-purple-500 focus-visible:bg-purple-500",
-  },
-  {
     label: "GAMES",
     href: "/games" as Route,
     mainAccentClassName: "hover:text-blue-500 focus-visible:text-blue-500",
     floatingAccentClassName: "hover:bg-blue-500 focus-visible:bg-blue-500",
   },
   {
-    label: "TOOLS",
-    href: "/tools" as Route,
-    mainAccentClassName: "hover:text-green-500 focus-visible:text-green-500",
-    floatingAccentClassName: "hover:bg-green-500 focus-visible:bg-green-500",
+    label: "REVIEWS",
+    href: "/reviews" as Route,
+    mainAccentClassName: "hover:text-purple-500 focus-visible:text-purple-500",
+    floatingAccentClassName: "hover:bg-purple-500 focus-visible:bg-purple-500",
   },
   {
     label: "ABOUT",
     href: "/about" as Route,
     mainAccentClassName: "hover:text-amber-500 focus-visible:text-amber-500",
     floatingAccentClassName: "hover:bg-amber-500 focus-visible:bg-amber-500",
+  },
+  {
+    label: "TOOLS",
+    href: "/tools" as Route,
+    mainAccentClassName: "hover:text-green-500 focus-visible:text-green-500",
+    floatingAccentClassName: "hover:bg-green-500 focus-visible:bg-green-500",
   },
 ];
 

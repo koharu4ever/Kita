@@ -24,7 +24,7 @@ export function ReviewsPage({ reviews }: ReviewsPageProps) {
       <section className="relative z-10 mx-auto max-w-6xl px-5 pt-24 pb-16 md:pt-28 md:pb-20">
         <header className="mb-10 text-center">
           <p className="mb-3 text-sm tracking-[0.35em] text-purple-200/70 uppercase">
-            Kita Archive
+            Review Journal
           </p>
           <h1 className="kita-display text-6xl leading-none text-white md:text-7xl">
             REVIEWS

@@ -1,6 +1,6 @@
 # Kita 文档入口
 
-> 最后核对：2026-08-14
+> 最后核对：2026-09-01
 
 `docs/` 只保存当前仍需维护的项目文档。早期学习笔记、一次性实施计划、阶段评估和事故全文已经从工作树移除；需要追溯时使用 Git 历史，不再把历史快照与当前操作混在一起。
 
@@ -14,17 +14,17 @@
 2. [当前项目状态](./current-project-status.md)
 3. 根据任务选择下面的一份专题文档
 
-| 文档                                                           | 唯一职责                                        | 什么时候阅读                 |
-| -------------------------------------------------------------- | ----------------------------------------------- | ---------------------------- |
-| [architecture.md](./architecture.md)                           | 当前架构、目录边界和数据流                      | 修改结构、理解前后端关系     |
-| [development.md](./development.md)                             | 本地开发、Payload schema、migration、Git 和排障 | 开发或修复功能               |
-| [codex-cli.md](./codex-cli.md)                                 | Dev Container 中 Codex CLI 的权限、凭据和维护   | 使用、升级或移除 Codex CLI   |
-| [testing-and-ci.md](./testing-and-ci.md)                       | 测试分层、命令和 GitHub Actions                 | 增加测试、排查 CI            |
-| [deployment.md](./deployment.md)                               | Docker Compose、Coolify、环境变量和发布/回滚    | 部署或调整生产配置           |
-| [backup-and-recovery.md](./backup-and-recovery.md)             | 备份资产、恢复边界和演练步骤                    | 备份、换机或灾难恢复         |
-| [payload-content-and-media.md](./payload-content-and-media.md) | Collections、Media/R2 和内容维护                | 修改 Payload 或录入内容      |
-| [openlist.md](./openlist.md)                                   | Kita 与 OpenList 的产品及部署边界               | 修改 archive 入口或 OpenList |
-| [product-roadmap.md](./product-roadmap.md)                     | 产品定位、真实内容和后续优先级                  | 选择下一项产品工作           |
+| 文档                                                           | 唯一职责                                        | 什么时候阅读               |
+| -------------------------------------------------------------- | ----------------------------------------------- | -------------------------- |
+| [architecture.md](./architecture.md)                           | 当前架构、目录边界和数据流                      | 修改结构、理解前后端关系   |
+| [development.md](./development.md)                             | 本地开发、Payload schema、migration、Git 和排障 | 开发或修复功能             |
+| [codex-cli.md](./codex-cli.md)                                 | Dev Container 中 Codex CLI 的权限、凭据和维护   | 使用、升级或移除 Codex CLI |
+| [testing-and-ci.md](./testing-and-ci.md)                       | 测试分层、命令和 GitHub Actions                 | 增加测试、排查 CI          |
+| [deployment.md](./deployment.md)                               | Docker Compose、Coolify、环境变量和发布/回滚    | 部署或调整生产配置         |
+| [backup-and-recovery.md](./backup-and-recovery.md)             | 备份资产、恢复边界和演练步骤                    | 备份、换机或灾难恢复       |
+| [payload-content-and-media.md](./payload-content-and-media.md) | Collections、Media/R2 和内容维护                | 修改 Payload 或录入内容    |
+| [openlist.md](./openlist.md)                                   | Kita 与 OpenList 的产品及部署边界               | 核对独立文件服务边界       |
+| [product-roadmap.md](./product-roadmap.md)                     | 产品定位、真实内容和后续优先级                  | 选择下一项产品工作         |
 
 ## 事实来源优先级
 

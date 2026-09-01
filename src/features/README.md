@@ -2,13 +2,8 @@
 
 Business features live here as vertical slices.
 
-Future feature examples:
+A feature can own its visual components, stable DTOs, mappers, development
+fixtures, and focused tests. Payload queries stay in `src/server`, collection
+schemas stay in `src/payload`, and route composition stays in `src/app`.
 
-```txt
-articles/
-projects/
-site-settings/
-```
-
-A feature can own its own components, data access wrappers, types, schemas, and
-tests. Do not create feature implementations before the feature exists.
+Do not scaffold speculative features before a product capability exists.

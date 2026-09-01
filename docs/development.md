@@ -1,6 +1,6 @@
 # Kita 开发指南
 
-> 最后核对：2026-08-14
+> 最后核对：2026-09-01
 >
 > 正常工作区：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
@@ -84,7 +84,6 @@ pnpm build
 
 只记录键，不把真实值写入文档或提交：
 
-- `NEXT_PUBLIC_SITE_URL`
 - `PAYLOAD_SECRET`（至少 32 字符）
 - `ENABLE_DEV_SEED`
 - `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`

@@ -31,39 +31,43 @@ export function AboutPage() {
 
       <main className="relative z-10 mx-auto my-16 max-w-4xl rounded-lg border border-black/50 bg-[#35020990] p-6 shadow-2xl sm:my-24 sm:p-10">
         <div className="space-y-12">
-          <h1 className="text-4xl font-bold text-gray-100">ABOUT ME</h1>
+          <h1 className="text-4xl font-bold text-gray-100">ABOUT KITA</h1>
 
-          <ContentSection title="1. GOAL OF THE SITE">
+          <ContentSection title="1. WHAT KITA IS">
             <div className="space-y-4 text-[#fa4347]">
               <p>
-                This page is a quiet note about the shape of the site. It is a
-                place for visual novels, memories, experiments, and the small
-                feelings that are easy to lose if nobody writes them down.
+                Kita is a self-hosted game catalog and review publishing
+                platform. It keeps a focused record of games, the atmosphere
+                around them, and the longer notes that remain after finishing a
+                story.
               </p>
               <p>
-                The current text is only a placeholder. Later, this area can be
-                replaced by a short introduction from Payload CMS while keeping
-                the same front-end layout.
+                Visitors browse published entries. The private editorial side
+                stays with the site owner, so the public experience remains a
+                small, curated archive rather than an open community platform.
               </p>
             </div>
           </ContentSection>
 
-          <ContentSection title="2. WHAT THIS SITE COLLECTS">
+          <ContentSection title="2. WHAT YOU WILL FIND">
             <ul className="list-inside list-disc space-y-2 text-[#fa4347]">
-              <li>Personal notes about games, stories, and atmosphere.</li>
-              <li>Small reviews that focus on feeling before scoring.</li>
-              <li>Tools and experiments that help preserve a memory.</li>
-              <li>Fragments that do not fit neatly into a formal article.</li>
+              <li>
+                Game entries with release details, status, and references.
+              </li>
+              <li>Long-form reviews that preserve a personal point of view.</li>
+              <li>Media selected for each catalog entry.</li>
+              <li>A small toolkit of useful external resources.</li>
             </ul>
           </ContentSection>
 
-          <ContentSection title="3. CURRENT STATUS">
+          <ContentSection title="3. HOW IT IS BUILT">
             <div className="space-y-4 text-[#fa4347]">
               <p>
-                This first version is intentionally simple. The page is static,
-                the navigation is local, and the content is written directly in
-                the component so the visual direction can be checked before the
-                CMS layer is introduced.
+                Next.js and React render the public site. Payload CMS provides
+                the authenticated Admin and content foundation, PostgreSQL
+                stores the catalog, and Cloudflare R2 serves production media.
+                Only published Games and Reviews are available to anonymous
+                visitors.
               </p>
             </div>
           </ContentSection>
