@@ -29,7 +29,7 @@ workspace: C:\dev\Kita
 - GitHub Actions required `quality`；
 - 独立 OpenList Application 边界。
 
-项目已经进入 `v1.0` 收尾阶段。固定定位是自托管游戏目录与评论发布平台；后续优先完成公开入口、真实内容、产品状态和隔离验证，不再扩张技术栈或业务类型。
+项目已经进入 `v1.0` 收尾阶段。固定定位是自托管游戏目录与评论发布平台；后续优先完成真实内容、隔离验证和最终展示，不再扩张技术栈或业务类型。
 
 ## 本地开发
 
@@ -126,7 +126,7 @@ OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用�
 
 GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tests 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 121 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 121 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 测试缺口：
 
@@ -142,11 +142,11 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tes
 - [x] 根 README、Home/About 定位与公开 metadata；
 - [x] 清理公开页面的 placeholder/draft 工程文案；
 - [x] 移除 repository development seed 和 Games gallery 中针对商业游戏 archive 的专用入口；
+- [x] 统一列表 empty、站点 error/not-found/loading，并对详情查询做请求级去重；
 - [ ] 从 Production Game 内容删除未经确认授权的 archive URL，并确认公开 API 不再返回；
 - [ ] 确认公开背景图、封面与最终截图的来源/许可边界；
 - [ ] PostgreSQL 16 完整 migration smoke；
 - [ ] 真实 Payload anonymous/published/authenticated access 集成测试；
-- [ ] 统一 empty/error/not-found/loading；
 - [ ] 最终 Production 截图与准确发布材料。
 
 ### 随后独立完成
@@ -169,4 +169,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、tes
 
 ## 下一步
 
-完成公开定位 PR 后，下一项先收口 empty/error/not-found/loading 和详情查询去重；然后使用隔离 PostgreSQL 做 migration 与真实权限集成 smoke。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一项使用隔离 PostgreSQL 做完整 migration 与真实 Payload 权限集成 smoke；随后处理首页资源/键盘体验和小型 readiness health。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

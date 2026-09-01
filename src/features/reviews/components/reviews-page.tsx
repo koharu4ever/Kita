@@ -32,14 +32,23 @@ export function ReviewsPage({ reviews }: ReviewsPageProps) {
         </header>
 
         {featuredReview ? (
-          <ReviewCard review={featuredReview} featured />
-        ) : null}
+          <>
+            <ReviewCard review={featuredReview} featured />
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          {moreReviews.map((review) => (
-            <ReviewCard key={review.slug} review={review} />
-          ))}
-        </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              {moreReviews.map((review) => (
+                <ReviewCard key={review.slug} review={review} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <section className="rounded-lg border border-white/10 bg-slate-950/70 p-8 text-center shadow-xl shadow-black/30">
+            <h2 className="text-2xl font-semibold">No published reviews yet</h2>
+            <p className="mx-auto mt-3 max-w-lg leading-7 text-white/58">
+              New long-form reviews will appear here when published.
+            </p>
+          </section>
+        )}
       </section>
     </main>
   );

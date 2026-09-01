@@ -28,7 +28,6 @@ Kita 是一个具有视觉小说氛围的自托管游戏目录与评论发布平
 - Games 需要以真实资料替换 placeholder 字段；
 - 公开 archive URL 和视觉素材需要完成来源/授权核对；
 - Tools 需要决定由 CMS 维护还是保留内置 fallback；
-- error、empty、not-found 和 loading 体验尚需统一；
 - 最终 Production 截图和发布文案尚需与真实内容对齐。
 
 根 README、Home/About 定位、公开 metadata 和开发期文案已在 2026-08-31 的 portfolio positioning 工作中收敛；最终 Production 截图留到真实内容完成后获取。
@@ -43,9 +42,9 @@ slug/URL/必填文本验证、显式写权限和共用 rich-text 配置已经收
 
 根 README、Home/About 产品定义、页面 metadata 和公开开发期文案已经统一。最终截图必须在真实内容收口后从 Production 获取，不使用 mockup。
 
-### 3. 产品状态
+### 3. 产品状态（已完成）
 
-补统一的 empty/error/not-found/loading 和详情查询去重，让空数据与后端故障都有可解释的界面。
+Games、Reviews 和 Tools 具有明确 empty state；站点路由统一处理 error/not-found/loading；详情页通过 React request cache 让 metadata 与页面共享一次 Payload 查询，不引入跨请求缓存。
 
 ### 4. 数据链路集成 smoke
 

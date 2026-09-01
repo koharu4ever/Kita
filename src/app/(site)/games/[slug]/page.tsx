@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { GameDetailPage } from "@/features/games/components/game-detail-page";
 import { getGameBySlug } from "@/server/games/get-games";
@@ -12,11 +13,13 @@ type GamePageProps = {
 
 export const dynamic = "force-dynamic";
 
+const getCachedGameBySlug = cache(getGameBySlug);
+
 export async function generateMetadata({
   params,
 }: GamePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const game = await getGameBySlug(slug);
+  const game = await getCachedGameBySlug(slug);
 
   if (!game) {
     return {
@@ -32,7 +35,7 @@ export async function generateMetadata({
 
 export default async function GamePage({ params }: GamePageProps) {
   const { slug } = await params;
-  const game = await getGameBySlug(slug);
+  const game = await getCachedGameBySlug(slug);
 
   if (!game) {
     notFound();

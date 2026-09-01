@@ -23,38 +23,51 @@ export function ToolsPage({ items }: ToolsPageProps) {
             </p>
           </header>
 
-          <div className="space-y-12">
-            {items.map((item) => (
-              <article key={item.id} id={item.id} className="scroll-mt-12">
-                <h2 className="inline-block p-1 text-3xl leading-tight text-[#9aff00] transition-colors hover:bg-lime-900/50">
-                  <a href={`#${item.id}`}>
-                    {">"} {item.title}
-                  </a>
-                </h2>
-                <p className="mt-2 pl-4 text-sm text-lime-400/65 uppercase">
-                  POSTED ON: {item.postedOn}
-                </p>
-                <p className="mt-4 max-w-5xl pl-4 text-lg leading-relaxed text-lime-300/90">
-                  {item.summary}
-                </p>
-                <ul className="mt-4 space-y-2 pl-4">
-                  {item.links.map((link) => (
-                    <li key={link.href} className="text-lg leading-relaxed">
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="border-b border-lime-300/40 text-lime-200 hover:bg-lime-300 hover:text-[#101827]"
-                      >
-                        {link.label}
-                      </a>
-                      <span className="text-lime-400/75"> :: {link.note}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
+          {items.length > 0 ? (
+            <div className="space-y-12">
+              {items.map((item) => (
+                <article key={item.id} id={item.id} className="scroll-mt-12">
+                  <h2 className="inline-block p-1 text-3xl leading-tight text-[#9aff00] transition-colors hover:bg-lime-900/50">
+                    <a href={`#${item.id}`}>
+                      {">"} {item.title}
+                    </a>
+                  </h2>
+                  <p className="mt-2 pl-4 text-sm text-lime-400/65 uppercase">
+                    POSTED ON: {item.postedOn}
+                  </p>
+                  <p className="mt-4 max-w-5xl pl-4 text-lg leading-relaxed text-lime-300/90">
+                    {item.summary}
+                  </p>
+                  <ul className="mt-4 space-y-2 pl-4">
+                    {item.links.map((link) => (
+                      <li key={link.href} className="text-lg leading-relaxed">
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="border-b border-lime-300/40 text-lime-200 hover:bg-lime-300 hover:text-[#101827]"
+                        >
+                          {link.label}
+                        </a>
+                        <span className="text-lime-400/75">
+                          {" "}
+                          :: {link.note}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <section className="border border-lime-300/25 bg-black/35 p-8 text-center">
+              <h2 className="text-3xl">[ No published tools yet ]</h2>
+              <p className="mt-4 text-lg leading-7 text-lime-300/70">
+                Curated utilities and references will appear here as the
+                collection grows.
+              </p>
+            </section>
+          )}
 
           <footer className="mt-20 border-t border-lime-400/25 pt-8 text-center text-sm text-lime-400/60">
             KITA TOOLKIT / CURATED RESOURCES
