@@ -81,7 +81,7 @@ Database backup bucket/token 与 Media bucket/token 必须分离。
 ## Migration 发布边界
 
 - 破坏性 migration 合并前确认生产内容满足前置条件，并确认最近备份对象存在。
-- Production 数据库曾由项目所有者手动复建；当前证据只证明复建后的运行和后续增量 migration，不证明 6 个 migration 能从全新数据库自动建立当前 schema。
+- Production 数据库曾由项目所有者手动复建；隔离 smoke 已证明 6 个 migration 能从全新 PostgreSQL 16 建立当前 schema，但不证明带真实 Production 数据升级、全部 `down` 或 dump restore。
 - Development schema push 与 Production migration 记录不是同一事实源。
 - 回滚旧镜像前确认旧代码需要的列和约束。不能只切镜像而忽略 schema。
 

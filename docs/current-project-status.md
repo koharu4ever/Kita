@@ -31,6 +31,8 @@ workspace: C:\dev\Kita
 
 项目已经进入 `v1.0` 收尾阶段。固定定位是自托管游戏目录与评论发布平台；后续优先完成真实内容、隔离验证和最终展示，不再扩张技术栈或业务类型。
 
+截至 2026-09-01，未发布的作品集收尾代码集中在本地分支 `codex/portfolio-v1-readiness`，由一组小型提交组成，工作树干净。该分支尚未 push、创建 PR、合并或部署；Production 仍运行 `main` 基线。
+
 ## 本地开发
 
 正常目录为 `C:\dev\Kita`；D 盘旧工作区不再开发或提交。
@@ -94,6 +96,19 @@ Coolify 使用 repository `compose.yaml`。Production `web` 等待 PostgreSQL he
 
 不要在现有本地或 Production 数据库盲跑全部初始 migration，也不要为了测试删除 Volume。
 
+### Production 发布审计（2026-09-01）
+
+本次只读取公开页面和 REST API，没有登录 Admin、写入内容或修改基础设施。结果表明代码结构已经可以收尾，Production 仍需完成以下发布门禁：
+
+- 用真实编辑内容替换演示条目、测试说明和无效日期；
+- 删除未经确认授权的下载入口，只保留官方、资料库或合法商店链接；
+- 逐项确认 Games/Reviews 的内容、外部链接和 Media 来源，确保为原创或有明确公开授权；
+- 将需要保留的仓库原创素材通过 Payload Media 上传到 R2，并更新对应 relationship；仓库静态文件不会自动覆盖 R2 对象；
+- 清理 Tools 的标题格式和描述文案；
+- `/api/health` 当前尚未部署；合并发布后再验证 200/503 readiness 行为。
+
+以上是内容和发布阻塞项，不是新的架构缺陷。具体内容清单不进入公开仓库；Production 应由项目所有者在 Payload Admin 中逐条确认，代码任务不能替代版权与编辑判断。
+
 ## Backup 与恢复
 
 已完成：
@@ -151,18 +166,22 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - [x] 清理公开页面的 placeholder/draft 工程文案；
 - [x] 移除 repository development seed、运行时静态 fallback 和 Games gallery 中针对商业游戏 archive 的专用入口；
 - [x] 统一列表 empty、站点 error/not-found/loading，并对详情查询做请求级去重；
-- [ ] 从 Production Game 内容删除未经确认授权的 archive URL，并确认公开 API 不再返回；
+- [ ] 从 Production Games 删除未经授权的下载入口和测试说明，并确认公开 API 不再返回；
 - [x] 用原创素材替换仓库静态背景与兼容封面，并建立唯一 provenance/third-party notice；
-- [ ] 逐项确认 Production Games/Reviews 的 Payload Media 与外部链接来源/许可；
+- [ ] 用真实 Game 内容替换演示条目，并清理无效发布日期；
+- [ ] 将 Production Games 的 R2 Media 替换为原创或明确授权素材，逐条复核外部链接；
+- [ ] 确认 Production Reviews 为原创或已获公开授权；
+- [ ] 修正 Production Tools 的标题格式与描述；
 - [x] PostgreSQL 16 完整 fresh migration、再次运行无待执行 migration 和 Media-only schema smoke；
 - [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
 - [x] 首页资源按需加载、reduced motion、Home 导航与 Games gallery 键盘焦点收尾；
 - [x] DB-backed `/api/health`、安全 503 响应与 Compose `web` healthcheck；
+- [ ] push `codex/portfolio-v1-readiness`、创建 Draft PR，并通过远端 required check；
+- [ ] 合并部署后验证 `/api/health`、Games、Reviews、Tools、Media URL 和 Redeploy 持久性；
 - [ ] 最终 Production 截图与准确发布材料。
 
 ### 随后独立完成
 
-- [ ] Reviews/Games 录入真实内容并清理 placeholder；
 - [x] Tools、Reviews、Games 统一为 CMS-only；空数据与查询错误不再被演示内容掩盖；
 - [ ] 明确 Review 是否必须关联 Games 馆藏中的条目；只有业务规则成立后才做 relationship migration。
 
@@ -180,4 +199,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-下一项回到 Production 真实内容与 Media 来源核对；完成后再采集最终 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一步按固定顺序执行：先在获得明确授权后 push 当前本地分支并创建 Draft PR；required check 和人工 review 通过后再合并部署；随后在 Payload Admin 完成上述 Production 内容与 Media 清理，做一次公开 API/页面/Redeploy smoke，最后采集 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
