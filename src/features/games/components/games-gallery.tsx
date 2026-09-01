@@ -22,7 +22,7 @@ export function GamesGallery({ games }: GamesGalleryProps) {
           <div
             aria-hidden="true"
             className="absolute inset-0 bg-cover bg-center opacity-0 transition duration-500 group-hover:opacity-75"
-            style={{ backgroundImage: "url('/home-rain-harbor.jpg')" }}
+            style={{ backgroundImage: "url('/home-rain-harbor.webp')" }}
           />
           <div
             aria-hidden="true"
@@ -62,7 +62,9 @@ export function GamesGallery({ games }: GamesGalleryProps) {
         </Link>
 
         {games.length > 0 ? (
-          games.map((game) => <GameGalleryCard key={game.slug} game={game} />)
+          games.map((game, index) => (
+            <GameGalleryCard key={game.slug} game={game} eager={index === 0} />
+          ))
         ) : (
           <section className="mb-5 break-inside-avoid rounded-lg border border-white/10 bg-slate-950/70 p-8 shadow-2xl shadow-black/35">
             <p className="text-xs tracking-[0.3em] text-sky-100/55 uppercase">

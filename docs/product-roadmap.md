@@ -50,13 +50,21 @@ Games、Reviews 和 Tools 具有明确 empty state；站点路由统一处理 er
 
 无 Volume 的一次性 PostgreSQL 16 已验证完整 fresh migration、再次运行时无待执行 migration、Media-only schema 和 Reviews 的 anonymous published/authenticated write 边界；同一路径进入 CI。它不代表带数据升级、down 或 restore 已验证。
 
-### 5. 真实内容
+### 5. 首页性能与基础可访问性（已完成）
+
+首页背景改用体积更小的 WebP，并从一次挂载全部壁纸改为随轮播按需挂载；rain WebGL 延迟到对应区块进入视口。Reduced Motion 会停止自动换图和持续动画，Home 非活动导航退出焦点顺序，Games gallery 使用原生 modal dialog 完成初始焦点、关闭后恢复和始终可见的键盘控件。没有引入 UI 框架、图片服务或额外运行时。
+
+### 6. Readiness health
+
+增加一个只验证 Next/Payload 与 PostgreSQL 可达性的轻量 `/api/health`，并让 Compose `web` 使用 Node 内置 `fetch` 探测。它不扩张为 R2、backup、OpenList 或完整监控平台。
+
+### 7. 真实内容
 
 优先完成至少一篇真实 Review、Games 的真实元数据、Tools 决策和素材授权核对。删除前台 placeholder。
 
 在真实 Review 和 Games 清理后，再决定 Review 是否必须关联一个馆藏 Game。只有规则成立时才增加 relationship；不为了展示数据库关系强制耦合内容模型。
 
-### 6. 项目展示
+### 8. 项目展示
 
 在真实内容收口后补 Production 截图和准确发布/简历描述。只描述实际实现，不声称高并发、微服务或完整灾备。
 

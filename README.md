@@ -39,6 +39,8 @@ business database and Cloudflare R2 stores production media.
 ## Features
 
 - Responsive Home, Games, Reviews, About, and Tools pages.
+- On-demand WebP home backgrounds, reduced-motion behavior, and keyboard-safe
+  gallery dialogs.
 - Dynamic Game and Review detail routes with server-rendered metadata.
 - Payload Admin with authenticated content and media management.
 - Published-only anonymous access for Games and Reviews.
@@ -196,6 +198,8 @@ backup surface, or deployment responsibility.
   claimed.
 - Kita has one trusted content owner; public registration, multi-role RBAC,
   comments, and multi-tenancy are intentionally out of scope.
+- Browser behavior is covered by focused manual smoke checks; a repeatable
+  Playwright smoke suite remains optional follow-up work.
 
 ## Documentation
 

@@ -128,6 +128,15 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 121 个 Vitest、4 个 backup shell 场景、4 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认正常 Games 页面和未发布 Game 的品牌化 404，控制台无错误。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
+首页和 Games gallery 的本地浏览器收尾已完成：
+
+- 首页静态视觉资源使用 WebP，首次渲染只挂载当前背景 URL，后续壁纸随轮播按需加载；保留的旧 JPEG 仅用于已有内容和 migration 的路径兼容；
+- rain WebGL 只在对应区块进入视口后初始化；
+- `prefers-reduced-motion` 会停止自动换图、持续动画、光标闪烁和平滑滚动；
+- Home 非活动导航使用 `inert`/`aria-hidden`，不会残留隐藏的键盘焦点；
+- Games lightbox 使用原生 modal dialog，控件始终存在，具有可见焦点、初始焦点和关闭后焦点恢复；
+- 本地浏览器已确认首页初始只引用一张壁纸、未提前初始化 WebGL，以及 gallery 打开/关闭焦点流程。这里是针对当前实现的手动 smoke，不等同于 Playwright 自动回归套件。
+
 测试缺口：
 
 - 首页、内容页和 Admin 的最小 Playwright smoke；
@@ -145,6 +154,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - [ ] 确认公开背景图、封面与最终截图的来源/许可边界；
 - [x] PostgreSQL 16 完整 fresh migration、再次运行无待执行 migration 和 Media-only schema smoke；
 - [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
+- [x] 首页资源按需加载、reduced motion、Home 导航与 Games gallery 键盘焦点收尾；
 - [ ] 最终 Production 截图与准确发布材料。
 
 ### 随后独立完成
@@ -167,4 +177,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-下一项处理首页资源加载、reduced motion 和键盘焦点，再补小型 DB-backed readiness health。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一项补小型 DB-backed readiness health；随后回到真实内容、素材来源核对和最终 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

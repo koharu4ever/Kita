@@ -38,7 +38,7 @@ export const homeWallpapers: HomeWallpaper[] = [
     id: "cover",
     name: "Cover",
     image: {
-      url: "/cover.png",
+      url: "/cover.webp",
       alt: "Kita cover artwork behind a rain glass layer",
     },
   },
@@ -46,7 +46,7 @@ export const homeWallpapers: HomeWallpaper[] = [
     id: "rain-harbor",
     name: "Rain Harbor",
     image: {
-      url: "/home-rain-harbor.jpg",
+      url: "/home-rain-harbor.webp",
       alt: "Rain drops over a night harbor scene",
     },
   },
@@ -54,7 +54,7 @@ export const homeWallpapers: HomeWallpaper[] = [
     id: "sunset-field",
     name: "Sunset Field",
     image: {
-      url: "/home-sunset-field.jpg",
+      url: "/home-sunset-field.webp",
       alt: "A silhouetted figure standing in a sunset field",
     },
   },
@@ -62,7 +62,7 @@ export const homeWallpapers: HomeWallpaper[] = [
     id: "sea-girl",
     name: "Sea Girl",
     image: {
-      url: "/home-sea-girl.jpg",
+      url: "/home-sea-girl.webp",
       alt: "A girl walking beside the sea at sunset",
     },
   },
@@ -70,7 +70,7 @@ export const homeWallpapers: HomeWallpaper[] = [
     id: "night-sky",
     name: "Night Sky",
     image: {
-      url: "/home-night-sky.jpg",
+      url: "/home-night-sky.webp",
       alt: "A quiet night sky in deep blue tones",
     },
   },

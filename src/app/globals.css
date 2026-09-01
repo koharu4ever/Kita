@@ -76,3 +76,14 @@ body {
     opacity: 0;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-wallpaper-breathing,
+  .typewriter-caret::after {
+    animation: none;
+  }
+}

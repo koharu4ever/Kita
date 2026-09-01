@@ -14,10 +14,12 @@ export function FloatingVisualNav({
   return (
     <nav
       aria-label="Floating primary"
+      aria-hidden={!isVisible}
       className={[
-        "fixed top-1/2 right-0 z-50 flex -translate-y-1/2 flex-col gap-1 transition-opacity duration-500 md:gap-2",
+        "fixed top-1/2 right-0 z-50 flex -translate-y-1/2 flex-col gap-1 transition-opacity duration-500 motion-reduce:transition-none md:gap-2",
         isVisible ? "opacity-100" : "pointer-events-none opacity-0",
       ].join(" ")}
+      inert={!isVisible}
     >
       {items.map((item) => (
         <Link

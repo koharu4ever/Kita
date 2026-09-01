@@ -24,7 +24,8 @@ export function HomeExperience({
   wallpapers,
   verses,
 }: HomeExperienceProps) {
-  const activeWallpaperIndex = useRotatingIndex(wallpapers.length, 8500);
+  const { index: activeWallpaperIndex, hasRotated: hasWallpaperRotated } =
+    useRotatingIndex(wallpapers.length, 8500);
   const hasScrolled = useScrollThreshold(0.2);
   const activeWallpaper =
     wallpapers[activeWallpaperIndex] ?? wallpapers.at(0) ?? null;
@@ -38,6 +39,7 @@ export function HomeExperience({
       <section className="fixed inset-0 isolate flex min-h-svh items-end overflow-hidden">
         <SceneBackground
           activeIndex={activeWallpaperIndex}
+          hasRotated={hasWallpaperRotated}
           wallpapers={wallpapers}
         />
         <div className="absolute inset-0 z-10 bg-black/35" />

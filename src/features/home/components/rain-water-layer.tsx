@@ -163,6 +163,32 @@ export function RainWaterLayer({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isRainEnabled, setIsRainEnabled] = useState(false);
   const [isFallbackVisible, setIsFallbackVisible] = useState(false);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container || !("IntersectionObserver" in window)) {
+      setIsNearViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) {
+          return;
+        }
+
+        setIsNearViewport(true);
+        observer.disconnect();
+      },
+      { threshold: 0.01 },
+    );
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const desktopRainMedia = window.matchMedia(desktopRainMediaQuery);
@@ -185,7 +211,7 @@ export function RainWaterLayer({
     const container = containerRef.current;
     const canvas = canvasRef.current;
 
-    if (!container || !canvas || !isRainEnabled) {
+    if (!container || !canvas || !isRainEnabled || !isNearViewport) {
       setIsFallbackVisible(true);
       return;
     }
@@ -232,7 +258,7 @@ export function RainWaterLayer({
       resizeObserver.disconnect();
       scene?.destroy();
     };
-  }, [backgroundImageUrl, intensity, isRainEnabled]);
+  }, [backgroundImageUrl, intensity, isNearViewport, isRainEnabled]);
 
   return (
     <div
@@ -241,7 +267,7 @@ export function RainWaterLayer({
       ref={containerRef}
     >
       <canvas
-        className={`absolute inset-0 h-full w-full transition-opacity duration-300 ${
+        className={`absolute inset-0 h-full w-full transition-opacity duration-300 motion-reduce:transition-none ${
           isRainEnabled && !isFallbackVisible ? "opacity-90" : "opacity-0"
         }`}
         ref={canvasRef}
