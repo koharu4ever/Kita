@@ -88,7 +88,7 @@ Reviews 展示层已在当前分支完成本地实现：
 - `/reviews` 信息流和 Review 详情使用独立 route layout，不污染其他路由；
 - 信息流以全屏封面 Hero 和打字机文案进入博客式双列卡片；列表按每页 4 篇执行 Payload 分页，并在信息流底部提供紧凑页码和前后翻页；
 - 开发环境可通过 `/reviews/preview` 查看 6 篇无数据库写入的占位内容和两页分页效果，Production 返回 404；详情保留封面、正文卡和粘性目录；
-- 详情页包含 Lexical heading 自动目录、上一篇/下一篇、随机 Review 与本地阅读位置恢复；
+- 详情页包含 Lexical heading 自动目录、上一篇/下一篇、随机 Review 与本地阅读位置恢复；导航与随机选择读取全部已发布 Reviews，不再受旧的 20 条上限限制，信息流仍独立执行每页 4 篇的服务端分页；
 - 光暗模式、角色导航、按 pathname 稳定散布并随页面滚动的侧边装饰贴纸和自定义鼠标严格限制在 Reviews 子路由；Giscus iframe 随主题加载对应 CSS；
 - Hero 不显示向下箭头；阅读工具在滚动后以博客式蓝色方块 SVG 按钮出现，包含主题、工具收折、随机阅读和进度/返回顶部；手机进入评论区时隐藏浮动工具，避免遮挡输入与登录；
 - 评论区沿用所有者博客的渐变标签、点阵底纹、渐变边框和七张装饰贴纸，窄屏减少贴纸并保留真实 Giscus 输入区；
@@ -190,7 +190,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 源码集中在 `src/features/tools/`，资源来源记录在 `THIRD_PARTY_NOTICES.md`。本次不写入开发或生产内容，不执行 migration；Reviews 与 Tools 在同一 PR 中提交，不合并、不部署。
 
-验证：136 个 Vitest 和 4 个 backup shell 场景通过；`pnpm check` 与 `SKIP_ENV_VALIDATION=true pnpm build` 通过。浏览器检查五模式、分类与来源筛选、全角关键词、清空/空结果、标题排序、25/All、第二页及 390px 布局；保留键盘焦点和 reduced-motion 支持。生产预渲染的 preview 包含 404 边界、不含样例工具。手机高级选项只修正原版负边距造成的越界，未重设整体视觉。
+验证：2026-09-02 同步 PR #25 后重新运行 137 个 Vitest 和 4 个 backup shell 场景通过；`pnpm check` 与 `SKIP_ENV_VALIDATION=true pnpm build` 通过，包含超过 20 篇 Review 的导航回归测试。此前本地浏览器检查五模式、分类与来源筛选、全角关键词、清空/空结果、标题排序、25/All、第二页及 390px 布局；保留键盘焦点和 reduced-motion 支持。生产预渲染的 preview 包含 404 边界、不含样例工具。手机高级选项只修正原版负边距造成的越界，未重设整体视觉。
 
 本次读取真实本地 `/tools` 返回 200，但当前开发数据库没有 Tools 条目，页面正确显示空状态；样例只出现在 `/tools/preview`。从 Tools 客户端导航到 Reviews 后 Tools 根样式容器消失，Reviews 页面正常渲染。未据此推断生产内容数量。
 

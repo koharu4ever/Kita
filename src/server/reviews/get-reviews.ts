@@ -8,7 +8,7 @@ export async function getReviews() {
     const payload = await getPayloadClient();
     const reviews = await payload.find({
       collection: "reviews",
-      limit: 20,
+      pagination: false,
       overrideAccess: false,
       sort: "-publishedAt",
       where: {

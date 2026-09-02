@@ -46,6 +46,7 @@ describe("getReviews", () => {
       expect.objectContaining({
         collection: "reviews",
         overrideAccess: false,
+        pagination: false,
         where: { status: { equals: "published" } },
       }),
     );
@@ -144,6 +145,26 @@ describe("getReviews", () => {
       next: { slug: "new" },
       previous: { slug: "old" },
     });
+  });
+
+  it("keeps navigation available beyond the first twenty reviews", async () => {
+    const find = arrangeFind(
+      Array.from({ length: 22 }, (_, index) =>
+        createPayloadReviewDocument({ slug: `review-${index}` }),
+      ),
+    );
+
+    await expect(getReviewNavigation("review-20")).resolves.toMatchObject({
+      next: { slug: "review-19" },
+      previous: { slug: "review-21" },
+    });
+    expect(find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pagination: false,
+        overrideAccess: false,
+        where: { status: { equals: "published" } },
+      }),
+    );
   });
 
   it("excludes the current review when choosing a random review", async () => {
