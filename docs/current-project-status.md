@@ -33,7 +33,7 @@ workspace: C:\dev\Kita
 
 截至 2026-09-01，PR #24 已合并到 `main` 并部署；Production `/api/health` 已返回 `200`、`ready` 和 `database: reachable`。后续视觉替换与内容整理继续使用独立小型分支，不直接修改 `main`。
 
-2026-09-02 已核实 PR #25 恢复旧视觉的改动合并到 `main`。Reviews 博客式展示和 Tools 五模式归档共同在 `codex/reviews-blog-experience` 分支整理，用户已授权提交并创建 PR；尚未合并或部署。
+2026-09-02 已核实 PR #25 恢复旧视觉的改动合并到 `main`。Reviews 博客式展示和 Tools 五模式归档已共同提交并推送到 `codex/reviews-blog-experience`；用户已授权创建 PR，但尚未创建成功，也未合并或部署。
 
 ## 本地开发
 
@@ -215,7 +215,8 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - [x] DB-backed `/api/health`、安全 503 响应与 Compose `web` healthcheck；
 - [x] `codex/portfolio-v1-readiness` 通过 PR #24 合并到 `main`；
 - [x] 合并部署后验证 `/api/health` readiness；
-- [ ] push `codex/reviews-blog-experience`、创建 Draft PR，并通过远端 required check；
+- [x] 提交并 push `codex/reviews-blog-experience`，通过本地 test/check/build；
+- [ ] 为 Reviews 与 Tools 分支创建 Draft PR，并通过远端 required check；
 - [ ] Reviews 与 Tools PR 合并部署后验证列表、详情、主题、目录、随机入口、五种工具视图、Giscus 和首条 Discussion；
 - [ ] 完成内容清理后验证 Games、Reviews、Tools、Media URL 和 Redeploy 持久性；
 - [ ] 最终 Production 截图与准确发布材料。
@@ -239,4 +240,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-当前执行 Reviews 与 Tools 分支提交和 Draft PR；required check 和人工 review 通过后，另获明确授权才合并部署。Production 内容和 Media 清理由项目所有者确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+当前分支已推送，下一步创建 Reviews 与 Tools Draft PR；required check 和人工 review 通过后，另获明确授权才合并部署。Production 内容和 Media 清理由项目所有者确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
