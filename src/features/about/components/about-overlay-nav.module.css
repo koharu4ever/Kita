@@ -1,146 +1,292 @@
-.menuButton {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-  width: 50px;
-  height: 50px;
-  border: 0;
-  border-radius: 999px;
-  background: rgb(0 0 0 / 92%);
-  color: white;
-  cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    transform 0.3s ease;
-}
-
-.menuButton:hover {
-  background: rgb(36 10 44 / 96%);
-  transform: scale(1.04);
-}
-
-.hamburger {
+.navigation {
+  --veil-ink: #fff;
+  --veil-accent: #ffae87;
   position: relative;
-  display: block;
-  width: 24px;
-  height: 24px;
+  z-index: 50;
 }
 
-.hamburgerLine {
+.menuButton,
+.closeButton {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 18px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--veil-ink);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 8px rgb(62 19 14 / 60%);
+  cursor: pointer;
+}
+
+.menuIcon,
+.closeIcon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.menuIcon span,
+.closeIcon::before,
+.closeIcon::after {
   position: absolute;
+  top: 9px;
   left: 0;
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: white;
-  transition:
-    top 0.3s ease,
-    opacity 0.2s ease,
-    transform 0.3s ease;
+  width: 20px;
+  height: 1px;
+  background: currentColor;
+  content: "";
 }
 
-.hamburgerLineTop {
-  top: 25%;
+.menuIcon span:first-child {
+  transform: translateY(-3px);
 }
-
-.hamburgerLineMiddle {
-  top: 50%;
+.menuIcon span:last-child {
+  transform: translateY(3px);
 }
-
-.hamburgerLineBottom {
-  top: 75%;
-}
-
-.isOpen .hamburgerLineTop {
-  top: 50%;
+.closeIcon::before {
   transform: rotate(45deg);
 }
-
-.isOpen .hamburgerLineMiddle {
-  opacity: 0;
-}
-
-.isOpen .hamburgerLineBottom {
-  top: 50%;
+.closeIcon::after {
   transform: rotate(-45deg);
 }
 
-.overlay {
+/* Native modal semantics keep focus off the page; the cloth itself stays translucent. */
+.veil {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  border: 0;
+  color: var(--veil-ink);
   background:
-    radial-gradient(circle at 78% 18%, rgb(168 85 247 / 18%), transparent 30%),
-    rgb(2 6 23 / 92%);
-  clip-path: circle(0 at calc(100% - 45px) 45px);
-  transition: clip-path 0.42s ease-in-out;
+    linear-gradient(
+      110deg,
+      rgb(242 114 66 / 12%),
+      rgb(121 40 32 / 28%) 58%,
+      rgb(65 19 26 / 60%)
+    ),
+    linear-gradient(180deg, rgb(255 166 98 / 10%), rgb(83 24 22 / 22%));
+  backdrop-filter: blur(1.5px) saturate(1.05);
+  opacity: 0;
+  clip-path: circle(0 at calc(100% - 54px) 46px);
+  transition:
+    clip-path 750ms cubic-bezier(0.22, 0.68, 0, 1),
+    opacity 450ms ease,
+    display 750ms allow-discrete,
+    overlay 750ms allow-discrete;
 }
 
-.overlayOpen {
-  clip-path: circle(145% at calc(100% - 45px) 45px);
+.veil[open] {
+  opacity: 1;
+  clip-path: circle(150% at calc(100% - 54px) 46px);
+}
+
+@starting-style {
+  .veil[open] {
+    opacity: 0;
+    clip-path: circle(0 at calc(100% - 54px) 46px);
+  }
+}
+
+.veil::backdrop {
+  background: transparent;
+}
+
+/* Two very faint threads, not a moving noise texture or a new image asset. */
+.veil::before {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.15;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgb(255 229 220 / 12%) 0 1px,
+      transparent 1px 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgb(255 229 220 / 9%) 0 1px,
+      transparent 1px 4px
+    );
+}
+
+.directory {
+  position: relative;
+  width: min(340px, 30vw);
+  margin: max(112px, calc((100dvh - 440px) / 2)) 0 80px 62%;
+}
+
+.caption {
+  margin: 0 0 28px 39px;
+  color: #e6beab;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
 }
 
 .navList {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: center;
+  margin: 0;
+  padding: 0;
   list-style: none;
-  transform: translate(-50%, -50%);
+}
+.navList li + li {
+  margin-top: 9px;
 }
 
 .navLink {
-  position: relative;
-  display: inline-flex;
-  min-width: 180px;
-  justify-content: center;
-  padding: 5px 30px;
-  color: white;
-  font-size: 30px;
-  font-weight: 500;
-  line-height: 50px;
+  --link-accent: var(--veil-accent);
+  display: flex;
+  width: fit-content;
+  min-height: 66px;
+  align-items: center;
+  gap: 23px;
+  padding: 8px 10px 8px 0;
+  color: var(--veil-ink);
   text-decoration: none;
-  transition:
-    color 0.3s ease,
-    transform 0.3s ease;
+  transition: color 220ms ease;
 }
 
-.navLink::after {
+/* Use the same unmodified Tailwind palette as the Home primary navigation. */
+.navLink[href="/"] {
+  --link-accent: var(--color-amber-500);
+}
+.navLink[href="/games"] {
+  --link-accent: var(--color-blue-500);
+}
+.navLink[href="/reviews"] {
+  --link-accent: var(--color-purple-500);
+}
+.navLink[href="/tools"] {
+  --link-accent: var(--color-green-500);
+}
+
+.index {
+  color: #d5ad99;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  transition: color 220ms ease;
+}
+
+.label {
+  position: relative;
+  font-size: clamp(32px, 3.2vw, 48px);
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: 0.025em;
+  text-shadow: 0 1px 3px rgb(40 12 10 / 35%);
+  transition: transform 250ms ease;
+}
+
+.label::after {
   position: absolute;
-  inset: -5% -2%;
-  z-index: -1;
+  bottom: -8px;
+  left: 0;
+  width: 28px;
+  height: 1px;
+  background: var(--link-accent);
   content: "";
-  border-radius: 50px;
-  background: linear-gradient(160deg, #a855f7, #6d28d9, #2563eb);
-  transform: scaleY(0);
-  transition: transform 0.3s ease;
-  animation: hueRotate 1.5s linear infinite;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 250ms ease;
 }
 
 .navLink:hover,
 .navLink:focus-visible {
-  color: white;
-  transform: translateY(-1px);
+  color: var(--link-accent);
+}
+.navLink:hover .index,
+.navLink:focus-visible .index {
+  color: var(--link-accent);
+}
+.closeButton:hover {
+  color: var(--veil-accent);
+}
+.navLink:hover .label,
+.navLink:focus-visible .label {
+  transform: translateX(6px);
+}
+.navLink:hover .label::after,
+.navLink:focus-visible .label::after {
+  transform: scaleX(1);
 }
 
-.navLink:hover::after,
-.navLink:focus-visible::after {
-  transform: scaleY(1);
+.endMark {
+  display: block;
+  width: 46px;
+  height: 1px;
+  margin: 36px 0 0 39px;
+  background: rgb(244 185 150 / 35%);
 }
 
-@keyframes hueRotate {
-  0% {
-    filter: hue-rotate(0deg);
+.menuButton:focus-visible,
+.closeButton:focus-visible {
+  outline: 1px solid var(--veil-accent);
+  outline-offset: 6px;
+}
+
+.navLink:focus-visible {
+  outline: 1px solid var(--link-accent);
+  outline-offset: 6px;
+}
+
+/* Only the About article recedes. The original fixed wallpaper is untouched. */
+.navigation + main {
+  transition:
+    opacity 450ms ease,
+    filter 450ms ease;
+}
+.navigation:has(.veil[open]) + main {
+  opacity: 0.1;
+  filter: blur(3px);
+}
+
+@media (max-width: 639px) {
+  .menuButton,
+  .closeButton {
+    top: 16px;
+    right: 18px;
   }
+  .directory {
+    width: 220px;
+    margin: max(112px, calc((100dvh - 400px) / 2)) auto 64px;
+  }
+  .label {
+    font-size: 38px;
+  }
+  .veil {
+    clip-path: circle(0 at calc(100% - 40px) 38px);
+  }
+  .veil[open] {
+    clip-path: circle(150% at calc(100% - 40px) 38px);
+  }
+  @starting-style {
+    .veil[open] {
+      clip-path: circle(0 at calc(100% - 40px) 38px);
+    }
+  }
+}
 
-  100% {
-    filter: hue-rotate(360deg);
+@media (prefers-reduced-motion: reduce) {
+  .veil,
+  .navigation + main,
+  .navLink,
+  .index,
+  .label,
+  .label::after {
+    transition: none;
   }
 }

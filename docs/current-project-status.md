@@ -9,7 +9,7 @@
 本轮文档整理基线：
 
 ```text
-main: 72481e1 (PR #27 merge)
+main: c41ba89 (PR #28 merge)
 workspace: C:\dev\Kita
 ```
 
@@ -33,7 +33,7 @@ workspace: C:\dev\Kita
 
 截至 2026-09-01，PR #24 已合并到 `main` 并部署；Production `/api/health` 已返回 `200`、`ready` 和 `database: reachable`。后续视觉替换与内容整理继续使用独立小型分支，不直接修改 `main`。
 
-2026-09-02 已核实 PR #25 恢复旧视觉、PR #26 Reviews 博客式展示和 Tools 五模式归档，以及 PR #27 首页雨景与雨声均已合并到 `main`。本轮只核对 GitHub 合并状态，不据此推断 PR #26 / #27 的生产部署或页面验收结果。Games 雨窗在独立分支 `codex/games-window-return` 接入正式组件；发布仍需完成 PR 审查、合并和部署，不能据此宣称已上线。
+2026-09-02 已核实 PR #25 恢复旧视觉、PR #26 Reviews 博客式展示和 Tools 五模式归档，以及 PR #27 首页雨景与雨声均已合并到 `main`。本轮 fetch 后的 `origin/main` 为 `c41ba89`，确认 PR #28 Games 雨窗也已合并；这些合并记录不代替 PR #26 / #27 / #28 的生产部署和页面验收。
 
 ## 本地开发
 
@@ -209,9 +209,9 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 2026-09-02 提审前同步 PR #26 基线后，在 Dev Container 以 `node` 用户通过 152 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build`。新增测试覆盖等功率接缝、按需加载、后台暂停、加载中离开页面及资源释放。对最终 MP3 解码后的片段进行数值核对：循环 16 秒，没有全零帧或削波，重叠段与主体平均音量差约 0.2 dB，回绕边界保持原素材相邻采样关系。浏览器已确认首屏隐藏入口、下滑显示图标、点击成功加载播放，以及播放中回顶仍保留关闭入口；自动检查和本地验收不代表所有浏览器/设备的听感均已覆盖。本轮未重新运行数据库 integration smoke，也未合并或部署。
 
-### Games 雨窗入口（提审中，2026-09-02）
+### Games 雨窗入口（PR #28 已合并，2026-09-02）
 
-`codex/games-window-return` 从 PR #27 合并后的 `origin/main` 创建，项目所有者已确认本地效果，并授权提交代码与三张城市/玻璃素材、创建 Draft PR；不合并、不部署。
+`codex/games-window-return` 从 PR #27 合并后的 `origin/main` 创建，项目所有者已确认本地效果。PR #28 已合并到 `main`（`c41ba89`）；本轮没有操作生产部署，以下验证仍是本地验证。
 
 - 正式 `/games` 的第一格使用 Urban Rain 城市雨窗，取代大号 GAMES / Return 卡片，保留原瀑布流、真实 Game 卡片、详情和 lightbox 链路；页面保留辅助技术可读的 Games 主标题。
 - 城市底图及左右透明窗玻璃均为 3840 × 2400，位于 `public/games/window/`，随 Docker 的 public 目录一起发布。总大小约 2.62 MB；没有为本地预览之外的环境设置素材读取禁令。来源、文件映射与所有者的公开使用确认仅维护在 `THIRD_PARTY_NOTICES.md`。
@@ -225,6 +225,14 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 2026-09-02 正式接入版在 Dev Container 以 `node` 用户通过 160 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build`。移除临时素材 route 后同时删除了其 10 个测试，数量下降不代表测试失败。检查时清除了两份已核实损坏的 `.next/dev/types` 自动生成文件，重跑检查和构建通过；没有删除 `.next` 目录或数据卷。
 
 浏览器已在正式 `/games` 确认三张素材均以 3840 × 2400 加载、雨滴画布显示、暂停/继续及键盘返回首页正常；在复用正式组件的 preview 中确认悬停晃动、暂停停止晃动、1440px 桌面与 390px 窄屏无横向溢出。本地目前没有已发布 Game，多封面排版仅使用 preview 样例检查，没有为此写入数据库；真实生产条目、lightbox 与部署后的验收仍需部署后核对。本轮未运行数据库 integration smoke；CI 配置仍包含该检查。
+
+### About 窗纱导航（提审中，2026-09-02）
+
+`codex/about-compact-nav` 从 PR #28 合并后的 `origin/main` 创建。小目录经过本地预览后，按项目所有者的新方向改成全屏窗纱导航：保留右上角弧形展开，使用呼应 About 晚霞的红橙半透明层、轻微模糊和纯 CSS 细织纹，四个原有链接在桌面偏右成组排列、窄屏居中。后续配色微调减轻了织纹与模糊、移除灰紫去饱和效果；链接默认纯白，hover/键盘聚焦时文字、编号、短线及焦点框直接复用首页主导航的 Tailwind 500 色阶：Home 琥珀、Games 蓝、Reviews 紫、Tools 绿，不再使用粉彩替代值或同色雾状柔光。没有新增图片或依赖；原背景和正文内容、其他路由及数据库均不变。
+
+导航采用原生 modal dialog：打开时正文淡出、背景保留，锁定页面滚动并阻止焦点进入底层页面；支持关闭按钮、Esc、点击窗纱空白处收起和返回触发按钮，卸载后恢复滚动样式。关闭后导航不可聚焦；减少动态效果偏好下禁用过渡。不支持离散 display/overlay 过渡的浏览器仍可正常开关，但可能没有完整弧形退场。项目所有者已确认本地效果并授权提 PR；本轮仅提审，不合并、不部署。
+
+最终配色版在提交前重新通过 162 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build`。早期结构验证曾仅清理已核实损坏的 `.next/dev/types/validator.ts` 自动生成文件，没有删除源码、目录或数据卷。浏览器检查了 1440px 桌面、390px 窄屏、原生 modal 状态、键盘进入链接、Esc 关闭后焦点/滚动恢复，以及 Home 跳转后导航与滚动锁清理，并逐项确认四个链接聚焦时的文字与短线使用首页同一色值。以上不是生产或跨浏览器验收；本轮未运行数据库 integration smoke。
 
 ### 当前收尾
 
@@ -270,4 +278,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-下一步审查 Games 雨窗 Draft PR 与 CI，通过后由项目所有者另行决定合并部署。PR #26 / #27 的生产验收与 Production 内容、Media 清理仍需单独确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一步审查 About 窗纱导航 PR 与 CI；合并、部署由项目所有者另行决定。PR #26 / #27 / #28 的生产验收与 Production 内容、Media 清理仍需单独确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
