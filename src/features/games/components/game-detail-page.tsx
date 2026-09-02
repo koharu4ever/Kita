@@ -1,8 +1,8 @@
-import { RichText } from "@payloadcms/richtext-lexical/react";
 import Image from "next/image";
 import Link from "next/link";
 
 import type { GameDetail } from "@/features/games/types/game-detail";
+import { ContentRichText } from "@/features/content/components/content-rich-text";
 
 import styles from "./game-rich-text.module.css";
 
@@ -87,7 +87,7 @@ export function GameDetailPage({ game }: GameDetailPageProps) {
         <div className="py-10">
           <p className="text-lg leading-8 text-white/76">{game.summary}</p>
 
-          <RichText className={styles.root} data={game.body} />
+          <ContentRichText className={styles.root} body={game.body} />
 
           <p className="mt-8 text-xs tracking-[0.2em] text-white/38 uppercase">
             {game.tags.join(" / ")}

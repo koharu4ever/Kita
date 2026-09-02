@@ -149,6 +149,8 @@ export interface User {
   collection: 'users';
 }
 /**
+ * 公开图片库，供 Game 封面和 Reviews/Games 正文复用。删除前请手动检查所有引用；目前没有自动阻止删除使用中图片的保护。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -190,33 +192,73 @@ export interface Media {
   };
 }
 /**
+ * Tools 是外部资源目录，不是文章。这里编辑的资料会用于前台五种展示模式。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tools".
  */
 export interface Tool {
   id: number;
   title: string;
+  /**
+   * 简要说明用途、适用场景和注意事项；此字段使用纯文本，保证列表搜索与五种视图一致。
+   */
   description: string;
+  /**
+   * 官方资源或项目地址，须包含 https:// 或 http://；来源站点由此自动推导。
+   */
   url: string;
+  /**
+   * 内容分类，与前台五种展示模式不是同一个概念。
+   */
   category: 'text-hooking' | 'runtime' | 'database' | 'capture';
+  /**
+   * 默认精选排序中，数值越小越靠前；前台仍可切换其他排序。
+   */
   sortOrder: number;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * 撰写图文评论。草稿仅在后台可读；保存为 Published 后才能从公开页面访问。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "reviews".
  */
 export interface Review {
   id: number;
   title: string;
+  /**
+   * 文章地址：小写英文、数字和连字符；不要使用 random 或 preview。发布后修改会影响链接及评论。
+   */
   slug: string;
+  /**
+   * Draft 不对外展示；Published 保存后公开。这里不是自动保存或历史版本系统。
+   */
   status: 'draft' | 'published';
+  /**
+   * 文章讨论的游戏名，不要求先创建 Game。
+   */
   gameTitle: string;
+  /**
+   * 展示日期，不是定时发布任务。
+   */
   publishedAt: string;
+  /**
+   * 列表卡片与文章首屏使用的简短摘要，正文写在 Body 中。
+   */
   excerpt: string;
+  /**
+   * 文章封面路径或已配置的 R2 图片 URL。正文图片请在 Body 工具栏选择 Media。
+   */
   coverImage: string;
+  /**
+   * 0–10 分。
+   */
   rating: number;
+  /**
+   * 预计阅读时间，例如 5 min read。
+   */
   readingTime: string;
   tags?:
     | {
@@ -224,6 +266,9 @@ export interface Review {
         id?: string | null;
       }[]
     | null;
+  /**
+   * 使用固定工具栏或输入 / 插入标题、Media 图片和分隔线；选中文字可设置格式或链接。H2–H4 自动生成前台目录。图片说明在每次插入处单独填写。
+   */
   body: {
     root: {
       type: string;
@@ -243,19 +288,36 @@ export interface Review {
   createdAt: string;
 }
 /**
+ * 管理游戏资料、封面与图文介绍。先选择 Media 封面，再保存发布状态。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "games".
  */
 export interface Game {
   id: number;
   title: string;
+  /**
+   * 游戏地址：小写英文、数字和连字符；不要使用 preview。发布后尽量保持不变。
+   */
   slug: string;
   originalTitle?: string | null;
   developer: string;
+  /**
+   * 展示文本，例如 2024-03-29 或 TBA，不会执行定时任务。
+   */
   releaseDate: string;
   playStatus: 'finished' | 'playing' | 'planned';
+  /**
+   * Draft 仅在后台可读，Published 保存后进入公开画廊。
+   */
   publicationStatus: 'draft' | 'published';
+  /**
+   * 详情页开头的简短介绍；长篇图文内容写在 Body 中。
+   */
   summary: string;
+  /**
+   * 支持标题、列表、引用、链接、行内代码、正文图片和图片说明；从工具栏或 / 菜单插入。
+   */
   body: {
     root: {
       type: string;
@@ -272,7 +334,7 @@ export interface Game {
     [k: string]: unknown;
   };
   /**
-   * Required Payload Media cover.
+   * 必填封面。重复使用图片时选择已有 Media；正文插图也可复用同一图片。
    */
   cover: number | Media;
   tags?:
@@ -281,6 +343,9 @@ export interface Game {
         id?: string | null;
       }[]
     | null;
+  /**
+   * 添加官方站点、商店或参考链接，地址须为 HTTP(S)。
+   */
   links?:
     | {
         label: string;
