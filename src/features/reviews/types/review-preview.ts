@@ -11,4 +11,15 @@ export type ReviewPreview = {
   readingTime: string;
   tags: string[];
   body: DefaultTypedEditorState;
+  updatedAt: string;
+};
+
+export type ReviewNavigationItem = Pick<
+  ReviewPreview,
+  "date" | "slug" | "title"
+>;
+
+export type ReviewNavigation = {
+  next?: ReviewNavigationItem;
+  previous?: ReviewNavigationItem;
 };

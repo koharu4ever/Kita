@@ -6,7 +6,7 @@ export async function getTools() {
     const payload = await getPayloadClient();
     const tools = await payload.find({
       collection: "tools",
-      limit: 20,
+      pagination: false,
       overrideAccess: false,
       sort: "sortOrder",
     });

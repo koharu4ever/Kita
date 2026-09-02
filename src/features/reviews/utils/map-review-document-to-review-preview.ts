@@ -15,6 +15,7 @@ export type PayloadReviewDocument = Pick<
   | "slug"
   | "tags"
   | "title"
+  | "updatedAt"
 >;
 
 function compactStrings(values: Array<string | null | undefined> = []) {
@@ -35,5 +36,6 @@ export function mapReviewDocumentToReviewPreview(
     readingTime: review.readingTime,
     tags: compactStrings(review.tags?.map((tag) => tag.label) ?? []),
     body: review.body as DefaultTypedEditorState,
+    updatedAt: review.updatedAt,
   };
 }

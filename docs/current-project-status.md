@@ -1,6 +1,6 @@
 # Kita 当前项目状态
 
-> 最后核对：2026-09-01
+> 最后核对：2026-09-02
 >
 > 本文是可变事实和待办的唯一来源。操作步骤见 [文档入口](./README.md) 中的专题文档。
 
@@ -9,11 +9,11 @@
 本轮文档整理基线：
 
 ```text
-main: 1fa2ab4 (PR #24 merge)
+main: 6e15b45 (PR #25 merge)
 workspace: C:\dev\Kita
 ```
 
-开始新任务时必须重新查询 Git；上述 SHA 是 2026-09-01 的基线证据，不代表永久 HEAD。
+开始新任务时必须重新查询 Git；上述 SHA 是 2026-09-02 的基线证据，不代表永久 HEAD。
 
 仓库当前包含：
 
@@ -32,6 +32,8 @@ workspace: C:\dev\Kita
 项目已经进入 `v1.0` 收尾阶段。固定定位是自托管游戏目录与评论发布平台；后续优先完成真实内容、隔离验证和最终展示，不再扩张技术栈或业务类型。
 
 截至 2026-09-01，PR #24 已合并到 `main` 并部署；Production `/api/health` 已返回 `200`、`ready` 和 `database: reachable`。后续视觉替换与内容整理继续使用独立小型分支，不直接修改 `main`。
+
+2026-09-02 已核实 PR #25 恢复旧视觉的改动合并到 `main`。Reviews 博客式展示和 Tools 五模式归档已共同提交并推送到 `codex/reviews-blog-experience`；用户已授权创建 PR，但尚未创建成功，也未合并或部署。
 
 ## 本地开发
 
@@ -80,6 +82,19 @@ Games Media-only 已完成：
 - 旧 `coverSrc`、`coverAlt`、`coverWidth`、`coverHeight` schema/列已删除；
 - mapper 从 Media metadata 构造前端 cover DTO；
 - 生产 6 条 Games 的 relationship、页面、Media URL 与 Redeploy 持久性曾于 2026-07-22 验证。
+
+Reviews 展示层已在当前分支完成本地实现：
+
+- `/reviews` 信息流和 Review 详情使用独立 route layout，不污染其他路由；
+- 信息流以全屏封面 Hero 和打字机文案进入博客式双列卡片；列表按每页 4 篇执行 Payload 分页，并在信息流底部提供紧凑页码和前后翻页；
+- 开发环境可通过 `/reviews/preview` 查看 6 篇无数据库写入的占位内容和两页分页效果，Production 返回 404；详情保留封面、正文卡和粘性目录；
+- 详情页包含 Lexical heading 自动目录、上一篇/下一篇、随机 Review 与本地阅读位置恢复；导航与随机选择读取全部已发布 Reviews，不再受旧的 20 条上限限制，信息流仍独立执行每页 4 篇的服务端分页；
+- 光暗模式、角色导航、按 pathname 稳定散布并随页面滚动的侧边装饰贴纸和自定义鼠标严格限制在 Reviews 子路由；Giscus iframe 随主题加载对应 CSS；
+- Hero 不显示向下箭头；阅读工具在滚动后以博客式蓝色方块 SVG 按钮出现，包含主题、工具收折、随机阅读和进度/返回顶部；手机进入评论区时隐藏浮动工具，避免遮挡输入与登录；
+- 评论区沿用所有者博客的渐变标签、点阵底纹、渐变边框和七张装饰贴纸，窄屏减少贴纸并保留真实 Giscus 输入区；
+- Giscus 使用 pathname 映射到 Kita GitHub Discussions，支持配套光暗主题和 Anki-tan reaction CSS；
+- 本地 Giscus iframe 使用所有者博客已公开的同款主题，避免跨来源加载 localhost CSS 失败；部署版本使用 Kita 自己的 `/reviews/giscus/` 主题与素材；
+- 评论不进入 Payload/PostgreSQL，不新增后端内容模型或 secret。
 
 ## Production 与数据库
 
@@ -141,7 +156,7 @@ OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用�
 
 GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快速 tests、隔离 PostgreSQL/Payload integration smoke 和 build；main ruleset 要求 PR 与 required check。
 
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 已在 Dev Container 重新验证 115 个 Vitest、4 个 backup shell 场景、5 个真实 PostgreSQL/Payload integration 测试、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；本地浏览器同时确认 Home、About、Games、Reviews 的桌面与窄屏状态和 Review 兼容封面，控制台无错误或警告。此前还验证了未发布 Game 的品牌化 404。减少的测试来自连同实现一起移除的 development seed/fallback，不代表当前行为失去覆盖。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
+最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 在 Reviews 分支重新验证 126 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；新增测试覆盖目录 Unicode/重复标题 ID、Review 导航、随机选择、稳定随机贴纸布局和列表分页。浏览器确认 Reviews Hero、打字机、真实翻页、桌面与 390px 窄屏、主题切换、随机路由、目录、Giscus 加载及路由隔离；Giscus 在首次留言前提示尚未创建对应 Discussion，属于预期行为。此前的 5 个真实 PostgreSQL/Payload integration 测试仍是 PR #24 基线结果，本分支没有修改 Payload schema。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
 
 同日将 Next.js、Payload、Sharp 和 PostCSS 更新到修复已知高危 advisory 的同栈补丁版本，并在升级后重跑上述完整门禁。锁文件的 `pnpm audit --prod --audit-level high` 结果为 0 high、0 critical；剩余 low/moderate 项来自上游固定的 Admin/CLI 传递依赖，当前不使用未经上游验证的强制 override。
 
@@ -159,6 +174,25 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 - 首页、内容页和 Admin 的最小 Playwright smoke；
 - backup last-success healthcheck/告警。
+
+## Tools 五模式移植（分支实现，2026-09-02）
+
+`/tools` 复用所有者博客 `/notes/` 的界面，而不是另行设计：Minimal、Minimal+、Compact、Extended、Thumbnail 五种模式，透明蓝色背景、分类色块、实时搜索、AND 多条件筛选、上下分页和 25/50/All 每页数量均保留。控件使用 React 状态替代 Hexo 的 DOM 重排和 PJAX 初始化；偏好保存在独立的 `kita-tools-archive` localStorage key，`?view=` 可覆盖默认展示模式。样式全部限制在 Tools 类名下，不修改站点或 Reviews 的主题。
+
+必要的数据适配：
+
+- 原文章分类对应现有 Tools category；原标签筛选对应 URL 来源站点筛选，不新增数据库 tags 字段；
+- 原阅读时长与作者列改成 External link 与 Source，不虚构工具的阅读时长；
+- 默认排序尊重 CMS `sortOrder`（Curated order），另保留按新旧日期和标题排序；
+- getter 使用 `pagination: false` 读取全部工具，保留 `overrideAccess: false`；原来仅取 20 条无法支持完整客户端搜索与分页。当前小型目录采用与博客相同的全量客户端模式，规模显著增长后再评估服务端检索；
+- 四类工具使用博客授权图片作为分类装饰封面，不代表实际软件截图，也没有引入 Media/schema migration；
+- `/tools/preview` 只在 development 开放，提供 30 条展示样例用于测试分页；production 返回 404，正式 `/tools` 仍只显示 Payload 数据，查询错误仍交给 error boundary。
+
+源码集中在 `src/features/tools/`，资源来源记录在 `THIRD_PARTY_NOTICES.md`。本次不写入开发或生产内容，不执行 migration；Reviews 与 Tools 在同一 PR 中提交，不合并、不部署。
+
+验证：2026-09-02 同步 PR #25 后重新运行 137 个 Vitest 和 4 个 backup shell 场景通过；`pnpm check` 与 `SKIP_ENV_VALIDATION=true pnpm build` 通过，包含超过 20 篇 Review 的导航回归测试。此前本地浏览器检查五模式、分类与来源筛选、全角关键词、清空/空结果、标题排序、25/All、第二页及 390px 布局；保留键盘焦点和 reduced-motion 支持。生产预渲染的 preview 包含 404 边界、不含样例工具。手机高级选项只修正原版负边距造成的越界，未重设整体视觉。
+
+本次读取真实本地 `/tools` 返回 200，但当前开发数据库没有 Tools 条目，页面正确显示空状态；样例只出现在 `/tools/preview`。从 Tools 客户端导航到 Reviews 后 Tools 根样式容器消失，Reviews 页面正常渲染。未据此推断生产内容数量。
 
 ## 当前待办
 
@@ -179,8 +213,11 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
 - [x] 首页资源按需加载、reduced motion、Home 导航与 Games gallery 键盘焦点收尾；
 - [x] DB-backed `/api/health`、安全 503 响应与 Compose `web` healthcheck；
-- [x] push `codex/portfolio-v1-readiness`、创建 Draft PR，并通过远端 required check；
+- [x] `codex/portfolio-v1-readiness` 通过 PR #24 合并到 `main`；
 - [x] 合并部署后验证 `/api/health` readiness；
+- [x] 提交并 push `codex/reviews-blog-experience`，通过本地 test/check/build；
+- [ ] 为 Reviews 与 Tools 分支创建 Draft PR，并通过远端 required check；
+- [ ] Reviews 与 Tools PR 合并部署后验证列表、详情、主题、目录、随机入口、五种工具视图、Giscus 和首条 Discussion；
 - [ ] 完成内容清理后验证 Games、Reviews、Tools、Media URL 和 Redeploy 持久性；
 - [ ] 最终 Production 截图与准确发布材料。
 
@@ -203,4 +240,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-下一步按固定顺序执行：先由项目所有者在本地确认已恢复的旧视觉效果；随后在 Payload Admin 完成上述 Production 内容与 Media 清理，做一次公开 API/页面/Redeploy smoke，最后采集 Production 截图。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+当前分支已推送，下一步创建 Reviews 与 Tools Draft PR；required check 和人工 review 通过后，另获明确授权才合并部署。Production 内容和 Media 清理由项目所有者确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

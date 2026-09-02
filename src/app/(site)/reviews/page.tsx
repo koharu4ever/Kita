@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { ReviewsPage as ReviewsFeaturePage } from "@/features/reviews/components/reviews-page";
-import { getReviews } from "@/server/reviews/get-reviews";
+import {
+  normalizeReviewPage,
+  reviewsPerPage,
+} from "@/features/reviews/utils/review-pagination";
+import { getReviewsPage } from "@/server/reviews/get-reviews";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +15,22 @@ export const metadata: Metadata = {
   description: "Read Kita's published long-form game reviews.",
 };
 
-export default async function ReviewsPage() {
-  const reviews = await getReviews();
+type ReviewsPageProps = {
+  searchParams: Promise<{ page?: string | string[] }>;
+};
 
-  return <ReviewsFeaturePage reviews={reviews} />;
+export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
+  const page = normalizeReviewPage((await searchParams).page);
+  const result = await getReviewsPage(page, reviewsPerPage);
+
+  if (page > result.pagination.totalPages) {
+    notFound();
+  }
+
+  return (
+    <ReviewsFeaturePage
+      pagination={result.pagination}
+      reviews={result.reviews}
+    />
+  );
 }

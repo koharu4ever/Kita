@@ -16,6 +16,9 @@ describe("mapToolDocumentToToolkitItem", () => {
 
     expect(result).toMatchObject({
       id: "42",
+      category: "Database",
+      source: "vndb.org",
+      cover: "/tools/archive/database.webp",
       links: [
         {
           href: "https://vndb.org/",
@@ -38,5 +41,14 @@ describe("mapToolDocumentToToolkitItem", () => {
 
     expect(result.links[0]?.note).toBe("Tool");
     expect(result.addedOn).toBe("Payload CMS");
+    expect(result.cover).toBe("/tools/archive/text-hooking.webp");
+  });
+
+  it("keeps malformed legacy metadata from crashing the list", () => {
+    const result = mapToolDocumentToToolkitItem(
+      createPayloadToolDocument({ createdAt: "invalid", url: "invalid" }),
+    );
+    expect(result.addedOn).toBe("Payload CMS");
+    expect(result.source).toBe("External resource");
   });
 });

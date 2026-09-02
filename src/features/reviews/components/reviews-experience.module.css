@@ -1,0 +1,537 @@
+.shell {
+  --reviews-accent: #0ea5e9;
+  --reviews-accent-strong: #0284c7;
+  --reviews-bg: #f4f7fb;
+  --reviews-card: rgb(255 255 255 / 90%);
+  --reviews-card-solid: #fff;
+  --reviews-border: rgb(15 23 42 / 8%);
+  --reviews-muted: rgb(51 65 85 / 72%);
+  --reviews-nav: rgb(255 255 255 / 82%);
+  --reviews-shadow: rgb(15 23 42 / 10%);
+  --reviews-text: #273142;
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  color: var(--reviews-text);
+  color-scheme: light;
+  background:
+    radial-gradient(
+      circle at 12% 10%,
+      rgb(56 189 248 / 10%),
+      transparent 28rem
+    ),
+    radial-gradient(circle at 88% 18%, rgb(99 102 241 / 8%), transparent 26rem),
+    var(--reviews-bg);
+}
+
+.shell[data-reviews-theme="dark"] {
+  --reviews-accent: #38bdf8;
+  --reviews-accent-strong: #7dd3fc;
+  --reviews-bg: #0f172a;
+  --reviews-card: rgb(24 34 53 / 92%);
+  --reviews-card-solid: #182235;
+  --reviews-border: rgb(148 163 184 / 15%);
+  --reviews-muted: rgb(203 213 225 / 72%);
+  --reviews-nav: rgb(15 23 42 / 84%);
+  --reviews-shadow: rgb(2 6 23 / 38%);
+  --reviews-text: #edf5ff;
+  color-scheme: dark;
+  background:
+    radial-gradient(
+      circle at 12% 10%,
+      rgb(56 189 248 / 12%),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 88% 18%,
+      rgb(99 102 241 / 10%),
+      transparent 26rem
+    ),
+    var(--reviews-bg);
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+.content {
+  width: min(1140px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 4rem 0 5.5rem;
+  scroll-margin-top: 4rem;
+}
+
+.indexHero {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  color: #fff;
+}
+
+.indexHeroImage {
+  object-fit: cover;
+  object-position: center 42%;
+  transform: scale(1.01);
+}
+
+.indexHeroShade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(6 12 24 / 78%), rgb(6 12 24 / 34%)),
+    linear-gradient(0deg, rgb(6 12 24 / 58%), transparent 46%);
+}
+
+.indexHeroContent {
+  position: relative;
+  z-index: 1;
+  width: min(920px, calc(100% - 2rem));
+  padding: 5rem 1rem;
+  text-align: center;
+  text-shadow: 0 4px 24px rgb(0 0 0 / 64%);
+}
+
+.indexHeroEyebrow {
+  margin: 0 0 1rem;
+  color: rgb(186 230 253 / 92%);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.indexHeroTitle {
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 5.2rem);
+  font-weight: 760;
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.typewriter {
+  min-height: 2.25rem;
+  margin: 1.5rem 0 0;
+  font-size: clamp(1rem, 2.2vw, 1.45rem);
+  line-height: 1.6;
+  letter-spacing: 0.025em;
+}
+
+.typewriterText::after {
+  display: inline-block;
+  height: 1.15em;
+  margin-left: 0.12em;
+  border-right: 2px solid rgb(255 255 255 / 88%);
+  content: "";
+  vertical-align: -0.12em;
+  animation: typewriter-caret 720ms steps(1, end) infinite;
+}
+
+.screenReaderOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.feedIntro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--reviews-muted);
+  line-height: 1.75;
+}
+
+.feedIntro p {
+  max-width: 42rem;
+  margin: 0;
+}
+
+.feedEyebrow {
+  color: var(--reviews-accent-strong);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.feed {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  display: block;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--reviews-border);
+  border-radius: 20px;
+  background: var(--reviews-card);
+  box-shadow: 0 24px 70px var(--reviews-shadow);
+  vertical-align: top;
+  backdrop-filter: blur(14px);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 80px
+    color-mix(in srgb, var(--reviews-shadow) 135%, transparent);
+}
+
+.cardMedia {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--reviews-card-solid);
+}
+
+.cardImage {
+  object-fit: cover;
+  transition: transform 500ms ease;
+}
+
+.card:hover .cardImage {
+  transform: scale(1.025);
+}
+
+.cardBody {
+  padding: 1.55rem 1.65rem 1.75rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.75rem;
+  align-items: center;
+  color: var(--reviews-muted);
+  font-size: 0.76rem;
+  font-weight: 550;
+  letter-spacing: 0.02em;
+}
+
+.cardTitle {
+  margin: 0.65rem 0 0;
+  color: var(--reviews-text);
+  font-size: clamp(1.3rem, 2vw, 1.65rem);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.cardTitle a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardTitle a:hover {
+  color: var(--reviews-accent);
+}
+
+.excerpt {
+  margin: 1rem 0 0;
+  color: var(--reviews-muted);
+  line-height: 1.8;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+}
+
+.tag {
+  padding: 0.24rem 0;
+  border: 0;
+  border-radius: 999px;
+  color: var(--reviews-accent-strong);
+  font-size: 0.72rem;
+}
+
+.tag::before {
+  content: "#";
+}
+
+.emptyState {
+  padding: 4rem 1.5rem;
+  border: 1px solid var(--reviews-border);
+  border-radius: 1rem;
+  background: var(--reviews-card);
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.45rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.paginationLink,
+.paginationCurrent,
+.paginationArrow,
+.paginationEllipsis {
+  display: grid;
+  min-width: 2.65rem;
+  height: 2.65rem;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.paginationLink,
+.paginationArrow {
+  border: 1px solid var(--reviews-border);
+  color: var(--reviews-text);
+  background: var(--reviews-card);
+  box-shadow: 0 8px 24px var(--reviews-shadow);
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.paginationLink:hover,
+.paginationLink:focus-visible,
+.paginationArrow:hover,
+.paginationArrow:focus-visible {
+  color: var(--reviews-bg);
+  background: var(--reviews-accent);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.paginationCurrent {
+  color: #fff;
+  background: var(--reviews-accent-strong);
+  box-shadow: 0 10px 26px
+    color-mix(in srgb, var(--reviews-accent) 34%, transparent);
+  font-weight: 750;
+}
+
+.paginationEllipsis {
+  min-width: 1.5rem;
+  color: var(--reviews-muted);
+}
+
+.utilityDock {
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(12px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    visibility 180ms;
+}
+
+.utilityDock[data-visible="true"] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+.utilityExtra[hidden] {
+  display: none;
+}
+
+.utilityButton {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  background: #60bffa;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.utilityButton:hover,
+.utilityButton:focus-visible {
+  color: #fff;
+  background: #ff8fb6;
+}
+
+.utilityButton:focus-visible {
+  outline: 2px solid var(--reviews-text);
+  outline-offset: 3px;
+}
+
+.progressButton {
+  position: relative;
+}
+
+.progress {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.progressArrow {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+}
+
+.progressButton:hover .progress,
+.progressButton:focus-visible .progress {
+  opacity: 0;
+}
+
+.progressButton:hover .progressArrow,
+.progressButton:focus-visible .progressArrow {
+  opacity: 1;
+}
+
+.stickerRail {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.stickerRail[data-below-hero="true"] {
+  top: 100svh;
+}
+
+.sticker {
+  position: absolute;
+  top: var(--sticker-top);
+  width: var(--sticker-size);
+  height: auto;
+  opacity: var(--sticker-opacity);
+  filter: drop-shadow(0 2px 0 rgb(255 255 255 / 52%))
+    drop-shadow(0 10px 14px rgb(15 23 42 / 22%));
+  transform: translateY(-50%) rotate(var(--sticker-rotation))
+    scaleX(var(--sticker-flip));
+  transform-origin: center;
+}
+
+.sticker[data-side="left"] {
+  left: var(--sticker-offset);
+}
+
+.sticker[data-side="right"] {
+  right: var(--sticker-offset);
+}
+
+@media (min-width: 1440px) {
+  .stickerRail {
+    display: block;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shell,
+  .shell * {
+    cursor: url("/reviews/cursor/kral-cursor-default.png"), auto;
+  }
+
+  .shell a,
+  .shell button,
+  .shell a *,
+  .shell button * {
+    cursor: url("/reviews/cursor/kral-cursor-pointer.png"), pointer !important;
+  }
+
+  .shell input,
+  .shell textarea,
+  .shell [contenteditable="true"] {
+    cursor: url("/reviews/cursor/kral-cursor-text.png"), text !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .content {
+    width: min(100% - 1.25rem, 1140px);
+    padding-top: 2.75rem;
+  }
+
+  .indexHero {
+    min-height: 82svh;
+  }
+
+  .indexHeroTitle {
+    font-size: clamp(2.25rem, 12vw, 3.8rem);
+  }
+
+  .indexHeroContent {
+    padding-top: 7rem;
+  }
+
+  .feedIntro {
+    display: block;
+  }
+
+  .feedEyebrow {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .feed {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .cardImage {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:hover .cardImage {
+    transform: none;
+  }
+
+  .typewriterText::after {
+    animation: none;
+  }
+
+  .utilityDock,
+  .utilityButton {
+    transition: none;
+  }
+}
+
+@keyframes typewriter-caret {
+  0%,
+  48% {
+    opacity: 1;
+  }
+
+  49%,
+  100% {
+    opacity: 0;
+  }
+}

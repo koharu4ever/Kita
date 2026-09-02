@@ -64,6 +64,16 @@ Getter 明确使用 `overrideAccess: false`。匿名访问只读取 published Re
 
 Games getter 使用 `depth: 1` 解析必填的 `cover` Media relationship。Mapper 从 Media 的 display/original 元数据构造封面 DTO；Game 表不再保存重复的 cover URL、alt、width 或 height。
 
+## Reviews 展示边界
+
+`/reviews` 使用自己的 route layout 和视觉 shell。光暗主题、阅读进度、随机文章、文章目录、装饰贴纸与自定义鼠标仅存在于该子路由；它们不修改全局 `<html>` 状态，也不影响 Home、Games、Tools 或 Payload Admin。
+
+Review 正文和元数据仍沿用标准内容数据流，由 Payload/PostgreSQL 提供。目录从已读取的 Lexical heading 节点派生，不保存第二份目录数据；上一篇、下一篇和随机文章只查询已发布 Reviews，并继续经过 `overrideAccess: false` 的 getter。
+
+`/reviews/preview` 是仅在 `NODE_ENV=development` 下可见的 UI 评审入口，使用仓库内占位数据，不读取或写入 Payload/PostgreSQL。Production 对该入口返回 404；正常 `/reviews` 不会在查询失败或内容为空时退回占位数据。
+
+评论是有意独立的外部边界：详情页使用 Giscus 将当前 pathname 映射到 `koharu4ever/Kita` 的 GitHub Discussions，不将评论复制到 Payload 或 PostgreSQL。Giscus repository/category 标识是公开配置，不是 secret；光暗主题和 reaction CSS 随 Reviews shell 同步。自定义 reaction 在 Giscus DOM 发生变化时保留原生 emoji 回退。
+
 ## Payload 当前边界
 
 Collections：
@@ -107,6 +117,7 @@ Development 的 Docker daemon、PostgreSQL Volume 和 targeted volumes 与宿主
 - Development schema push 方便迭代；Production 只执行 migration。
 - 使用一个 repository Compose 管理 web/postgres/backup；其他外部工具不进入 Kita 核心运行链路。
 - Media/R2 使用 Payload storage adapter，不自建上传服务。
+- Reviews 评论使用 Giscus/GitHub Discussions，不自建评论 Collection、登录和审核系统。
 - 保持单体，不引入 Redis、Prisma、微服务、Kubernetes或大型监控平台，除非出现具体需求。
 
 ## 架构变更准入问题

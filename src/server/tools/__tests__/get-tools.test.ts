@@ -37,6 +37,8 @@ describe("getTools", () => {
       expect.objectContaining({
         collection: "tools",
         overrideAccess: false,
+        pagination: false,
+        sort: "sortOrder",
       }),
     );
   });

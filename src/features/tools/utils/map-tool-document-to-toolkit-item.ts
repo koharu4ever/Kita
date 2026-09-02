@@ -14,7 +14,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 function formatAddedOn(value?: string | null) {
-  if (!value) {
+  if (!value || !Number.isFinite(Date.parse(value))) {
     return "Payload CMS";
   }
 
@@ -22,6 +22,7 @@ function formatAddedOn(value?: string | null) {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "UTC",
   }).format(new Date(value));
 }
 
@@ -36,6 +37,11 @@ export function mapToolDocumentToToolkitItem(
     id: String(tool.id),
     title: tool.title,
     addedOn: formatAddedOn(tool.createdAt),
+    createdAt: tool.createdAt,
+    category,
+    source: getToolSource(tool.url),
+    // Decorative category artwork, not a screenshot of the linked resource.
+    cover: `/tools/archive/${tool.category && Object.hasOwn(categoryLabels, tool.category) ? tool.category : "text-hooking"}.webp`,
     summary: tool.description,
     links: [
       {
@@ -45,4 +51,12 @@ export function mapToolDocumentToToolkitItem(
       },
     ],
   };
+}
+
+function getToolSource(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "External resource";
+  }
 }
