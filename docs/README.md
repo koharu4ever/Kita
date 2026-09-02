@@ -1,6 +1,6 @@
 # Kita 文档入口
 
-> 最后核对：2026-09-01
+> 最后核对：2026-09-02
 
 `docs/` 只保存当前仍需维护的项目文档。早期学习笔记、一次性实施计划、阶段评估和事故全文已经从工作树移除；需要追溯时使用 Git 历史，不再把历史快照与当前操作混在一起。
 
@@ -8,7 +8,9 @@
 
 ## 阅读顺序
 
-新会话或新维护者按下面顺序开始：
+想了解项目的读者，先看 [仓库 README](../README.md)，再看 [架构](./architecture.md)。只想确认做到哪里、还有哪些边界，直接看 [当前项目状态](./current-project-status.md)。
+
+准备修改项目的维护者或 agent 按下面顺序开始：
 
 1. [Codex 交接](./CODEX_HANDOFF.md)
 2. [当前项目状态](./current-project-status.md)
@@ -24,7 +26,7 @@
 | [backup-and-recovery.md](./backup-and-recovery.md)             | 备份资产、恢复边界和演练步骤                    | 备份、换机或灾难恢复       |
 | [payload-content-and-media.md](./payload-content-and-media.md) | Collections、Media/R2 和内容维护                | 修改 Payload 或录入内容    |
 | [openlist.md](./openlist.md)                                   | Kita 与 OpenList 的产品及部署边界               | 核对独立文件服务边界       |
-| [product-roadmap.md](./product-roadmap.md)                     | 产品定位、真实内容和后续优先级                  | 选择下一项产品工作         |
+| [product-roadmap.md](./product-roadmap.md)                     | 产品定位、范围与维护原则                        | 判断新工作是否值得做       |
 
 ## 事实来源优先级
 
