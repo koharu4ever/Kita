@@ -1,6 +1,6 @@
 # Payload 内容与 Media
 
-> 最后核对：2026-09-01
+> 最后核对：2026-09-02
 
 ## 当前 Collections
 
@@ -47,7 +47,7 @@ public URL -> HTTPS custom domain
 
 Production 配置缺失会拒绝启动，防止图片误写容器临时文件系统。允许 MIME：JPEG、PNG、WebP、AVIF；单文件上限 10 MiB。Payload 生成 400px thumbnail 和 1600px display WebP（不放大小图）。Alt 必填，长度 3–240。
 
-删除 Media document 时 storage adapter 会删除对应对象和生成尺寸。删除前先确认没有 Game relationship 继续引用它；不要直接在 R2 控制台删除仍被 Payload 引用的对象。
+删除 Media document 会触发文件清理，但数据库与对象存储之间没有跨系统事务，不能保证记录和文件同时删除成功。目前没有自动引用保护：删除前必须手动检查 Game 封面及 Reviews/Games 正文插图的全部引用，删除后核对存储结果。不要直接在 R2 控制台删除仍被 Payload 引用的对象。已知失败边界见 [当前项目状态](./current-project-status.md)。
 
 R2 免费额度与价格可能变化，容量判断应以 Cloudflare 当前账单页为准。对个人站图片规模通常充足，但仍需关注对象数、Class A/B 操作和存储增长。
 
@@ -73,18 +73,44 @@ Production 数据库曾手动复建。PR #17/#18 的成功证明增量 migration
 2. 如果同一图片已存在，选择 existing Media，不重复上传；
 3. 创建 Game，填写唯一 slug、状态、摘要和正文；
 4. 选择必填 `cover`；
-5. 先保存 draft，预览内容后再切 published；
+5. 可先用 draft 保存，在 Admin 检查正文后再切 published 并保存；当前没有私密草稿的前台预览；
 6. 验证 `/games`、详情页和 Media URL。
 
 ### 删除 Game 或 Media
 
-- 删除 Game 不自动意味着图片无用；先检查 Media 是否被其他 Game 复用。
+- 删除 Game 或 Review 不自动删除 Media；先检查图片是否被其他封面或正文复用。
 - 删除 Media 前解除所有引用，并确认 R2 对象删除符合预期。
 - Production 删除属于真实数据变更；需要项目所有者明确决定。
 
-### Reviews 与 Tools
+### 写 Review 或 Game 正文
 
-Reviews 使用 Lexical rich text 和手写 draft/published 状态。Tools 按 `sortOrder` 排序。现阶段不需要 drafts/versions、角色系统或自建搜索。
+Reviews 和 Games 共用 `src/payload/fields/content-editor.ts`，前台共用 `ContentRichText`，不另装一套编辑器。编辑区域中的排版立即可见；它不是和网站详情页完全相同的实时预览。
+
+1. 在 `/admin` 选择 Reviews 或 Games，打开记录或 Create New。标题、摘要、正文放在主区域；slug、发布状态等放在侧栏。
+2. 使用正文上方固定工具栏，或选中文字后的浮动工具栏。支持 H2/H3/H4、粗体、斜体、下划线、删除线、行内代码、有序/无序列表、引用、对齐与缩进。Reviews 的前台目录继续从正文标题生成。
+3. 在新段落输入 `/` 可打开插入菜单，选择上传图片或分隔线。图片只能来自 Media，可选择已有图片，也可创建新 Media。相同图片优先复用；选择图片后仍需保存文章。上传 Media 与保存文章是两次操作，放弃文章不会自动清理已经上传的图片。
+4. Media 的 `alt` 描述画面内容；插入图片的 `caption` 是本次使用的可选图注（最多 300 字符），显示在正文图片下方，不修改其他文章中的图注。
+5. 链接可填写安全的网页地址，或选择站内 Games/Reviews 文档。前台只生成已发布目标的详情链接；未解析、草稿或不安全链接降级为普通文字，不输出可执行协议。公开 Media 本身不随文章 draft 状态变成私密资源。
+6. Reviews 填写游戏名、日期、评分、阅读时间、摘要与封面路径/URL；Games 填写开发者、发布日期文本、游玩状态、摘要及必填 Media 封面。Review 封面仍是旧 URL/path 字段，不是本次新增的正文 Media 插图；外部封面地址须符合 Next Image 的允许来源。
+7. 点击 Save 才持久化正文。选择 published 并保存后，检查列表和详情页。日期、阅读时间和 slug 不会根据正文自动计算；修改已发布记录后保存会直接更新公开内容，没有独立的“已发布版本 + 编辑草稿”双版本。
+
+前台插图优先使用 Media 的 display 尺寸，缺少该尺寸则使用原图；缺失图片只显示占位提示，不使整篇文章崩溃。图注作为文本渲染。没有开放任意 HTML、脚本或 iframe 输入。
+
+运行开发服务后，`/reviews/preview/rain-city-after-midnight` 提供插图与图注的前台示例；该 fixture 只用于开发预览，不会创建 Media 或文章记录，也不是已保存草稿的预览入口。
+
+这次使用 Payload 自带的 [Lexical features](https://payloadcms.com/docs/rich-text/official-features) 和 JSX converter 扩展。没有加入表格、代码块语法高亮、视频嵌入、自动保存、版本历史或工作流审批；这些不是当前基础文章编辑的前提。
+
+### 维护 Tool
+
+Tools 是外链目录，不是文章 Collection，因此保留清晰的结构化表单：标题、纯文本描述、目标 URL、分类、`sortOrder`。保存后即公开；没有 draft 状态。来源显示由 URL 推导。分类是内容分组，五种展示模式是前台视图，二者不是同一概念；较小的 `sortOrder` 优先展示，前台手动排序仍可改变当前视图。
+
+### 数据兼容与验证
+
+新增格式、插图引用和图注保存在现有 `body` JSONB 内，没有增加数据库列或新 Collection，因此本轮不新增 migration。旧正文仍可渲染；Admin import map 和 Payload types 随配置重新生成。
+
+隔离 PostgreSQL 测试通过已有 migration 建库后，真实上传临时图片，创建/更新/匿名读取 Review 和 Game 的正文、Media 及图注，并验证 Tools 字段。测试图片使用临时目录，不写当前开发 Media 或 R2。渲染单测覆盖缺图、图注转义、链接过滤与标题格式；最新执行结果集中记录在 [当前项目状态](./current-project-status.md)。
+
+没有 schema migration 不等于可以任意降级代码：开始保存新的 upload 节点后，旧版本可能不认识这些节点或无法正确展示。回退时应保留对应编辑器与渲染支持，或先备份并转换新增内容；不能靠运行旧的 down migration 处理正文格式。
 
 ## 后续验证
 

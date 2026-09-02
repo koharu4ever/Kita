@@ -1,4 +1,5 @@
 .root {
+  overflow-wrap: anywhere;
   margin-top: 2rem;
   color: color-mix(in srgb, var(--reviews-text) 78%, transparent);
   font-size: 1.04rem;
@@ -85,4 +86,40 @@
 
 .root > :global(:last-child) {
   margin-bottom: 0;
+}
+
+.root :global(figure) {
+  margin: 2rem 0;
+}
+
+.root :global(figure img) {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+}
+
+.root :global(figcaption) {
+  margin-top: 0.6rem;
+  color: var(--reviews-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.root :global(code) {
+  border-radius: 0.25rem;
+  padding: 0.15em 0.35em;
+  background: color-mix(in srgb, var(--reviews-accent) 10%, transparent);
+  color: var(--reviews-text);
+  font-family: monospace;
+  font-size: 0.9em;
+  box-decoration-break: clone;
+}
+
+.root :global(hr) {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid
+    color-mix(in srgb, var(--reviews-accent) 25%, transparent);
 }

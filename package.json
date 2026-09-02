@@ -21,7 +21,7 @@
     "payload:migrate:status": "node scripts/assert-dev-workspace-user.mjs && payload migrate:status --use-swc",
     "payload:types": "node scripts/assert-dev-workspace-user.mjs && payload generate:types --use-swc",
     "check": "node scripts/assert-dev-workspace-user.mjs --check-next && pnpm format:check && pnpm lint && pnpm typecheck",
-    "typecheck": "node scripts/assert-dev-workspace-user.mjs --check-next && tsc --noEmit",
+    "typecheck": "node scripts/assert-dev-workspace-user.mjs --check-next && next typegen && tsc --noEmit",
     "test": "pnpm test:unit && pnpm test:backup",
     "test:unit": "node scripts/assert-dev-workspace-user.mjs && vitest run",
     "test:backup": "node scripts/assert-dev-workspace-user.mjs && sh docker/postgres-backup/tests/backup.test.sh",

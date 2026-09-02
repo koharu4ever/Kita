@@ -1,4 +1,5 @@
 import type { DefaultTypedEditorState } from "@payloadcms/richtext-lexical";
+import rainCityImage from "../../../../public/reviews/preview/rain-city.webp";
 
 import type {
   ReviewNavigation,
@@ -47,11 +48,35 @@ function headingNode(text: string) {
   };
 }
 
-function previewBody(introduction: string, sections: PreviewSection[]) {
+function previewBody(
+  introduction: string,
+  sections: PreviewSection[],
+  showIllustration = false,
+) {
   return {
     root: {
       children: [
         paragraphNode(introduction),
+        ...(showIllustration
+          ? [
+              {
+                type: "upload",
+                version: 3,
+                relationTo: "media",
+                value: {
+                  url: rainCityImage.src,
+                  width: rainCityImage.width,
+                  height: rainCityImage.height,
+                  mimeType: "image/webp",
+                  alt: "雨夜里的城市与灯光",
+                },
+                fields: {
+                  caption:
+                    "正文插图与图注示例；仅用于本地预览，不写入 Media 或数据库。",
+                },
+              },
+            ]
+          : []),
         ...sections.flatMap((section) => [
           headingNode(section.heading),
           ...section.paragraphs.map(paragraphNode),
@@ -78,27 +103,31 @@ export const reviewPreviewFixtures: ReviewPreview[] = [
     rating: 9,
     readingTime: "8",
     tags: ["氛围", "叙事", "城市"],
-    body: previewBody("这是一篇用于验证 Reviews 文章布局的本地预览内容。", [
-      {
-        heading: "城市不是布景",
-        paragraphs: [
-          "最好的环境叙事不会急着解释世界。它先让重复出现的空间形成记忆，再让一次微小变化成为事件。",
-          "雨水模糊了远景，却把近处的灯光变得更清楚。视觉设计因此承担了角色没有说出的部分。",
-        ],
-      },
-      {
-        heading: "节奏来自停顿",
-        paragraphs: [
-          "这类作品真正困难的不是制造高潮，而是判断何时应该让玩家停下来。安静本身需要被设计。",
-        ],
-      },
-      {
-        heading: "最后的判断",
-        paragraphs: [
-          "当地点能够留下人物经过的痕迹，场景就拥有了叙事上的时间。这也是这段体验最值得记住的地方。",
-        ],
-      },
-    ]),
+    body: previewBody(
+      "这是一篇用于验证 Reviews 文章布局的本地预览内容。",
+      [
+        {
+          heading: "城市不是布景",
+          paragraphs: [
+            "最好的环境叙事不会急着解释世界。它先让重复出现的空间形成记忆，再让一次微小变化成为事件。",
+            "雨水模糊了远景，却把近处的灯光变得更清楚。视觉设计因此承担了角色没有说出的部分。",
+          ],
+        },
+        {
+          heading: "节奏来自停顿",
+          paragraphs: [
+            "这类作品真正困难的不是制造高潮，而是判断何时应该让玩家停下来。安静本身需要被设计。",
+          ],
+        },
+        {
+          heading: "最后的判断",
+          paragraphs: [
+            "当地点能够留下人物经过的痕迹，场景就拥有了叙事上的时间。这也是这段体验最值得记住的地方。",
+          ],
+        },
+      ],
+      true,
+    ),
     updatedAt: "2026-08-28T12:00:00.000Z",
   },
   {

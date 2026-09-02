@@ -1,5 +1,9 @@
 import { buildEditorState } from "@payloadcms/richtext-lexical";
 import type { Payload, TypedUser } from "payload";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import sharp from "sharp";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { env } from "@/config/env";
@@ -11,6 +15,7 @@ const allowedDatabaseHosts = new Set(["127.0.0.1", "localhost", "::1"]);
 
 let payload: Payload;
 let authenticatedUser: TypedUser;
+let mediaDirectory: string | undefined;
 
 function assertDisposableDatabase() {
   const parsedURI = new URL(env.DATABASE_URI);
@@ -60,7 +65,14 @@ beforeAll(async () => {
     import("../../payload.config"),
   ]);
 
-  payload = await getPayload({ config });
+  const resolvedConfig = await config;
+  const mediaConfig = resolvedConfig.collections.find(
+    ({ slug }) => slug === "media",
+  );
+  if (!mediaConfig?.upload) throw new Error("Media upload config is missing");
+  mediaDirectory = await mkdtemp(path.join(tmpdir(), "kita-authoring-test-"));
+  mediaConfig.upload.staticDir = mediaDirectory;
+  payload = await getPayload({ config: resolvedConfig });
 
   await payload.create({
     collection: "users",
@@ -88,6 +100,192 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await payload?.destroy();
+  if (
+    mediaDirectory &&
+    path.dirname(mediaDirectory) === tmpdir() &&
+    path.basename(mediaDirectory).startsWith("kita-authoring-test-")
+  ) {
+    await rm(mediaDirectory, { recursive: true, force: true });
+  }
+});
+
+describe("rich text authoring against PostgreSQL", () => {
+  it("round-trips uploaded Media and per-use captions in Review and Game bodies", async () => {
+    const image = await sharp(
+      Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="40"><rect width="64" height="40" fill="#4488bb"/></svg>',
+      ),
+    )
+      .png()
+      .toBuffer();
+    const media = await payload.create({
+      collection: "media",
+      data: { alt: "Integration illustration" },
+      file: {
+        data: image,
+        mimetype: "image/png",
+        name: "authoring.png",
+        size: image.length,
+      },
+      overrideAccess: false,
+      user: authenticatedUser,
+    });
+    const body = buildEditorState({ text: "Article with an illustration." });
+    body.root.children.push({
+      type: "upload",
+      version: 3,
+      relationTo: "media",
+      value: media.id,
+      fields: { caption: "Saved caption" },
+    } as unknown as (typeof body.root.children)[number]);
+    const review = await payload.create({
+      collection: "reviews",
+      data: { ...createReviewData("rich-text-authoring", "published"), body },
+      overrideAccess: false,
+      user: authenticatedUser,
+    });
+    const game = await payload.create({
+      collection: "games",
+      data: {
+        title: "Authoring game",
+        slug: "authoring-game",
+        developer: "Test studio",
+        releaseDate: "2026",
+        summary: "Test game summary",
+        publicationStatus: "published",
+        playStatus: "planned",
+        cover: media.id,
+        body,
+      },
+      overrideAccess: false,
+      user: authenticatedUser,
+    });
+
+    for (const [collection, id] of [
+      ["reviews", review.id],
+      ["games", game.id],
+    ] as const) {
+      const saved = await payload.findByID({
+        collection,
+        id,
+        depth: 1,
+        overrideAccess: false,
+      });
+      expect(saved.body.root.children).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: "upload",
+            fields: { caption: "Saved caption" },
+            value: expect.objectContaining({
+              id: media.id,
+              alt: "Integration illustration",
+              mimeType: "image/png",
+            }),
+          }),
+        ]),
+      );
+    }
+
+    const updatedBody = buildEditorState({ text: "Revised article." });
+    updatedBody.root.children.push({
+      type: "paragraph",
+      version: 1,
+      format: "",
+      indent: 0,
+      direction: "ltr",
+      children: [
+        {
+          type: "link",
+          version: 3,
+          format: "",
+          indent: 0,
+          direction: "ltr",
+          fields: {
+            linkType: "internal",
+            doc: { relationTo: "games", value: game.id },
+          },
+          children: [
+            {
+              type: "text",
+              version: 1,
+              text: "Related game",
+              format: 0,
+              detail: 0,
+              mode: "normal",
+              style: "",
+            },
+          ],
+        },
+      ],
+    } as unknown as (typeof updatedBody.root.children)[number]);
+    updatedBody.root.children.push({
+      type: "upload",
+      version: 3,
+      relationTo: "media",
+      value: media.id,
+      fields: { caption: "Revised caption" },
+    } as unknown as (typeof updatedBody.root.children)[number]);
+    await payload.update({
+      collection: "reviews",
+      id: review.id,
+      data: { body: updatedBody },
+      overrideAccess: false,
+      user: authenticatedUser,
+    });
+    const reloaded = await payload.findByID({
+      collection: "reviews",
+      id: review.id,
+      depth: 1,
+      overrideAccess: false,
+    });
+    expect(reloaded.body.root.children).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ fields: { caption: "Revised caption" } }),
+        expect.objectContaining({
+          children: [
+            expect.objectContaining({
+              type: "link",
+              fields: expect.objectContaining({
+                doc: {
+                  relationTo: "games",
+                  value: expect.objectContaining({
+                    id: game.id,
+                    slug: game.slug,
+                    publicationStatus: "published",
+                  }),
+                },
+              }),
+            }),
+          ],
+        }),
+      ]),
+    );
+  });
+
+  it("round-trips Tools directory fields without turning descriptions into rich text", async () => {
+    const tool = await payload.create({
+      collection: "tools",
+      data: {
+        title: "Integration tool",
+        description: "A plain-text tool summary.",
+        url: "https://example.com/tool",
+        category: "capture",
+        sortOrder: 20,
+      },
+      overrideAccess: false,
+      user: authenticatedUser,
+    });
+    const saved = await payload.findByID({
+      collection: "tools",
+      id: tool.id,
+      overrideAccess: false,
+    });
+    expect(saved).toMatchObject({
+      description: "A plain-text tool summary.",
+      category: "capture",
+      sortOrder: 20,
+    });
+  });
 });
 
 describe("fresh PostgreSQL migrations", () => {

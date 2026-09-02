@@ -1,6 +1,6 @@
 # Kita 测试与 CI
 
-> 最后核对：2026-09-01
+> 最后核对：2026-09-02
 
 ## 当前质量门禁
 
@@ -26,6 +26,12 @@ GitHub Actions `quality` 在对 `main` 的 Pull Request 和 `main` push 上运�
 7. production build。
 
 Workflow 使用 Node 22、pnpm packageManager 版本和只读 contents permission，不读取 Production secret。Main ruleset 要求 PR 和 required `quality`。
+
+### 全新检出的 TypeScript 检查
+
+`pnpm typecheck` 先运行 `next typegen`，再运行 `tsc --noEmit`，遵循 [Next.js 类型生成流程](https://nextjs.org/docs/app/api-reference/cli/next#next-typegen-options)。这会生成被 Git 忽略的 `next-env.d.ts` 和路由类型，同时加载 Next.js 的静态图片模块声明；不需要先启动开发服务器或完成一次 build。
+
+不要提交自动生成的 `next-env.d.ts`，也不要用 `any` 声明掩盖图片导入错误。CI 必须在没有既存 `.next`、`next-env.d.ts` 或 TypeScript 增量缓存的全新检出上运行检查，否则本地生成文件可能掩盖准备步骤缺失。类型生成会读取 Next.js 配置：本地使用正常开发配置，CI 沿用 workflow 中的 `SKIP_ENV_VALIDATION=true`；此开关不用于 Production 运行时。
 
 ## 测试分层
 

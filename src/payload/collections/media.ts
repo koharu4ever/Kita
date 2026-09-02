@@ -13,6 +13,8 @@ export const Media: CollectionConfig = {
     update: isAuthenticated,
   },
   admin: {
+    description:
+      "公开图片库，供 Game 封面和 Reviews/Games 正文复用。删除前请手动检查所有引用；目前没有自动阻止删除使用中图片的保护。",
     defaultColumns: ["filename", "alt", "mimeType", "updatedAt"],
     useAsTitle: "filename",
   },
