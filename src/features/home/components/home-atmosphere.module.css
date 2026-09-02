@@ -1,0 +1,107 @@
+.wallpaper {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.incoming {
+  animation: reveal-wallpaper 1800ms linear both;
+}
+.rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 650ms ease-out;
+}
+.rain canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.soundControl {
+  position: fixed;
+  z-index: 60;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  right: max(1.25rem, env(safe-area-inset-right));
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: rgb(255 255 255 / 62%);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  cursor: pointer;
+  transition:
+    opacity 500ms,
+    visibility 500ms,
+    color 200ms;
+}
+.soundControl[data-visible="true"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.soundControl[aria-pressed="true"] {
+  color: rgb(255 255 255 / 88%);
+}
+.soundControl:hover {
+  color: white;
+}
+.soundControl:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 4px;
+}
+.soundControl svg {
+  width: 19px;
+  height: 19px;
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 65%));
+}
+.soundTooltip {
+  position: absolute;
+  right: calc(100% + 0.35rem);
+  white-space: nowrap;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  color: white;
+  background: rgb(5 7 12 / 75%);
+  font-size: 0.7rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms;
+}
+.soundControl:hover .soundTooltip,
+.soundControl:focus-visible .soundTooltip {
+  opacity: 1;
+}
+.soundStatus {
+  position: fixed;
+  z-index: 60;
+  bottom: 4.5rem;
+  right: 1.25rem;
+  max-width: 18rem;
+  color: white;
+  background: rgb(5 7 12 / 70%);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+}
+@keyframes reveal-wallpaper {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .incoming {
+    animation: none;
+  }
+  .rain,
+  .soundControl {
+    transition: none;
+  }
+}

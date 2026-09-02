@@ -9,7 +9,7 @@
 本轮文档整理基线：
 
 ```text
-main: 6e15b45 (PR #25 merge)
+main: 3989fec (PR #26 merge)
 workspace: C:\dev\Kita
 ```
 
@@ -33,7 +33,7 @@ workspace: C:\dev\Kita
 
 截至 2026-09-01，PR #24 已合并到 `main` 并部署；Production `/api/health` 已返回 `200`、`ready` 和 `database: reachable`。后续视觉替换与内容整理继续使用独立小型分支，不直接修改 `main`。
 
-2026-09-02 已核实 PR #25 恢复旧视觉的改动合并到 `main`。Reviews 博客式展示和 Tools 五模式归档已共同提交并推送到 `codex/reviews-blog-experience`；用户已授权创建 PR，但尚未创建成功，也未合并或部署。
+2026-09-02 已核实 PR #25 恢复旧视觉，以及 PR #26 Reviews 博客式展示和 Tools 五模式归档均已合并到 `main`。本轮只核对 GitHub 合并状态，不据此推断 PR #26 的生产部署或页面验收结果。首页雨景与雨声使用独立的 `codex/home-rain-atmosphere` 分支提审。
 
 ## 本地开发
 
@@ -83,7 +83,7 @@ Games Media-only 已完成：
 - mapper 从 Media metadata 构造前端 cover DTO；
 - 生产 6 条 Games 的 relationship、页面、Media URL 与 Redeploy 持久性曾于 2026-07-22 验证。
 
-Reviews 展示层已在当前分支完成本地实现：
+Reviews 展示层已随 PR #26 合并到 `main`：
 
 - `/reviews` 信息流和 Review 详情使用独立 route layout，不污染其他路由；
 - 信息流以全屏封面 Hero 和打字机文案进入博客式双列卡片；列表按每页 4 篇执行 Payload 分页，并在信息流底部提供紧凑页码和前后翻页；
@@ -164,7 +164,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 - 首页、About 与仓库内 Review 兼容封面已恢复为 PR #24 生成图替换之前的旧视觉；项目所有者已明确授权 Kita 使用其本地 Kral 博客资源，Git 来源版本和授权边界统一记录在根目录 `THIRD_PARTY_NOTICES.md`；
 - 首页静态视觉资源使用 WebP，首次渲染只挂载当前背景 URL，后续壁纸随轮播按需加载；保留的旧 JPEG 文件名仅用于已有内容和 migration 的路径兼容；
-- rain WebGL 只在对应区块进入视口后初始化；
+- rain WebGL 在首次下滑进入雨景后初始化；回到干燥首屏或页面隐藏时停止绘制；
 - `prefers-reduced-motion` 会停止自动换图、持续动画、光标闪烁和平滑滚动；
 - Home 非活动导航使用 `inert`/`aria-hidden`，不会残留隐藏的键盘焦点；
 - Games lightbox 使用原生 modal dialog，控件始终存在，具有可见焦点、初始焦点和关闭后焦点恢复；
@@ -175,7 +175,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - 首页、内容页和 Admin 的最小 Playwright smoke；
 - backup last-success healthcheck/告警。
 
-## Tools 五模式移植（分支实现，2026-09-02）
+## Tools 五模式移植（PR #26 已合并，2026-09-02）
 
 `/tools` 复用所有者博客 `/notes/` 的界面，而不是另行设计：Minimal、Minimal+、Compact、Extended、Thumbnail 五种模式，透明蓝色背景、分类色块、实时搜索、AND 多条件筛选、上下分页和 25/50/All 每页数量均保留。控件使用 React 状态替代 Hexo 的 DOM 重排和 PJAX 初始化；偏好保存在独立的 `kita-tools-archive` localStorage key，`?view=` 可覆盖默认展示模式。样式全部限制在 Tools 类名下，不修改站点或 Reviews 的主题。
 
@@ -188,13 +188,26 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - 四类工具使用博客授权图片作为分类装饰封面，不代表实际软件截图，也没有引入 Media/schema migration；
 - `/tools/preview` 只在 development 开放，提供 30 条展示样例用于测试分页；production 返回 404，正式 `/tools` 仍只显示 Payload 数据，查询错误仍交给 error boundary。
 
-源码集中在 `src/features/tools/`，资源来源记录在 `THIRD_PARTY_NOTICES.md`。本次不写入开发或生产内容，不执行 migration；Reviews 与 Tools 在同一 PR 中提交，不合并、不部署。
+源码集中在 `src/features/tools/`，资源来源记录在 `THIRD_PARTY_NOTICES.md`。实现不写入开发或生产内容，不执行 migration；Reviews 与 Tools 已在同一个 PR #26 中合并，生产部署状态需另行核验。
 
 验证：2026-09-02 同步 PR #25 后重新运行 137 个 Vitest 和 4 个 backup shell 场景通过；`pnpm check` 与 `SKIP_ENV_VALIDATION=true pnpm build` 通过，包含超过 20 篇 Review 的导航回归测试。此前本地浏览器检查五模式、分类与来源筛选、全角关键词、清空/空结果、标题排序、25/All、第二页及 390px 布局；保留键盘焦点和 reduced-motion 支持。生产预渲染的 preview 包含 404 边界、不含样例工具。手机高级选项只修正原版负边距造成的越界，未重设整体视觉。
 
 本次读取真实本地 `/tools` 返回 200，但当前开发数据库没有 Tools 条目，页面正确显示空状态；样例只出现在 `/tools/preview`。从 Tools 客户端导航到 Reviews 后 Tools 根样式容器消失，Reviews 页面正常渲染。未据此推断生产内容数量。
 
 ## 当前待办
+
+### 首页雨景与雨声（2026-09-02）
+
+`codex/home-rain-atmosphere` 最初从 PR #25 基线独立创建，提审前同步到已合并 PR #26 的 `origin/main`；保留 Reviews/Tools 内容，本次 PR 差异只涉及首页雨景、音频、测试与说明。项目所有者已确认本地预览可以进入 PR 审查，并授权提交、推送和创建 PR；合并与部署仍需另行确认。
+
+- 保留原有全部背景图片和轮换顺序；移除独立两屏玻璃区块的边线、底色和整面模糊。
+- 雨滴画布固定覆盖首页视口，通过连续滚动进度控制显现和雨量，不随内容区块从屏幕底部滑入。
+- 壁纸与水滴折射共用已加载图片和 1.8 秒换图过渡，采用同样的居中 cover 裁切；取消首页壁纸单独的呼吸缩放，避免水滴内部图像与外部景物错位。换图不重建水珠模拟。
+- 页面首屏隐藏声音入口；下滑后右下角只显示无底色的扬声器图标，悬停/键盘聚焦才显示提示。默认静音；只有主动点击后才下载约 362 KB 的 DRAGON-STUDIO 雨声片段并建立 Web Audio。18 秒片段在解码后做 2 秒等功率交叉淡化，得到约 16 秒连续循环；固定低音量，不随滚动改变。播放中即使回到顶部也保留关闭入口；切到后台淡出暂停，离开首页中止加载并释放资源。素材来源和处理方式只维护在根目录 `THIRD_PARTY_NOTICES.md`。
+- 低于 768px、粗指针、减少动态效果或 WebGL 失败时保留清晰背景，不强行显示模糊玻璃。导航和文字不经过水滴渲染，保持可操作性。
+- 不新增依赖，不修改 Payload/schema、数据库、Media、生产内容或基础设施。
+
+2026-09-02 提审前同步 PR #26 基线后，在 Dev Container 以 `node` 用户通过 152 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build`。新增测试覆盖等功率接缝、按需加载、后台暂停、加载中离开页面及资源释放。对最终 MP3 解码后的片段进行数值核对：循环 16 秒，没有全零帧或削波，重叠段与主体平均音量差约 0.2 dB，回绕边界保持原素材相邻采样关系。浏览器已确认首屏隐藏入口、下滑显示图标、点击成功加载播放，以及播放中回顶仍保留关闭入口；自动检查和本地验收不代表所有浏览器/设备的听感均已覆盖。本轮未重新运行数据库 integration smoke，也未合并或部署。
 
 ### 当前收尾
 
@@ -216,7 +229,7 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 - [x] `codex/portfolio-v1-readiness` 通过 PR #24 合并到 `main`；
 - [x] 合并部署后验证 `/api/health` readiness；
 - [x] 提交并 push `codex/reviews-blog-experience`，通过本地 test/check/build；
-- [ ] 为 Reviews 与 Tools 分支创建 Draft PR，并通过远端 required check；
+- [x] Reviews 与 Tools 已通过 PR #26 合并到 `main`；
 - [ ] Reviews 与 Tools PR 合并部署后验证列表、详情、主题、目录、随机入口、五种工具视图、Giscus 和首条 Discussion；
 - [ ] 完成内容清理后验证 Games、Reviews、Tools、Media URL 和 Redeploy 持久性；
 - [ ] 最终 Production 截图与准确发布材料。
@@ -240,4 +253,4 @@ GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快
 
 ## 下一步
 
-当前分支已推送，下一步创建 Reviews 与 Tools Draft PR；required check 和人工 review 通过后，另获明确授权才合并部署。Production 内容和 Media 清理由项目所有者确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+下一步完成首页雨景与雨声 PR 的 required check 和 review；另获明确授权后才合并部署。PR #26 的生产验收与 Production 内容、Media 清理仍需单独确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。

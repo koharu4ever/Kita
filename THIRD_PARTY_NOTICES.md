@@ -75,6 +75,25 @@ These are decorative category illustrations, not screenshots or logos of
 the linked tools. This port does not claim original authorship of the artwork
 or grant any additional reuse rights.
 
+## Homepage rain audio
+
+- Work: **Lo-Fi Rain Sounds** by **DRAGON-STUDIO**.
+- Source: <https://pixabay.com/sound-effects/nature-lo-fi-rain-sounds-444804/>
+- License: Pixabay Content License, <https://pixabay.com/service/license-summary/>
+  (source and license summary checked 2026-09-02).
+- The project owner supplied `dragon-studio-lo-fi-rain-sounds-444804.mp3` for
+  this local preview. The original download is not included in the repository.
+- `public/audio/home-rain.mp3` contains only source seconds 70–88, converted to
+  44.1 kHz stereo MP3 at 160 kbps with +8 dB gain; no music or generated rain
+  is mixed in. Runtime playback overlaps the final/initial two seconds using
+  an equal-power PCM crossfade, producing a roughly 16-second ambient loop.
+
+This is a third-party sound effect integrated into Kita's interactive homepage,
+not a Kita-original recording or a standalone audio download product. The
+Pixabay restrictions still apply; it is not relicensed as general open-source
+audio. This entry records the local prototype asset and does not claim that
+the filename or waveform proves it was recorded against a glass window.
+
 ## RainEffect
 
 Kita's rain-on-glass effect is adapted from **Rain & Water Effect Experiments

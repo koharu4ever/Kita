@@ -19,6 +19,8 @@ uniform vec2 u_parallax;
 uniform float u_parallaxFg;
 uniform float u_parallaxBg;
 uniform float u_textureRatio;
+uniform float u_previousTextureRatio;
+uniform float u_wallpaperMix;
 uniform bool u_renderShine;
 uniform bool u_renderShadow;
 uniform float u_minRefraction;
@@ -53,21 +55,10 @@ vec2 texCoord() {
   return vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y) / u_resolution;
 }
 
-vec2 scaledTexCoord() {
+vec2 coverTexCoord(vec2 uv, float imageRatio) {
   float ratio = u_resolution.x / u_resolution.y;
-  vec2 scale = vec2(1.0);
-  vec2 offset = vec2(0.0);
-  float ratioDelta = ratio - u_textureRatio;
-
-  if (ratioDelta >= 0.0) {
-    scale.y = 1.0 + ratioDelta;
-    offset.y = ratioDelta / 2.0;
-  } else {
-    scale.x = 1.0 - ratioDelta;
-    offset.x = -ratioDelta / 2.0;
-  }
-
-  return (texCoord() + offset) / scale;
+  vec2 scale = vec2(min(1.0, ratio / imageRatio), min(1.0, imageRatio / ratio));
+  return (uv - 0.5) * scale + 0.5;
 }
 
 vec4 fgColor(float x, float y) {
@@ -98,11 +89,15 @@ void main() {
 
   vec2 refraction = (vec2(x, y) - 0.5) * 2.0;
   vec2 refractionParallax = parallax(u_parallaxBg - u_parallaxFg);
-  vec2 refractionPos = scaledTexCoord()
+  vec2 refractionPos = texCoord()
     + (pixel() * refraction * (u_minRefraction + (depth * u_refractionDelta)))
     + refractionParallax;
 
-  vec4 tex = texture2D(u_textureFg, refractionPos);
+  vec4 tex = mix(
+    texture2D(u_textureBg, coverTexCoord(refractionPos, u_previousTextureRatio)),
+    texture2D(u_textureFg, coverTexCoord(refractionPos, u_textureRatio)),
+    u_wallpaperMix
+  );
 
   if (u_renderShine) {
     float maxShine = 490.0;
@@ -110,6 +105,7 @@ void main() {
     vec2 shinePos = vec2(0.5, 0.5)
       + ((1.0 / 512.0) * refraction) * -(minShine + ((maxShine - minShine) * depth));
     vec4 shine = texture2D(u_textureShine, shinePos);
+    shine.a *= 0.16;
     tex = blend(tex, shine);
   }
 
