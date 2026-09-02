@@ -1,0 +1,165 @@
+.window {
+  position: relative;
+  height: 560px;
+  break-inside: avoid;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111e2c;
+  isolation: isolate;
+}
+
+.link {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  color: #e3e9ed;
+}
+
+.scene {
+  position: absolute;
+  inset: -4px;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.city {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Same 8:5 coordinates as the source scene; never stretch the glass to a portrait. */
+.glassPlate {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  min-width: 100%;
+  aspect-ratio: 8 / 5;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.leftGlass {
+  transform: translateX(-6.72%);
+}
+.rightGlass {
+  transform: translateX(8.31%);
+}
+
+.rain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 72%, rgb(4 9 16 / 68%));
+  box-shadow: inset 0 0 16px rgb(4 9 16 / 18%);
+  pointer-events: none;
+}
+
+.returnLabel {
+  position: absolute;
+  right: 24px;
+  bottom: 25px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.78;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-shadow: 0 1px 4px #000;
+  transition: opacity 300ms ease;
+}
+
+.returnLabel svg,
+.pause svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pause {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: rgb(227 237 245 / 80%);
+  cursor: pointer;
+}
+
+.link:focus-visible {
+  outline: 2px solid #dce6ee;
+  outline-offset: -4px;
+}
+.pause:focus-visible {
+  outline: 2px solid #dce6ee;
+  outline-offset: -4px;
+}
+.link:focus-visible .returnLabel {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover .returnLabel {
+    opacity: 1;
+  }
+  .pause:hover {
+    background: rgb(2 5 10 / 25%);
+  }
+}
+
+/* Only the scenery moves. The link target, label and controls remain stable. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .window[data-paused="false"] .link:hover .scene {
+    animation: window-shiver 2.6s ease-in-out infinite;
+  }
+}
+
+@keyframes window-shiver {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  16% {
+    transform: translate(-1.5px, 0.6px) rotate(-0.12deg);
+  }
+  37% {
+    transform: translate(1.8px, -0.8px) rotate(0.15deg);
+  }
+  58% {
+    transform: translate(-0.8px, -0.4px) rotate(-0.08deg);
+  }
+  79% {
+    transform: translate(1.2px, 0.7px) rotate(0.09deg);
+  }
+}
+
+@media (max-width: 639px) {
+  .window {
+    height: 440px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .returnLabel {
+    transition: none;
+  }
+  .pause,
+  .rain {
+    display: none;
+  }
+}

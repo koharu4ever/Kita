@@ -94,6 +94,34 @@ Pixabay restrictions still apply; it is not relicensed as general open-source
 audio. This entry records the local prototype asset and does not claim that
 the filename or waveform proves it was recorded against a glass window.
 
+## Games window artwork — Urban Rain
+
+The owner supplied unpacked artwork from **Urban rain 城市窗外的雨景**,
+Steam Workshop item `2185088762`:
+<https://steamcommunity.com/sharedfiles/filedetails/?id=2185088762>.
+
+On 2026-09-02, the project owner explicitly confirmed that these three images
+are permitted for public use and authorized including them in Kita's public
+repository and Games interface. This records the owner's permission confirmation
+for Kita, not a blanket open-source license or a claim that Kita created the
+underlying artwork.
+
+The embedded JPEG/PNG payloads were extracted without changing their pixels:
+
+| Repository file                       | Unpacked source   | Dimensions  |
+| ------------------------------------- | ----------------- | ----------- |
+| `public/games/window/city.jpg`        | `materials/1.tex` | 3840 × 2400 |
+| `public/games/window/left-glass.png`  | `materials/2.tex` | 3840 × 2400 |
+| `public/games/window/right-glass.png` | `materials/3.tex` | 3840 × 2400 |
+
+The city photograph retains its original soft focus. Kita composes the city
+and two transparent glass layers in React and adds its own hover-only shiver.
+Rain uses the existing RainEffect adaptation documented below. No Workshop
+scripts, shaders, particle runtime, clock, VHS/pixelation effects or audio are
+included or executed.
+
+The earlier Rainy Night GIF study is not part of the published implementation.
+
 ## RainEffect
 
 Kita's rain-on-glass effect is adapted from **Rain & Water Effect Experiments
