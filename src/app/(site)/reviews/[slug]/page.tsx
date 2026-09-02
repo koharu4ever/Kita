@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { ReviewDetailPage } from "@/features/reviews/components/review-detail-page";
-import { getReviewBySlug } from "@/server/reviews/get-reviews";
+import {
+  getReviewBySlug,
+  getReviewNavigation,
+} from "@/server/reviews/get-reviews";
 
 type ReviewPageProps = {
   params: Promise<{
@@ -41,5 +44,7 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
     notFound();
   }
 
-  return <ReviewDetailPage review={review} />;
+  const navigation = await getReviewNavigation(review.slug);
+
+  return <ReviewDetailPage navigation={navigation} review={review} />;
 }

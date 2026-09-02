@@ -1,38 +1,48 @@
 import type { Route } from "next";
+import Image from "next/image";
 import Link from "next/link";
+
+import styles from "./reviews-top-nav.module.css";
 
 const navItems: Array<{
   href: Route;
+  icon: string;
   label: string;
 }> = [
-  { href: "/", label: "Home" },
-  { href: "/games", label: "Games" },
-  { href: "/about", label: "About" },
-  { href: "/tools", label: "Tools" },
+  { href: "/", icon: "home.webp", label: "Home" },
+  { href: "/games", icon: "games.webp", label: "Games" },
+  { href: "/about", icon: "about.webp", label: "About" },
+  { href: "/tools", icon: "tools.webp", label: "Tools" },
 ];
 
 export function ReviewsTopNav() {
   return (
-    <header className="fixed inset-x-0 top-0 z-30 border-b border-white/8 bg-[#05050a]/62 backdrop-blur-md">
-      <nav
-        aria-label="Reviews section navigation"
-        className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3"
-      >
-        <Link
-          href="/reviews"
-          className="kita-display text-xl leading-none text-white/80 transition hover:text-white"
-        >
-          REVIEWS
+    <header className={styles.header}>
+      <nav aria-label="Reviews section navigation" className={styles.nav}>
+        <Link href="/reviews" className={styles.brand}>
+          <Image
+            alt=""
+            aria-hidden="true"
+            className={styles.characterIcon}
+            height={34}
+            src="/reviews/navigation/reviews.webp"
+            width={34}
+          />
+          <span>Reviews</span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className={styles.links}>
           {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="px-2 py-1 text-xs tracking-[0.22em] text-white/48 uppercase transition hover:text-purple-100 focus-visible:text-purple-100 focus-visible:outline-none sm:px-3"
-            >
-              {item.label}
+            <Link key={item.href} href={item.href} className={styles.link}>
+              <Image
+                alt=""
+                aria-hidden="true"
+                className={styles.characterIcon}
+                height={32}
+                src={`/reviews/navigation/${item.icon}`}
+                width={32}
+              />
+              <span>{item.label}</span>
             </Link>
           ))}
         </div>

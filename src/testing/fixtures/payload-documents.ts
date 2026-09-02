@@ -41,6 +41,7 @@ export function createPayloadReviewDocument(
     slug: "test-review",
     tags: [{ id: "tag-1", label: "Drama" }],
     title: "Test Review",
+    updatedAt: "2026-07-11T00:00:00.000Z",
     ...overrides,
   };
 }

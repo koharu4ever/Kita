@@ -4,6 +4,31 @@ This file records third-party material incorporated into Kita. It applies only
 to the material listed below and does not grant or describe a license for the
 rest of the Kita repository.
 
+## Reviews reaction artwork
+
+The Anki-tan reaction artwork under
+`public/reviews/reactions/anki-tan/` is by **Shigeyuki** and is redistributed
+unmodified under the Creative Commons Attribution-ShareAlike 4.0 International
+license.
+
+- Artist: <https://ankiweb.net/shared/info/1136455830>
+- License: <https://creativecommons.org/licenses/by-sa/4.0/>
+- The original notice is retained as
+  `public/reviews/reactions/anki-tan/NOTICE.txt`.
+
+Kita uses part of this artwork around the Reviews discussion panel and maps
+selected images onto Giscus reactions. The latter CSS integration retains
+Giscus's native emoji as a compatibility fallback.
+
+## Reviews blog-derived visual assets
+
+The cursor images under `public/reviews/cursor/`, character navigation images
+under `public/reviews/navigation/`, and local UI preview images under
+`public/reviews/preview/` are reused from the owner's Kral blog source with the
+owner's explicit permission for Kita. They are scoped to the `/reviews`
+experience and are not represented here as generally redistributable assets
+under an open-source license.
+
 ## Project-owner supplied legacy visual assets
 
 On 2026-09-01, the project owner chose to restore the visual set used by Kita
@@ -25,6 +50,30 @@ This records project-specific authorization and repository provenance; it does
 not represent every image as generally redistributable under an open-source
 license. The public filenames remain stable because historical migrations, code
 references, and existing content may still reference them.
+
+## Tools archive port from the owner's blog
+
+The five Tools views and archive controls are adapted from the owner's
+`koharu-hexo/scripts/notes-gallery.js`,
+`source/js/notes-gallery-controls.js`, and the Notes section of
+`source/css/custom.css`, with explicit permission on 2026-09-02.
+The original visual values and class names are retained in
+`src/features/tools/components/tools-archive.css`; Hexo DOM initialization
+is replaced with React state, and article-only fields are mapped to Tools metadata.
+
+The following existing blog assets were copied with the same permission:
+
+| Kita asset                               | Blog source                                    |
+| ---------------------------------------- | ---------------------------------------------- |
+| `public/tools/archive/projects.webp`     | `source/img/start/projects.webp`               |
+| `public/tools/archive/text-hooking.webp` | `source/img/covers/learning-notes.webp`        |
+| `public/tools/archive/runtime.webp`      | `source/img/covers/dev-container.webp`         |
+| `public/tools/archive/database.webp`     | `source/img/covers/database-migrations.webp`   |
+| `public/tools/archive/capture.webp`      | `source/img/covers/kita-content-workflow.webp` |
+
+These are decorative category illustrations, not screenshots or logos of
+the linked tools. This port does not claim original authorship of the artwork
+or grant any additional reuse rights.
 
 ## RainEffect
 

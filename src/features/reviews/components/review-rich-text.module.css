@@ -1,8 +1,8 @@
 .root {
   margin-top: 2rem;
-  color: rgb(255 255 255 / 68%);
-  font-size: 1rem;
-  line-height: 2rem;
+  color: color-mix(in srgb, var(--reviews-text) 78%, transparent);
+  font-size: 1.04rem;
+  line-height: 2.05rem;
 }
 
 .root :global(p) {
@@ -13,9 +13,10 @@
 .root :global(h3),
 .root :global(h4) {
   margin: 2.75rem 0 1rem;
-  color: rgb(255 255 255 / 92%);
+  color: var(--reviews-text);
   font-weight: 600;
   line-height: 1.35;
+  scroll-margin-top: 6rem;
 }
 
 .root :global(h2) {
@@ -31,12 +32,12 @@
 }
 
 .root :global(strong) {
-  color: rgb(255 255 255 / 92%);
+  color: var(--reviews-text);
   font-weight: 650;
 }
 
 .root :global(em) {
-  color: rgb(233 213 255 / 82%);
+  color: color-mix(in srgb, var(--reviews-accent) 78%, var(--reviews-text));
 }
 
 .root :global(ul),
@@ -60,22 +61,26 @@
 
 .root :global(blockquote) {
   margin: 2rem 0;
-  border-left: 2px solid rgb(216 180 254 / 45%);
+  border-left: 2px solid var(--reviews-accent);
   padding-left: 1.25rem;
-  color: rgb(233 213 255 / 72%);
+  color: var(--reviews-muted);
   font-style: italic;
 }
 
 .root :global(a) {
-  color: rgb(233 213 255 / 92%);
+  color: var(--reviews-accent);
   text-decoration: underline;
-  text-decoration-color: rgb(216 180 254 / 45%);
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--reviews-accent) 55%,
+    transparent
+  );
   text-underline-offset: 0.2em;
 }
 
 .root :global(a:hover) {
-  color: white;
-  text-decoration-color: rgb(255 255 255 / 75%);
+  color: var(--reviews-accent-strong);
+  text-decoration-color: currentColor;
 }
 
 .root > :global(:last-child) {
