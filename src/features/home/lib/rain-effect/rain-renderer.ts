@@ -11,6 +11,7 @@ import {
   setUniform2f,
   updateTexture,
 } from "@/features/home/lib/rain-effect/webgl";
+import type { RainBackground } from "@/features/home/lib/rain-atmosphere";
 
 type RainRendererOptions = {
   brightness: number;
@@ -42,6 +43,7 @@ export class RainRenderer {
   private readonly shineImage: HTMLImageElement | null;
   private readonly positionBuffer: WebGLBuffer;
   private readonly options: RainRendererOptions;
+  private readonly textures: WebGLTexture[] = [];
   private parallaxX = 0;
   private parallaxY = 0;
 
@@ -83,17 +85,36 @@ export class RainRenderer {
     this.parallaxY = y;
   }
 
-  draw() {
+  setBackground(background: RainBackground) {
+    updateTexture(this.gl, 2, background.image);
+    updateTexture(this.gl, 3, background.previousImage);
+    setUniform1f(
+      this.gl,
+      this.program,
+      "textureRatio",
+      background.image.width / background.image.height,
+    );
+    setUniform1f(
+      this.gl,
+      this.program,
+      "previousTextureRatio",
+      background.previousImage.width / background.previousImage.height,
+    );
+  }
+
+  draw(wallpaperMix = 1) {
     const gl = this.gl;
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.useProgram(this.program);
+    setUniform1f(gl, this.program, "wallpaperMix", wallpaperMix);
     setUniform2f(gl, this.program, "parallax", this.parallaxX, this.parallaxY);
     updateTexture(gl, 0, this.liquidCanvas);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
   destroy() {
+    this.textures.forEach((texture) => this.gl.deleteTexture(texture));
     this.gl.deleteProgram(this.program);
     this.gl.deleteBuffer(this.positionBuffer);
   }
@@ -117,14 +138,16 @@ export class RainRenderer {
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
 
-    createTexture(gl, 0, this.liquidCanvas);
-    createTexture(
-      gl,
-      1,
-      this.shineImage ?? this.createTransparentTexturePlaceholder(),
+    this.textures.push(createTexture(gl, 0, this.liquidCanvas));
+    this.textures.push(
+      createTexture(
+        gl,
+        1,
+        this.shineImage ?? this.createTransparentTexturePlaceholder(),
+      ),
     );
-    createTexture(gl, 2, this.backgroundImage);
-    createTexture(gl, 3, this.backgroundImage);
+    this.textures.push(createTexture(gl, 2, this.backgroundImage));
+    this.textures.push(createTexture(gl, 3, this.backgroundImage));
 
     setUniform2f(
       gl,
