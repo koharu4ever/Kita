@@ -2,280 +2,95 @@
 
 > 最后核对：2026-09-02
 >
-> 本文是可变事实和待办的唯一来源。操作步骤见 [文档入口](./README.md) 中的专题文档。
+> 本文是可变事实、验证结果和已知边界的唯一来源。操作步骤见 [文档入口](./README.md)。实施过程和旧 PR 记录通过 Git 历史查阅，不在本页持续追加流水账。
 
-## 代码与 Git
+## 当前阶段
 
-本轮文档整理基线：
+主要功能与视觉调整已完成，项目进入内容维护和稳定性维护阶段，不再以增加框架、服务或展示效果作为默认下一步。
 
-```text
-main: c41ba89 (PR #28 merge)
-workspace: C:\dev\Kita
-```
+项目所有者已确认 PR #29 合并并部署。2026-09-02 只读评审核实：
 
-开始新任务时必须重新查询 Git；上述 SHA 是 2026-09-02 的基线证据，不代表永久 HEAD。
+- GitHub `main` 合并基线为 `6eb8b1b`（PR #29）；
+- 审查时本地 `a4a1f11` 与该 `main` 的文件内容一致；
+- 生产首页返回 HTTP 200，`/api/health` 返回 `ready`、`database: reachable`；
+- 对应 [main CI](https://github.com/koharu4ever/Kita/actions/runs/33656585588) 通过。
 
-仓库当前包含：
+这些是带日期的证据，不代表永久 HEAD，也不代替逐条生产内容、全部浏览器或真实管理员会话的验收。此次文档整理没有创建版本 tag；`package.json` 版本仍为 `0.1.0`，文档中的 `v1.0` 是原收尾目标，不是本次发布的版本号。
 
-- Next.js 16 App Router、React、TypeScript；
-- Payload CMS Admin、REST/GraphQL route 和 Local API；
-- PostgreSQL 16；
-- Users、Media、Tools、Reviews、Games collections；
-- server getter、mapper 和 feature DTO；
-- 6 个 production migration；
-- Dev Container + Docker-in-Docker；
-- Docker multi-stage standalone Production image；
-- repository Compose：web/postgres/backup；
-- GitHub Actions required `quality`；
-- 独立 OpenList Application 边界。
+正常工作区为 `C:\dev\Kita`。开始任务仍需重新检查 Git；不要根据本文推断本机已经切回 `main` 或已删除旧分支。
 
-项目已经进入 `v1.0` 收尾阶段。固定定位是自托管游戏目录与评论发布平台；后续优先完成真实内容、隔离验证和最终展示，不再扩张技术栈或业务类型。
+## 内容编辑补充验收（2026-09-02）
 
-截至 2026-09-01，PR #24 已合并到 `main` 并部署；Production `/api/health` 已返回 `200`、`ready` 和 `database: reachable`。后续视觉替换与内容整理继续使用独立小型分支，不直接修改 `main`。
+在上述生产基线之上，`codex/content-authoring` 功能分支补充 Reviews/Games 的正文 Media 插图、每次使用的图注、常用文字格式、对齐/缩进、分隔线与站内文章链接；前台共用渲染器，Admin 补充字段说明和侧栏组织。Tools 保持结构化外链目录。使用方法在功能 PR 中更新 [Payload 内容与 Media](./payload-content-and-media.md)。
 
-2026-09-02 已核实 PR #25 恢复旧视觉、PR #26 Reviews 博客式展示和 Tools 五模式归档，以及 PR #27 首页雨景与雨声均已合并到 `main`。本轮 fetch 后的 `origin/main` 为 `c41ba89`，确认 PR #28 Games 雨窗也已合并；这些合并记录不代替 PR #26 / #27 / #28 的生产部署和页面验收。
+没有新增依赖、Collection 或数据库列，不需要新的 migration；实施时没有修改生产内容或现有开发内容。项目所有者已查看本地效果并确认没有问题，授权将文档整理与基础编辑能力分别提交 PR。这里记录的是带日期的验收证据，不代表生产部署证明，也没有修复下文列出的全部评审边界；合并状态以 GitHub PR 为准。
 
-## 本地开发
+## 已交付范围
 
-正常目录为 `C:\dev\Kita`；D 盘旧工作区不再开发或提交。
+| 区域       | 当前实现                                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------ |
+| Home       | 原有壁纸按需加载、滚动雨景、主动开启的循环雨声；后台暂停与 reduced-motion 降级。                             |
+| Games      | Media 封面瀑布流、详情页、原生 dialog lightbox、城市雨窗返回入口与独立暂停控制。                             |
+| Reviews    | 每页 4 篇的服务端分页、Hero、富文本详情、目录、上一篇/下一篇、随机阅读、阅读进度、子路由主题/贴纸/鼠标效果。 |
+| Comments   | Giscus 对接 Kita GitHub Discussions；pathname 映射、光暗主题及 reaction 样式，不写入 Payload 数据库。        |
+| Tools      | 五种视图、关键词搜索、多条件筛选、排序与分页；使用现有 Collection，不新增独立搜索服务。                      |
+| About      | 项目介绍与红橙窗纱导航；原生 dialog、键盘焦点管理、Esc 关闭及路由主题色。                                    |
+| 内容后台   | Users、Media、Tools、Reviews、Games；显式内容写权限、共享校验和 Lexical 配置。                               |
+| 运行与交付 | Docker/Compose/Coolify、迁移后启动、数据库 readiness、PostgreSQL 备份 sidecar、PR CI。                       |
 
-已确认设计：
+静态图片、声音、移植效果的来源和使用边界只维护在 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)。不把背景或第三方素材描述为全部原创实现。
 
-- Dev Container 使用 Node 22 和 `node` 用户；
-- `node_modules` 与 `.next` 使用 targeted named volumes；
-- Codex CLI 固定安装在 Dev Container 镜像中，`CODEX_HOME` 使用独立的本机 named volume；
-- 本地 PostgreSQL 运行在 Dev Container 的 Docker-in-Docker；
-- `pnpm dev` 自动启动并等待 PostgreSQL healthy；
-- 本地 Media 使用 `.payload-media`，不需要 R2 credentials。
+## 数据与环境边界
 
-2026-07-20 曾完成 C SSD 全新 clone 复建：Dev Container、全新本地 PostgreSQL、主要页面、36 Vitest、4 个 backup shell 场景、check 和 build 通过。此记录只证明当时的本地复建；当前代码验证结果应重新运行命令获得。
+- 公开页面使用 `getter -> Payload Local API -> mapper -> DTO -> UI`；getter 保留 `overrideAccess: false`。
+- Games/Reviews 匿名仅可读 `published`；Media/Tools 公开可读；内容 create/update/delete 均显式要求登录。可信站主模型不是细粒度多角色权限系统。
+- 空 Collection 显示 empty state；查询失败抛错，不用静态示例掩盖故障。各 preview 路由仅供开发环境展示，不向生产数据库注入样例。
+- Games 的必填 `cover` Media relationship 是唯一封面事实源；四个旧 cover 字段已通过 migration 删除。Reviews 封面仍使用 URL/path 字段，不宣称所有图片都由 Media relationship 管理。
+- 本地使用 Dev Container、`node` 用户、Docker-in-Docker PostgreSQL 和 `.payload-media`；生产使用独立 PostgreSQL 与 R2。不要用生产凭据填充本地内容。
+- 生产数据库曾手动复建；其后的 Media 与 Media-only 增量迁移曾通过。2026-07-22 曾确认 6 条 Game 的关联、图片 URL 和 Redeploy 持久性；该历史数量不是当前内容数量。
+- 6 个已提交 migration 已有 fresh `up` 与重复执行 smoke。手动复建、fresh migration、带真实数据的升级和 dump restore 是不同验证，不能互相代替。
+- Production entrypoint 先运行 migration 再启动应用。回滚须核对数据库兼容性，不能默认只切旧镜像。
+- OpenList 为独立 Application，不共享 Kita 数据库、Volume、secret 或用户流程；不计入本站完成度。
 
-## 内容与 Payload
+## 验证证据
 
-当前 Collections：Users、Media、Tools、Reviews、Games。
+2026-09-02，针对 PR #29 同文件基线进行只读评审：
 
-读取边界：
+| 检查                  | 结果与边界                                                                                                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm test`           | 162 个 Vitest、4 个 backup shell 场景通过。                                                                                                                              |
+| `pnpm check`          | Prettier、ESLint、TypeScript 通过。                                                                                                                                      |
+| 合并后 CI             | 包含隔离 PostgreSQL/Payload integration 和 production build，结果成功；本轮没有在现有本地数据库重跑 integration。                                                        |
+| 本地 production build | PR #29 提交前已通过；本轮评审未停止开发服务再次构建。                                                                                                                    |
+| `pnpm audit --prod`   | 0 critical、0 high、15 moderate、4 low；主要链路为 Payload 间接引入的 Monaco/DOMPurify 和 drizzle 工具链/esbuild。不等于没有可利用风险，也没有以强制 override 伪造清零。 |
+| 生产只读探测          | 首页 200、数据库 readiness 正常；没有登录 Admin、读取凭据或操作数据库。                                                                                                  |
 
-- Media/Tools 允许匿名读取；
-- Reviews 匿名只读 `published`；
-- Games 匿名只读 `published`；
-- getter 使用 `overrideAccess: false`；
-- 所有环境的数据读取失败都会抛错，不用静态 fallback 掩盖故障；空 Collection 使用页面 empty state。
+前序本地手动 smoke 覆盖主要桌面/窄屏布局、路由隔离、主题、分页、目录、雨景暂停和 modal 焦点。它们不等于持续的多浏览器 E2E 回归，也没有证明每个生产内容条目和外部服务都正常。
 
-写权限边界：
+验证命令与 CI 分工见 [testing-and-ci.md](./testing-and-ci.md)。
 
-- Media、Tools、Reviews、Games 均显式要求登录才能 create/update/delete；
-- collection 配置测试覆盖全部内容 Collection 的公开读取和写权限声明；隔离 PostgreSQL smoke 另以 Reviews 验证真实 anonymous published 与 authenticated create/update/delete 链路。
+同日，本地 `codex/content-authoring` 工作区另外通过 `pnpm test`（188 个 Vitest + 4 个 backup 场景）、`pnpm check`、`SKIP_ENV_VALIDATION=true pnpm build` 与 `pnpm test:integration`（7 个场景）。隔离测试验证正文 Media、图注和站内链接的保存/重读，临时数据库容器与图片目录已自动清理。开发服务已恢复；本地预览文章的插图、图注和目录正常返回。Agent 检查 Admin 时停在登录页；随后项目所有者确认本地查看没有问题。该确认不等同于自动化浏览器端到端覆盖或生产验收。
 
-内容字段边界：
+## 评审结论与已知边界
 
-- Games/Reviews slug 只接受以单个连字符分隔的小写 ASCII 字母和数字；
-- Tools URL 与 Games links 只接受 `http/https` 绝对 URL；
-- Media、Tools、Reviews、Games 的必填 text/textarea 字段拒绝纯空白，并保留 Payload 原生 required/长度校验；
-- Games/Reviews 共用同一份 Lexical feature 配置。
+2026-09-02 评审结论为：保留 Next.js + Payload + PostgreSQL + R2 单体方案，局部收紧边界，不换技术栈。本次文档收尾及内容编辑补充不实施下列修复，也不把它们标记为解决。
 
-Games Media-only 已完成：
+| 边界            | 已确认事实与影响                                                                                                                                                           | 后续处理方向                                                                 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 生产认证 Cookie | Users 使用 `auth: true`，已安装 Payload 默认 `cookies.secure: false`；实际生产 Cookie 和额外 HSTS 保护未验证，不能宣称已经泄露。                                           | 显式配置生产 Secure 属性并验证实际响应。                                     |
+| Media 删除      | 无引用预检；Game 外键 `SET NULL` 与 `cover_id NOT NULL` 冲突。本地 Payload 先删文件再删记录，可导致记录回滚而文件丢失；R2 走另一钩子，远端删除错误可能仅记日志并留下对象。 | 删除前保护引用、明确失败反馈与核查方式；不能仅依赖外键或数据库回滚保护文件。 |
+| 发布数据契约    | slug 格式校验未保留 `random`/`preview` 等路由名；Review 封面只判非空，而 Next Image 限制远端来源。可保存出无法正常访问的文章地址或封面。                                   | Collection 级保留名校验，以及与图片加载配置一致的路径/URL 校验和测试。       |
+| 浏览器存储降级  | Reviews 主题/阅读进度直接访问 localStorage；浏览器拒绝存储时可能抛错，影响可选功能甚至页面子树。                                                                           | 存储失败回退到默认值或内存状态。                                             |
+| 备份与恢复      | PostgreSQL dump 上传链路已有证据；隔离 restore、Media 独立可恢复来源及备份 last-success 告警尚未形成完整验证闭环。                                                         | 按恢复手册做隔离演练，不在生产首次试验。                                     |
 
-- `cover` 是必填 Payload Media upload relationship；
-- Production 图片在独立 Cloudflare R2 Media bucket；
-- 公开 URL 使用 `media.kral-koharu.com` custom domain；
-- 旧 `coverSrc`、`coverAlt`、`coverWidth`、`coverHeight` schema/列已删除；
-- mapper 从 Media metadata 构造前端 cover DTO；
-- 生产 6 条 Games 的 relationship、页面、Media URL 与 Redeploy 持久性曾于 2026-07-22 验证。
+代码证据入口：[Users](../src/payload/collections/users.ts)、[Media](../src/payload/collections/media.ts)、[Media-only migration](../src/migrations/20260722_172809.ts)、[字段校验](../src/payload/fields/validators.ts)、[Reviews](../src/payload/collections/reviews.ts)、[主题状态](../src/features/reviews/components/reviews-experience-shell.tsx)。备份步骤和资产边界只维护在 [backup-and-recovery.md](./backup-and-recovery.md)。
 
-Reviews 展示层已随 PR #26 合并到 `main`：
+小型站点可暂时接受 Games 的 100 条列表上限、Reviews 导航/随机与 Tools 的全量集合读取；接近规模边界时再评估服务端查询，不提前引入缓存或搜索平台。Media 是公开资源，不用于私密附件。发布后改变 slug 也会改变 Giscus 的评论映射地址。
 
-- `/reviews` 信息流和 Review 详情使用独立 route layout，不污染其他路由；
-- 信息流以全屏封面 Hero 和打字机文案进入博客式双列卡片；列表按每页 4 篇执行 Payload 分页，并在信息流底部提供紧凑页码和前后翻页；
-- 开发环境可通过 `/reviews/preview` 查看 6 篇无数据库写入的占位内容和两页分页效果，Production 返回 404；详情保留封面、正文卡和粘性目录；
-- 详情页包含 Lexical heading 自动目录、上一篇/下一篇、随机 Review 与本地阅读位置恢复；导航与随机选择读取全部已发布 Reviews，不再受旧的 20 条上限限制，信息流仍独立执行每页 4 篇的服务端分页；
-- 光暗模式、角色导航、按 pathname 稳定散布并随页面滚动的侧边装饰贴纸和自定义鼠标严格限制在 Reviews 子路由；Giscus iframe 随主题加载对应 CSS；
-- Hero 不显示向下箭头；阅读工具在滚动后以博客式蓝色方块 SVG 按钮出现，包含主题、工具收折、随机阅读和进度/返回顶部；手机进入评论区时隐藏浮动工具，避免遮挡输入与登录；
-- 评论区沿用所有者博客的渐变标签、点阵底纹、渐变边框和七张装饰贴纸，窄屏减少贴纸并保留真实 Giscus 输入区；
-- Giscus 使用 pathname 映射到 Kita GitHub Discussions，支持配套光暗主题和 Anki-tan reaction CSS；
-- 本地 Giscus iframe 使用所有者博客已公开的同款主题，避免跨来源加载 localhost CSS 失败；部署版本使用 Kita 自己的 `/reviews/giscus/` 主题与素材；
-- 评论不进入 Payload/PostgreSQL，不新增后端内容模型或 secret。
+## 后续维护原则
 
-## Production 与数据库
-
-Coolify 使用 repository `compose.yaml`。Production `web` 等待 PostgreSQL healthy，entrypoint 先执行 Payload migration，再启动 standalone server。
-
-数据库事实边界：
-
-- Production 数据库曾由项目所有者手动复建；
-- 手动复建后 Admin、Tools、Reviews、Games 正常运行；
-- PR #17 Media/relationship 和 PR #18 Media-only cleanup 增量 migration 成功；
-- 2026-09-01 已在无 Volume 的一次性 PostgreSQL 16 上验证全部 6 个 migration、再次运行时无待执行 migration 和最终 Media-only schema；同一路径已加入 CI；
-- fresh smoke 不证明带真实 Production 数据升级、全部 `down` 或 dump restore；
-- PostgreSQL dump restore 尚未在隔离数据库演练。
-
-不要在现有本地或 Production 数据库盲跑全部初始 migration，也不要为了测试删除 Volume。
-
-### Production 发布审计（2026-09-01）
-
-本次只读取公开页面和 REST API，没有登录 Admin、写入内容或修改基础设施。结果表明代码结构已经可以收尾，Production 仍需完成以下发布门禁：
-
-- 用真实编辑内容替换演示条目、测试说明和无效日期；
-- 删除未经确认授权的下载入口，只保留官方、资料库或合法商店链接；
-- 逐项确认 Games/Reviews 的内容、外部链接和 Media 来源，确保为原创或有明确公开授权；
-- 将需要作为 Production 内容封面的替换素材通过 Payload Media 上传到 R2，并更新对应 relationship；仓库静态文件不会自动覆盖 R2 对象；
-- 清理 Tools 的标题格式和描述文案；
-- `/api/health` 已随 PR #24 部署并验证正常 readiness；故障时的 `503` 行为仍由自动测试覆盖，不在 Production 主动制造故障。
-
-以上是内容和发布阻塞项，不是新的架构缺陷。具体内容清单不进入公开仓库；Production 应由项目所有者在 Payload Admin 中逐条确认，代码任务不能替代版权与编辑判断。
-
-## Backup 与恢复
-
-已完成：
-
-- PostgreSQL custom-format dump -> private R2 sidecar 已启用并有真实对象；
-- backup shell 的 dump/校验/上传失败不会误报成功；
-- 关键账户、配置键和 secret 位置已盘点到 Bitwarden；
-- Coolify SSH keys/`authorized_keys` 的加密恢复归档曾完成 checksum 核对并上传 private R2；
-- C SSD 本地工作区丢失复建已演练。
-
-未完成或暂缓：
-
-- 隔离 PostgreSQL 16 dump restore；
-- private R2 SSH archive 再下载 round-trip；
-- OpenList 最终 storage、data inventory 和 backup/restore；
-- Coolify/VPS 端到端恢复；
-- Production secret 轮换；
-- backup last-success healthcheck/告警；
-- Bitwarden 独立离线恢复副本确认。
-
-不能把“有 R2 对象”“手动复建数据库”或“本地 clone 成功”写成完整灾难恢复闭环。
-
-## OpenList
-
-OpenList 以独立 Coolify Application 运行，不属于 Kita `v1.0` 核心用户流程。它不与 Kita 共享数据库、Volume、secret、构建流程或登录。
-
-最终 storage provider 尚未确定，当前测试挂载按可丢弃处理。OpenList data backup/restore 未闭环。
-
-## 测试与 CI
-
-GitHub Actions `quality` 运行 frozen install、format、lint、typecheck、快速 tests、隔离 PostgreSQL/Payload integration smoke 和 build；main ruleset 要求 PR 与 required check。
-
-最近文档记录的代码基线包含字段 validation、collection access/config、Dev Container workspace guard、CMS-only getter 与 readiness response 等 Vitest，以及 4 个 backup shell 场景。2026-09-01 在 Reviews 分支重新验证 126 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build` 全部通过；新增测试覆盖目录 Unicode/重复标题 ID、Review 导航、随机选择、稳定随机贴纸布局和列表分页。浏览器确认 Reviews Hero、打字机、真实翻页、桌面与 390px 窄屏、主题切换、随机路由、目录、Giscus 加载及路由隔离；Giscus 在首次留言前提示尚未创建对应 Discussion，属于预期行为。此前的 5 个真实 PostgreSQL/Payload integration 测试仍是 PR #24 基线结果，本分支没有修改 Payload schema。`SKIP_ENV_VALIDATION` 与 CI 一致，只用于受控 build；Production 运行时仍强制使用完整 R2 配置。
-
-同日将 Next.js、Payload、Sharp 和 PostCSS 更新到修复已知高危 advisory 的同栈补丁版本，并在升级后重跑上述完整门禁。锁文件的 `pnpm audit --prod --audit-level high` 结果为 0 high、0 critical；剩余 low/moderate 项来自上游固定的 Admin/CLI 传递依赖，当前不使用未经上游验证的强制 override。
-
-首页和 Games gallery 的本地浏览器收尾已完成：
-
-- 首页、About 与仓库内 Review 兼容封面已恢复为 PR #24 生成图替换之前的旧视觉；项目所有者已明确授权 Kita 使用其本地 Kral 博客资源，Git 来源版本和授权边界统一记录在根目录 `THIRD_PARTY_NOTICES.md`；
-- 首页静态视觉资源使用 WebP，首次渲染只挂载当前背景 URL，后续壁纸随轮播按需加载；保留的旧 JPEG 文件名仅用于已有内容和 migration 的路径兼容；
-- rain WebGL 在首次下滑进入雨景后初始化；回到干燥首屏或页面隐藏时停止绘制；
-- `prefers-reduced-motion` 会停止自动换图、持续动画、光标闪烁和平滑滚动；
-- Home 非活动导航使用 `inert`/`aria-hidden`，不会残留隐藏的键盘焦点；
-- Games lightbox 使用原生 modal dialog，控件始终存在，具有可见焦点、初始焦点和关闭后焦点恢复；
-- 本地浏览器已确认首页初始只引用一张壁纸、未提前初始化 WebGL，以及 gallery 打开/关闭焦点流程。这里是针对当前实现的手动 smoke，不等同于 Playwright 自动回归套件。
-
-测试缺口：
-
-- 首页、内容页和 Admin 的最小 Playwright smoke；
-- backup last-success healthcheck/告警。
-
-## Tools 五模式移植（PR #26 已合并，2026-09-02）
-
-`/tools` 复用所有者博客 `/notes/` 的界面，而不是另行设计：Minimal、Minimal+、Compact、Extended、Thumbnail 五种模式，透明蓝色背景、分类色块、实时搜索、AND 多条件筛选、上下分页和 25/50/All 每页数量均保留。控件使用 React 状态替代 Hexo 的 DOM 重排和 PJAX 初始化；偏好保存在独立的 `kita-tools-archive` localStorage key，`?view=` 可覆盖默认展示模式。样式全部限制在 Tools 类名下，不修改站点或 Reviews 的主题。
-
-必要的数据适配：
-
-- 原文章分类对应现有 Tools category；原标签筛选对应 URL 来源站点筛选，不新增数据库 tags 字段；
-- 原阅读时长与作者列改成 External link 与 Source，不虚构工具的阅读时长；
-- 默认排序尊重 CMS `sortOrder`（Curated order），另保留按新旧日期和标题排序；
-- getter 使用 `pagination: false` 读取全部工具，保留 `overrideAccess: false`；原来仅取 20 条无法支持完整客户端搜索与分页。当前小型目录采用与博客相同的全量客户端模式，规模显著增长后再评估服务端检索；
-- 四类工具使用博客授权图片作为分类装饰封面，不代表实际软件截图，也没有引入 Media/schema migration；
-- `/tools/preview` 只在 development 开放，提供 30 条展示样例用于测试分页；production 返回 404，正式 `/tools` 仍只显示 Payload 数据，查询错误仍交给 error boundary。
-
-源码集中在 `src/features/tools/`，资源来源记录在 `THIRD_PARTY_NOTICES.md`。实现不写入开发或生产内容，不执行 migration；Reviews 与 Tools 已在同一个 PR #26 中合并，生产部署状态需另行核验。
-
-验证：2026-09-02 同步 PR #25 后重新运行 137 个 Vitest 和 4 个 backup shell 场景通过；`pnpm check` 与 `SKIP_ENV_VALIDATION=true pnpm build` 通过，包含超过 20 篇 Review 的导航回归测试。此前本地浏览器检查五模式、分类与来源筛选、全角关键词、清空/空结果、标题排序、25/All、第二页及 390px 布局；保留键盘焦点和 reduced-motion 支持。生产预渲染的 preview 包含 404 边界、不含样例工具。手机高级选项只修正原版负边距造成的越界，未重设整体视觉。
-
-本次读取真实本地 `/tools` 返回 200，但当前开发数据库没有 Tools 条目，页面正确显示空状态；样例只出现在 `/tools/preview`。从 Tools 客户端导航到 Reviews 后 Tools 根样式容器消失，Reviews 页面正常渲染。未据此推断生产内容数量。
-
-## 当前待办
-
-### 首页雨景与雨声（PR #27 已合并，2026-09-02）
-
-`codex/home-rain-atmosphere` 最初从 PR #25 基线独立创建，提审前同步到已合并 PR #26 的 `origin/main`；保留 Reviews/Tools 内容，PR 差异只涉及首页雨景、音频、测试与说明。PR #27 已由项目所有者合并，merge commit 为 `72481e1`；生产部署结果未在本次任务核验。
-
-- 保留原有全部背景图片和轮换顺序；移除独立两屏玻璃区块的边线、底色和整面模糊。
-- 雨滴画布固定覆盖首页视口，通过连续滚动进度控制显现和雨量，不随内容区块从屏幕底部滑入。
-- 壁纸与水滴折射共用已加载图片和 1.8 秒换图过渡，采用同样的居中 cover 裁切；取消首页壁纸单独的呼吸缩放，避免水滴内部图像与外部景物错位。换图不重建水珠模拟。
-- 页面首屏隐藏声音入口；下滑后右下角只显示无底色的扬声器图标，悬停/键盘聚焦才显示提示。默认静音；只有主动点击后才下载约 362 KB 的 DRAGON-STUDIO 雨声片段并建立 Web Audio。18 秒片段在解码后做 2 秒等功率交叉淡化，得到约 16 秒连续循环；固定低音量，不随滚动改变。播放中即使回到顶部也保留关闭入口；切到后台淡出暂停，离开首页中止加载并释放资源。素材来源和处理方式只维护在根目录 `THIRD_PARTY_NOTICES.md`。
-- 低于 768px、粗指针、减少动态效果或 WebGL 失败时保留清晰背景，不强行显示模糊玻璃。导航和文字不经过水滴渲染，保持可操作性。
-- 不新增依赖，不修改 Payload/schema、数据库、Media、生产内容或基础设施。
-
-2026-09-02 提审前同步 PR #26 基线后，在 Dev Container 以 `node` 用户通过 152 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build`。新增测试覆盖等功率接缝、按需加载、后台暂停、加载中离开页面及资源释放。对最终 MP3 解码后的片段进行数值核对：循环 16 秒，没有全零帧或削波，重叠段与主体平均音量差约 0.2 dB，回绕边界保持原素材相邻采样关系。浏览器已确认首屏隐藏入口、下滑显示图标、点击成功加载播放，以及播放中回顶仍保留关闭入口；自动检查和本地验收不代表所有浏览器/设备的听感均已覆盖。本轮未重新运行数据库 integration smoke，也未合并或部署。
-
-### Games 雨窗入口（PR #28 已合并，2026-09-02）
-
-`codex/games-window-return` 从 PR #27 合并后的 `origin/main` 创建，项目所有者已确认本地效果。PR #28 已合并到 `main`（`c41ba89`）；本轮没有操作生产部署，以下验证仍是本地验证。
-
-- 正式 `/games` 的第一格使用 Urban Rain 城市雨窗，取代大号 GAMES / Return 卡片，保留原瀑布流、真实 Game 卡片、详情和 lightbox 链路；页面保留辅助技术可读的 Games 主标题。
-- 城市底图及左右透明窗玻璃均为 3840 × 2400，位于 `public/games/window/`，随 Docker 的 public 目录一起发布。总大小约 2.62 MB；没有为本地预览之外的环境设置素材读取禁令。来源、文件映射与所有者的公开使用确认仅维护在 `THIRD_PARTY_NOTICES.md`。
-- 可见水珠、折射与下滑水痕复用已有 RainEffect 底层模块，Games 使用独立生命周期与参数，不改变 Home。雨窗像素密度最高 1.75，绘制最高 30fps；离屏、后台或暂停时停止绘制，卸载时释放渲染资源。
-- 鼠标悬停时仅窗内图层约 2px 轻微晃动，返回文字和控件不移动；暂停会同时停止雨滴与晃动。减少动态效果时仅显示静态分层窗景；WebGL 失败时保留静图，不阻断返回链接。
-- 点击窗景或键盘激活返回首页，暂停按钮有独立可读名称和焦点样式；不加入音频、时钟、VHS、像素化或 Wallpaper Engine 运行时。
-- `/games/preview` 仅供 development 布局检查，复用同一正式组件并显示非交互封面样例；production/test 返回 404。它不读写 Payload，不注入虚假 Game 条目。
-- 已移除旧静态窗、GIF 组件和本地素材 route，也移除仅用于该 route 的 standalone tracing 排除规则；不再保留两套入口实现。
-- 不修改 Payload/schema、migration、数据库、Media/R2 或生产配置。
-
-2026-09-02 正式接入版在 Dev Container 以 `node` 用户通过 160 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build`。移除临时素材 route 后同时删除了其 10 个测试，数量下降不代表测试失败。检查时清除了两份已核实损坏的 `.next/dev/types` 自动生成文件，重跑检查和构建通过；没有删除 `.next` 目录或数据卷。
-
-浏览器已在正式 `/games` 确认三张素材均以 3840 × 2400 加载、雨滴画布显示、暂停/继续及键盘返回首页正常；在复用正式组件的 preview 中确认悬停晃动、暂停停止晃动、1440px 桌面与 390px 窄屏无横向溢出。本地目前没有已发布 Game，多封面排版仅使用 preview 样例检查，没有为此写入数据库；真实生产条目、lightbox 与部署后的验收仍需部署后核对。本轮未运行数据库 integration smoke；CI 配置仍包含该检查。
-
-### About 窗纱导航（提审中，2026-09-02）
-
-`codex/about-compact-nav` 从 PR #28 合并后的 `origin/main` 创建。小目录经过本地预览后，按项目所有者的新方向改成全屏窗纱导航：保留右上角弧形展开，使用呼应 About 晚霞的红橙半透明层、轻微模糊和纯 CSS 细织纹，四个原有链接在桌面偏右成组排列、窄屏居中。后续配色微调减轻了织纹与模糊、移除灰紫去饱和效果；链接默认纯白，hover/键盘聚焦时文字、编号、短线及焦点框直接复用首页主导航的 Tailwind 500 色阶：Home 琥珀、Games 蓝、Reviews 紫、Tools 绿，不再使用粉彩替代值或同色雾状柔光。没有新增图片或依赖；原背景和正文内容、其他路由及数据库均不变。
-
-导航采用原生 modal dialog：打开时正文淡出、背景保留，锁定页面滚动并阻止焦点进入底层页面；支持关闭按钮、Esc、点击窗纱空白处收起和返回触发按钮，卸载后恢复滚动样式。关闭后导航不可聚焦；减少动态效果偏好下禁用过渡。不支持离散 display/overlay 过渡的浏览器仍可正常开关，但可能没有完整弧形退场。项目所有者已确认本地效果并授权提 PR；本轮仅提审，不合并、不部署。
-
-最终配色版在提交前重新通过 162 个 Vitest、4 个 backup shell 场景、`pnpm check` 和 `SKIP_ENV_VALIDATION=true pnpm build`。早期结构验证曾仅清理已核实损坏的 `.next/dev/types/validator.ts` 自动生成文件，没有删除源码、目录或数据卷。浏览器检查了 1440px 桌面、390px 窄屏、原生 modal 状态、键盘进入链接、Esc 关闭后焦点/滚动恢复，以及 Home 跳转后导航与滚动锁清理，并逐项确认四个链接聚焦时的文字与短线使用首页同一色值。以上不是生产或跨浏览器验收；本轮未运行数据库 integration smoke。
-
-### 当前收尾
-
-- [x] 根 README、Home/About 定位与公开 metadata；
-- [x] 清理公开页面的 placeholder/draft 工程文案；
-- [x] 移除 repository development seed、运行时静态 fallback 和 Games gallery 中针对商业游戏 archive 的专用入口；
-- [x] 统一列表 empty、站点 error/not-found/loading，并对详情查询做请求级去重；
-- [ ] 从 Production Games 删除未经授权的下载入口和测试说明，并确认公开 API 不再返回；
-- [x] 恢复 PR #24 之前的仓库静态背景与兼容封面，并保留现有 WebP 性能路径；
-- [x] 记录恢复视觉的 Git 来源和项目所有者对 Kita 的使用授权，同时不将其误写为通用开源许可；
-- [ ] 用真实 Game 内容替换演示条目，并清理无效发布日期；
-- [ ] 将 Production Games 的 R2 Media 替换为原创或明确授权素材，逐条复核外部链接；
-- [ ] 确认 Production Reviews 为原创或已获公开授权；
-- [ ] 修正 Production Tools 的标题格式与描述；
-- [x] PostgreSQL 16 完整 fresh migration、再次运行无待执行 migration 和 Media-only schema smoke；
-- [x] 真实 Payload anonymous published/authenticated Reviews access smoke；
-- [x] 首页资源按需加载、reduced motion、Home 导航与 Games gallery 键盘焦点收尾；
-- [x] DB-backed `/api/health`、安全 503 响应与 Compose `web` healthcheck；
-- [x] `codex/portfolio-v1-readiness` 通过 PR #24 合并到 `main`；
-- [x] 合并部署后验证 `/api/health` readiness；
-- [x] 提交并 push `codex/reviews-blog-experience`，通过本地 test/check/build；
-- [x] Reviews 与 Tools 已通过 PR #26 合并到 `main`；
-- [ ] Reviews 与 Tools PR 合并部署后验证列表、详情、主题、目录、随机入口、五种工具视图、Giscus 和首条 Discussion；
-- [ ] 完成内容清理后验证 Games、Reviews、Tools、Media URL 和 Redeploy 持久性；
-- [ ] 最终 Production 截图与准确发布材料。
-
-### 随后独立完成
-
-- [x] Tools、Reviews、Games 统一为 CMS-only；空数据与查询错误不再被演示内容掩盖；
-- [ ] 明确 Review 是否必须关联 Games 馆藏中的条目；只有业务规则成立后才做 relationship migration。
-
-### 低优先级/条件触发
-
-- [ ] 清理真实日期后再评估 `releaseDate` date migration；
-- [ ] 出现误删痛点后再评估 Trash；
-- [ ] 出现多人编辑后再评估角色和 drafts/versions；
-- [ ] 数据价值提高后安排 restore/DR 演练和 last-success 监控；
-- [ ] OpenList storage 定型后补 data backup。
-
-## 当前不做
-
-不因为“后端看起来简单”而引入 Redis、Prisma、微服务、Kubernetes、自建上传服务、大型监控平台、复杂角色系统或深度 OpenList API 集成。
-
-## 下一步
-
-下一步审查 About 窗纱导航 PR 与 CI；合并、部署由项目所有者另行决定。PR #26 / #27 / #28 的生产验收与 Production 内容、Media 清理仍需单独确认，部署后核验页面与 Redeploy 持久性；首次真正留言为对应 pathname 创建 GitHub Discussion 时，再核验自定义 reaction、光暗主题和移动端。Review–Game relationship 只有在真实内容证明一 Review 必属一 Game 时才实施。
+- 当前停止无明确需求的功能扩展；根据实际故障、内容规模和维护成本决定下一项工作。
+- 优先处理认证、Media 安全和内容发布边界；是否实施及何时实施由项目所有者另行决定，不自动开启修复、迁移或部署。
+- Production 内容、外链和素材来源由站主持续维护。此次收尾没有重新逐条审计内容，不能将“网站基本完成”解释为所有来源、链接、日期或评论均已核验。
+- 对外说明只描述已实现的能力；不宣称高并发实测、完整灾难恢复、全面安全认证或尚未实施的修复。
+- 新功能按 [产品路线](./product-roadmap.md) 判断必要性；不为“显得完整”新增框架、服务、页面或文档。

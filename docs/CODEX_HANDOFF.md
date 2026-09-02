@@ -1,6 +1,6 @@
 # Kita Codex 交接
 
-> 最后核对：2026-09-01
+> 最后核对：2026-09-02
 >
 > 正常项目根目录：`C:\dev\Kita`。D 盘旧工作区已经退役。
 
@@ -38,17 +38,11 @@ Production 通过 Coolify 使用仓库 `compose.yaml` 运行 `web`、`postgres` 
 
 详细结构只维护在 [architecture.md](./architecture.md)。
 
-## 当前最重要的事实
+## 如何确认当前状态
 
-- `main` 的功能基线包含 PR #17 Media/R2、PR #18 Games Media-only 和后续文档纠偏。
-- Games 封面以必填 Media relationship 为唯一事实源；旧 cover URL/alt/width/height 列已删除。
-- Production 数据库曾由项目所有者手动复建；后续增量 migration 和 Production smoke 通过，全部 migration 也已在一次性 PostgreSQL 16 中完成 fresh `up` 验证；带真实数据的 Production 升级和 dump restore 仍未验证。
-- PostgreSQL -> private R2 backup 已有真实对象；隔离 restore 演练尚未完成。
-- C SSD 的本地 clone + Dev Container + 全新本地 PostgreSQL 复建曾验证通过。
-- OpenList 最终 storage/data backup 仍延期。
-- Media、Tools、Reviews 和 Games 的写操作均显式要求登录；详细字段规则与测试边界见 [Payload 内容与 Media](./payload-content-and-media.md)。
+合并/部署基线、测试证据、生产数据库历史和未处理的评审边界统一读取 [current-project-status.md](./current-project-status.md)。不要从旧 PR 的“下一步”继续自动扩展功能，也不要把文档收尾理解为已修复其中全部问题。
 
-带日期的完整事实和待办只维护在 [current-project-status.md](./current-project-status.md)。
+Games/Media 的数据模型和内容维护步骤见 [Payload 内容与 Media](./payload-content-and-media.md)；恢复是否已经演练必须单独核对，不能由网站正常运行推断。
 
 ## 正常开发入口
 
@@ -84,9 +78,9 @@ pnpm build
 
 `.env` 永不提交。真实配置保存在 Coolify/Bitwarden。恢复边界见 [backup-and-recovery.md](./backup-and-recovery.md)。
 
-## 当前推荐工作顺序
+## 如何选择后续工作
 
-具体优先级只维护在 [current-project-status.md](./current-project-status.md) 和 [product-roadmap.md](./product-roadmap.md)，不要在交接页复制可变任务清单。
+可变优先级只维护在 [current-project-status.md](./current-project-status.md)；[product-roadmap.md](./product-roadmap.md) 只描述稳定的维护原则。没有新的明确授权时，不自动实施修复、迁移、合并或部署。
 
 不要优先引入 Redis、Prisma、微服务、Kubernetes、复杂角色系统、Payload drafts/versions 或大型监控平台。选择依据见 [product-roadmap.md](./product-roadmap.md)。
 
