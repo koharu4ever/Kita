@@ -4,6 +4,22 @@ This file records third-party material incorporated into Kita. It applies only
 to the material listed below and does not grant or describe a license for the
 rest of the Kita repository.
 
+## Documentation screenshots
+
+The JPEG files in `docs/images/` are browser captures taken on 2026-09-03 to
+document Kita's implemented interface: five public-page captures and one local
+Payload Admin capture (`admin-editor.jpg`). They are not generated mockups.
+They retain the artwork and content visible on those pages; taking a screenshot
+does not create a new license for the underlying material.
+
+`review-detail.jpg`, `review-reading.jpg`, and `admin-editor.jpg` show the existing
+Persona 3 article (public route `/reviews/P3F`, also present in the local database).
+Its on-page attribution names **Persona 3 Archive /
+ペルソナ3アーカイブ** and links to
+<https://note.com/p3_mtaou03/n/nea9687a46636>. The documentation does not claim
+authorship of that source article or independently verify its historical claims.
+Other visible visual assets retain the project-specific provenance below.
+
 ## Reviews reaction artwork
 
 The Anki-tan reaction artwork under

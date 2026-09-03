@@ -9,6 +9,8 @@ A self-hosted game catalog and long-form review site with a visual-novel-inspire
 
 [中文说明](#中文说明) · [English guide](#english-guide)
 
+**快速了解 / Explore:** [界面截图 / Screenshots](#界面一览--screenshots) · [架构 / Architecture](#架构与技术分工) · [本地启动 / Run locally](#本地启动)
+
 **在线访问 / Live:** [Home](https://kita.kral-koharu.com/) ·
 [Games](https://kita.kral-koharu.com/games) ·
 [Reviews](https://kita.kral-koharu.com/reviews) ·
@@ -17,6 +19,34 @@ A self-hosted game catalog and long-form review site with a visual-novel-inspire
 
 **Stack:** Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · Payload CMS 3 ·
 PostgreSQL 16 · Cloudflare R2 · Giscus · Vitest · Docker Compose · GitHub Actions
+
+## 界面一览 / Screenshots
+
+首页以雨景连接各个内容区；进入 Games 看馆藏，进入 Reviews 阅读文章，进入 Tools 查找资源。
+
+The rain-themed home leads to the game gallery, long-form reviews, and resource archive.
+
+![Kita 首页：雨夜背景与四个内容入口 / Home with rain scenery and section navigation](./docs/images/home.jpg)
+
+| Games · 游戏画廊                                                                                            | Reviews · 文章详情                                                                                   |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [![Games：Media 封面与雨窗返回入口](./docs/images/games.jpg)](./docs/images/games.jpg)                      | [![Reviews：文章封面、标题与摘要](./docs/images/review-detail.jpg)](./docs/images/review-detail.jpg) |
+| 点击封面预览图片，再进入游戏资料。 / Open a cover, then explore the game entry.                             | 文章由 Payload 管理，公开页面展示已发布内容。 / Published articles managed in Payload.               |
+| **Reading · 正文与目录**                                                                                    | **Tools · 资源目录**                                                                                 |
+| [![阅读页：富文本正文、目录与阅读工具](./docs/images/review-reading.jpg)](./docs/images/review-reading.jpg) | [![Tools：扩展视图、搜索与分类筛选](./docs/images/tools.jpg)](./docs/images/tools.jpg)               |
+| 从正文标题生成目录，提供阅读进度与主题切换。 / Body-derived contents, reading progress, and theme controls. | 同一批数据可切换五种视图。 / Five views over the same resource collection.                           |
+
+以上为 **2026-09-03 的公开实站截图**，不是设计稿或自动填充的展示数据；点击小图可查看原图。截图时的内容不代表克隆仓库后自带的数据。素材归属见 [Third-Party Notices](./THIRD_PARTY_NOTICES.md)。
+
+Captured from the public site on **2026-09-03**, not mockups or seeded demo content. Click a thumbnail for the full image. Site content is not bundled with a fresh checkout.
+
+**Admin · 内容编辑（本地） / Content editor (local)**
+
+![本地 Payload Admin：Lexical 富文本工具栏与图片插入菜单 / Local Payload Admin with rich-text and image insertion controls](./docs/images/admin-editor.jpg)
+
+这张截图来自本地 Admin，展示现有文章的富文本工具栏与插入菜单；不是公开后台入口，也没有为截图修改或保存文章。正文插图选择 Payload Media，详细步骤见 [内容编辑指南](./docs/payload-content-and-media.md#写-review-或-game-正文)。
+
+This local Admin capture shows the existing article's Lexical toolbar and insertion menu. The editor was inspected without changing or saving content; body images are selected from Payload Media. Admin editing requires authentication.
 
 ## 中文说明
 
@@ -51,21 +81,23 @@ Kita 是一个单体应用：**Payload 集成在 Next.js 内，不是第二个�
 | Docker Compose / Coolify          | 应用打包、服务编排、运行配置与部署。                                     |
 | Vitest / GitHub Actions           | 单元测试、备份失败路径、隔离数据库验证和构建门禁。                       |
 
-下面是组件关系图，也供英文章节共用：
+先把它理解为“一个应用、一个数据库、一个图片存储”。图中框内属于同一个 Next.js 应用；Giscus 是独立的评论服务，也供英文章节共用：
 
 ```mermaid
 flowchart LR
-  Visitor[Visitor] --> App[Next.js App Router]
-  Owner[Site owner] --> Admin[Payload Admin]
-  Admin --> Payload[Payload CMS]
-  App --> Getter[Server getter]
-  Getter --> Payload
-  Payload --> Database[(PostgreSQL)]
-  Payload --> Media[Media adapter]
-  Media --> Local[Local files - development]
-  Media --> R2[Cloudflare R2 - production]
-  Visitor --> Comments[Giscus / GitHub Discussions]
+  Visitor["访客 / Visitor"] --> Site
+  Owner["站主 / Owner"] --> Admin
+  subgraph App["Kita · one Next.js application"]
+    Site["React pages + Server getters"] -->|Local API| CMS["Payload · access + validation"]
+    Admin["Payload Admin + Lexical editor"] --> CMS
+  end
+  CMS --> DB[("PostgreSQL · content and metadata")]
+  CMS -->|Media adapter| R2["R2 · production images"]
+  Visitor -->|Image requests| R2
+  Visitor -->|Comments| Giscus["Giscus / GitHub Discussions"]
 ```
+
+读文章时，页面从 Payload 读取已发布的数据，再整理为 UI 所需的字段；写文章时，站主在 Admin 保存标题、正文和发布状态。两条流程使用同一套内容模型，不是两个同步系统。本地开发把 R2 替换为 `.payload-media` 文件目录；数据库仍保存图片信息和关联，而非图片文件。
 
 公开页面的数据链路为：
 
@@ -76,7 +108,7 @@ Route -> server getter -> Payload Local API -> mapper -> feature DTO -> React UI
 
 - **getter** 负责查询与公开读取条件，不绕过 Payload 权限。
 - **mapper** 把 CMS 文档转换为页面需要的结构。
-- **DTO** 是 UI 使用的数据形状，让组件不直接依赖数据库字段或生成的 CMS 类型。
+- **DTO** 是 UI 使用的数据形状，隔离主要页面字段与数据库文档；正文仍采用 Lexical JSON，并非完全与 CMS 解耦。
 - 例如 Game 查询会解析关联的 Media；mapper 从图片元数据生成封面信息，而不是在 Game 表重复保存 URL、宽高等字段。
 
 Payload 提供现成的后台、认证和存储基础；Kita 实现内容模型、发布规则、权限配置、数据映射、前台交互、迁移、部署及测试。没有再引入独立 API 框架、第二套 ORM、Redis 或微服务。
@@ -136,6 +168,8 @@ Payload 提供现成的后台、认证和存储基础；Kita 实现内容模型�
 
 本地不需要 R2 凭据。Media 是公开资源，文章尚未发布并不使关联图片保密。Game 封面使用 Media relationship；Review 封面仍是路径/URL 字段，两者不要混淆。已知的保留 slug 和图片校验边界见下方限制说明。
 
+正文支持 Media 插图、每次使用的图注及常用富文本格式；编辑步骤见 [内容维护指南](./docs/payload-content-and-media.md#写-review-或-game-正文)。正文保存在数据库中，不通过向仓库添加 Markdown 自动发布。
+
 ### 测试与生产部署
 
 所有检查在 Dev Container 中以 `node` 用户运行。先用 `Ctrl+C` 停止开发服务，避免 dev/build 同时写 `.next`：
@@ -189,6 +223,8 @@ Motion effects include reduced-motion handling and resource cleanup. Development
 
 **Payload runs inside the Next.js application; it is not a second backend service to deploy.** See the shared [architecture diagram](#架构与技术分工) above.
 
+Think of it as one application, one database, and image storage. Visitors read published content through server getters; the owner writes content through Payload Admin. Both paths use the same models. PostgreSQL holds records and relationships, while R2 holds production image files; local development uses `.payload-media` instead. Giscus comments live separately in GitHub Discussions.
+
 | Technology                        | Responsibility                                                                                 |
 | --------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Next.js App Router                | Routes, server-rendered pages, metadata, and Payload Admin/API integration.                    |
@@ -209,7 +245,7 @@ Route -> server getter -> Payload Local API -> mapper -> feature DTO -> React UI
 
 - A **getter** performs the query and keeps Payload access checks enabled.
 - A **mapper** converts CMS documents into the shape needed by the page.
-- A **DTO** is the UI-facing data contract, keeping components independent of generated CMS types.
+- A **DTO** isolates the main UI fields from database documents. Article bodies still use Lexical JSON; this is not complete independence from the CMS.
 - For example, a Game query resolves its Media relationship; the mapper derives cover information from image metadata instead of duplicating the URL and dimensions in the Game record.
 
 Payload supplies the Admin, authentication, and storage foundation. Kita implements content models, publication and access rules, mapping, public interactions, migrations, deployment, and tests. It does not add a separate API framework, second ORM, Redis, or microservices.
@@ -268,6 +304,8 @@ Empty lists are expected on a new database. Production content is not imported a
 - **Access:** Anonymous visitors can read only published Games/Reviews. Media and Tools are public; content writes require authentication. Admin can show unpublished entries, but public getters still exclude them.
 
 Local development needs no R2 credentials. Media is public even when referenced by an unpublished entry. Game covers use Media relationships; Review covers still use path/URL fields. Reserved-slug and image-validation limitations are noted below.
+
+Article bodies support Media images, per-use captions, and common rich-text formatting. See the [editing guide](./docs/payload-content-and-media.md#写-review-或-game-正文). Articles are stored in the database; adding Markdown to the repository does not publish an article.
 
 ### Tests and production deployment
 
