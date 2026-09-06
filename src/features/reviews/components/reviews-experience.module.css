@@ -455,20 +455,26 @@
 @media (hover: hover) and (pointer: fine) {
   .shell,
   .shell * {
-    cursor: url("/reviews/cursor/kral-cursor-default.png"), auto;
+    cursor:
+      url("/reviews/cursor/konata-default.png") 7 4,
+      auto;
   }
 
   .shell a,
   .shell button,
   .shell a *,
   .shell button * {
-    cursor: url("/reviews/cursor/kral-cursor-pointer.png"), pointer !important;
+    cursor:
+      url("/reviews/cursor/konata-pointer.png") 8 6,
+      pointer !important;
   }
 
   .shell input,
   .shell textarea,
   .shell [contenteditable="true"] {
-    cursor: url("/reviews/cursor/kral-cursor-text.png"), text !important;
+    cursor:
+      url("/reviews/cursor/konata-text.png") 23 26,
+      text !important;
   }
 }
 
