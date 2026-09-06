@@ -9,20 +9,26 @@
 @media (hover: hover) and (pointer: fine) {
   *,
   body {
-    cursor: url("../cursor/kral-cursor-default.png"), auto;
+    cursor:
+      url("../cursor/konata-default.png") 7 4,
+      auto;
   }
 
   a,
   button,
   a *,
   button * {
-    cursor: url("../cursor/kral-cursor-pointer.png"), pointer;
+    cursor:
+      url("../cursor/konata-pointer.png") 8 6,
+      pointer;
   }
 
   input,
   textarea,
   [contenteditable="true"] {
-    cursor: url("../cursor/kral-cursor-text.png"), text;
+    cursor:
+      url("../cursor/konata-text.png") 23 26,
+      text;
   }
 }
 

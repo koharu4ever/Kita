@@ -38,12 +38,31 @@ Giscus's native emoji as a compatibility fallback.
 
 ## Reviews blog-derived visual assets
 
-The cursor images under `public/reviews/cursor/`, character navigation images
+The legacy `kral-cursor-*.png` images under `public/reviews/cursor/`, character navigation images
 under `public/reviews/navigation/`, and local UI preview images under
 `public/reviews/preview/` are reused from the owner's Kral blog source with the
 owner's explicit permission for Kita. They are scoped to the `/reviews`
 experience and are not represented here as generally redistributable assets
 under an open-source license.
+
+## Reviews Konata cursors
+
+`public/reviews/cursor/konata-{default,pointer,text}.png` are derived from
+**线框 / xian_kuang**'s “泉此方光标-6cursor” Linux package, supplied by the
+project owner on 2026-09-06 for this integration.
+
+- Source: <https://ko-fi.com/s/f4ff69ec1b>
+- Author: <https://x.com/xiankuangxk>
+- Package theme: `scm-quancifang-cursor-ac686609`
+- Conversion: first 48px Xcursor frame, decoded from premultiplied ARGB to PNG;
+  original hotspots retained (default: 7,4; pointer: 8,6; text: 23,26).
+
+The site uses static native browser cursors, scoped to Reviews and its Giscus
+theme on devices with a fine pointer and hover. Desktop animation and installer
+scripts are not included or executed. The supplied archive contains author
+attribution but no license text; this notice records provenance and does not
+grant an open-source redistribution license for the artwork. Legacy cursor
+files remain available for previously cached Giscus stylesheets.
 
 ## Project-owner supplied legacy visual assets
 
