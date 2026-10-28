@@ -1,9 +1,17 @@
 import type { MetadataRoute } from "next";
 
+import { getSitemapDetails } from "@/server/seo/get-sitemap-details";
+
 import { siteConfig } from "@/config/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Read current publication state on every request, including unpublishes and deletions.
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const details = await getSitemapDetails();
+
   return [
+    ...details,
     { changeFrequency: "weekly", priority: 1, url: siteConfig.url },
     {
       changeFrequency: "weekly",
