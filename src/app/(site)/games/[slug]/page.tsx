@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/config/metadata";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
@@ -23,14 +24,18 @@ export async function generateMetadata({
 
   if (!game) {
     return {
-      title: "Game not found",
+      title: "Game not found | Kita",
+      robots: { index: false },
     };
   }
 
-  return {
-    title: `${game.title} | Kita Games`,
-    description: game.summary,
-  };
+  return pageMetadata(
+    `${game.title} | Kita`,
+    game.summary,
+    `/games/${encodeURIComponent(game.slug)}`,
+    game.cover.src,
+    "website",
+  );
 }
 
 export default async function GamePage({ params }: GamePageProps) {
