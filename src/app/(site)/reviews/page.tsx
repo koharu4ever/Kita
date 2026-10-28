@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/config/metadata";
 import { notFound } from "next/navigation";
 
 import { ReviewsPage as ReviewsFeaturePage } from "@/features/reviews/components/reviews-page";
@@ -10,14 +10,18 @@ import { getReviewsPage } from "@/server/reviews/get-reviews";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Reviews | Kita",
-  description: "Read Kita's published long-form game reviews.",
-};
-
 type ReviewsPageProps = {
   searchParams: Promise<{ page?: string | string[] }>;
 };
+
+export async function generateMetadata({ searchParams }: ReviewsPageProps) {
+  const page = normalizeReviewPage((await searchParams).page);
+  return pageMetadata(
+    page > 1 ? `Reviews — Page ${page} | Kita` : "Reviews | Kita",
+    "Personal reviews and reflections on games and visual novels from Kita.",
+    page > 1 ? `/reviews?page=${page}` : "/reviews",
+  );
+}
 
 export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
   const page = normalizeReviewPage((await searchParams).page);

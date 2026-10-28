@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/config/metadata";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
@@ -27,13 +28,17 @@ export async function generateMetadata({
   if (!review) {
     return {
       title: "Review not found | Kita",
+      robots: { index: false },
     };
   }
 
-  return {
-    title: `${review.title} | Kita`,
-    description: review.excerpt,
-  };
+  return pageMetadata(
+    `${review.title} | Kita`,
+    review.excerpt,
+    `/reviews/${encodeURIComponent(review.slug)}`,
+    review.coverImage,
+    "article",
+  );
 }
 
 export default async function ReviewPage({ params }: ReviewPageProps) {
