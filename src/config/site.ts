@@ -1,7 +1,7 @@
 export const siteConfig = {
   description:
-    "A self-hosted game catalog and review publishing platform built with Next.js and Payload CMS.",
+    "Kita is a personal collection of games and visual novels, with game information, thoughtful reviews, and curated tools and references.",
   name: "Kita",
-  title: "Kita — Game Catalog & Reviews",
+  title: "Kita — Games, Visual Novels & Personal Reviews",
   url: "https://kita.kral-koharu.com",
 } as const;
